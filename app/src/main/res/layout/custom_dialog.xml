@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:cardCornerRadius="10dp">
+
+        <TextView
+            android:id="@+id/tvInputCustomDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Input Data"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal" />
+
+        <EditText
+            android:id="@+id/edtJudul"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="Masukkan Judul"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp" />
+
+        <EditText
+            android:id="@+id/edtCatatan"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="Masukkan Catatan"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="100dp" />
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:layout_gravity="center"
+            android:text="Input" />
+    </androidx.cardview.widget.CardView>
+</layout>
