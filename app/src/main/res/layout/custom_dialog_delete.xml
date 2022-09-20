@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        app:cardCornerRadius="10dp">
+
+        <TextView
+            android:id="@+id/tvInputCustomDialogDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete Data"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:id="@+id/btnDeleteYes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="50dp"
+            android:layout_gravity="center"
+            android:text="YES" />
+        <Button
+            android:id="@+id/btnDeleteNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="50dp"
+            android:layout_gravity="center"
+            android:text="NO" />
+    </androidx.cardview.widget.CardView>
+</layout>

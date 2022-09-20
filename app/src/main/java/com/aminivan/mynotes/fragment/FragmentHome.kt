@@ -2,7 +2,6 @@ package com.aminivan.mynotes.fragment
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +21,6 @@ import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.helper.DateHelper
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
-import com.aminivan.mynotes.viewmodel.MainViewModel
 import com.aminivan.mynotes.viewmodel.NoteAdapter
 
 class FragmentHome : Fragment() {
@@ -104,5 +101,4 @@ class FragmentHome : Fragment() {
             }
         })
     }
-
 }
