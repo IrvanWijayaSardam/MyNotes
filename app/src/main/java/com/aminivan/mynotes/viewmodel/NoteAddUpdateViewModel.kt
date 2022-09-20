@@ -1,6 +1,7 @@
 package com.aminivan.mynotes.viewmodel
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.repository.NoteRepository
@@ -16,4 +17,6 @@ class NoteAddUpdateViewModel(application: Application) : ViewModel() {
     fun delete(note: Note) {
         mNoteRepository.delete(note)
     }
+    fun getAllNotes(): LiveData<List<Note>> = mNoteRepository.getAllNotes()
+
 }

@@ -2,6 +2,7 @@ package com.aminivan.mynotes.fragment
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +11,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.database.NoteRoomDatabase
@@ -20,6 +23,8 @@ import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.helper.DateHelper
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
+import com.aminivan.mynotes.viewmodel.MainViewModel
+import com.aminivan.mynotes.viewmodel.NoteAdapter
 
 class FragmentHome : Fragment() {
 
@@ -28,7 +33,10 @@ class FragmentHome : Fragment() {
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
 
     private var note: Note? = null
-    
+
+    private lateinit var adapter: NoteAdapter
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,29 +48,33 @@ class FragmentHome : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var context = binding.rvNotes.context
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
         note = Note()
         dialogBinding = CustomDialogBinding.inflate(layoutInflater)
+
+        setAdapter()
+
         binding.fabAdd.setOnClickListener(){
-            var context = binding.rvNotes.context
             val dialog = Dialog(context)
             dialog.setContentView(R.layout.custom_dialog)
-            val judul = "Test"
-            val catatan = "test"
+            val judul : EditText = dialog.findViewById(R.id.edtJudul)
+            val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
             val submit : Button = dialog.findViewById(R.id.btnSubmit)
 
             submit.setOnClickListener{
                 when {
-                    judul.isEmpty() -> {
-                        Toast.makeText(context, "Jduul Tidak Boleh Kosong", Toast.LENGTH_SHORT).show()
+                    judul.text.toString().isEmpty() -> {
+                        dialogBinding.edtJudul.error = "Data Tidak Boleh Kosong !!"
                     }
-                    catatan.isEmpty() -> {
-                        Toast.makeText(context, "catatan Tidak Boleh Kosong", Toast.LENGTH_SHORT).show()
+                    catatan.text.toString().isEmpty() -> {
+                        dialogBinding.edtCatatan.error = "Data Tidak Boleh Kosong !!"
                     }
+
                     else -> {
                         note.let { note ->
-                            note?.title = judul
-                            note?.description = catatan
+                            note?.title = judul.text.toString()
+                            note?.description = catatan.text.toString()
                             note?.date = DateHelper.getCurrentDate()
                         }
                         noteAddUpdateViewModel.insert(note as Note)
@@ -77,6 +89,20 @@ class FragmentHome : Fragment() {
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
         val factory = ViewModelFactory.getInstance(activity.application)
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
+    }
+
+    fun setAdapter(){
+        adapter = NoteAdapter()
+        binding?.rvNotes?.layoutManager = LinearLayoutManager(context)
+        binding?.rvNotes?.setHasFixedSize(true)
+        binding?.rvNotes?.adapter = adapter
+
+        val mainViewModel = obtainViewModel(requireActivity())
+        mainViewModel.getAllNotes().observe(requireActivity(), { noteList ->
+            if (noteList != null) {
+                adapter.setListNotes(noteList)
+            }
+        })
     }
 
 }
