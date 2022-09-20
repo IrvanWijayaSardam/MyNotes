@@ -25,7 +25,7 @@ class FragmentRegister : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Glide.with(this)
             .load(R.drawable.document)
-            .into(binding.ivSplash);
+            .into(binding.ivRegister);
     }
 
 }

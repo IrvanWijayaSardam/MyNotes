@@ -27,7 +27,7 @@
                 android:textStyle="bold" />
 
             <ImageView
-                android:id="@+id/ivSplash"
+                android:id="@+id/ivRegister"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_below="@id/tvRegister"
