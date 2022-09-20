@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragment.FragmentRegister">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_marginTop="100dp"
+                android:id="@+id/tvRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="Register"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/ivSplash"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_below="@id/tvRegister"
+                android:layout_centerHorizontal="true"
+                />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvRegistUsername"
+                android:layout_centerHorizontal="true"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/tvRegister"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="10dp"
+                android:layout_marginTop="100dp">
+
+                <EditText
+                    android:id="@+id/edtUsername"
+                    android:hint="Username"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/tvRegister"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:inputType="text|textNoSuggestions" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvFullName"
+                android:layout_centerHorizontal="true"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/cvRegistUsername"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="10dp"
+                android:layout_marginTop="10dp">
+
+                <EditText
+                    android:id="@+id/edtEmail"
+                    android:hint="Email"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/cvRegistUsername"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:inputType="text|textNoSuggestions" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvPasswordRegist"
+                android:layout_centerHorizontal="true"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/cvFullName"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="10dp"
+                android:layout_marginTop="10dp">
+
+                <EditText
+                    android:id="@+id/edtPassword"
+                    android:hint="Password"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/cvFullName"
+                    android:gravity="center"
+                    android:background="@null"
+                    android:textSize="14sp"
+                    android:inputType="textVisiblePassword" />
+
+                <ImageView
+                    android:id="@+id/ivEye"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_eye"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="6dp"
+                    />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvRepeatPassword"
+                android:layout_centerHorizontal="true"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/cvPasswordRegist"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="10dp"
+                android:layout_marginTop="10dp">
+
+                <EditText
+                    android:id="@+id/edtRepeatPassword"
+                    android:hint="Repeat Password"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/cvPasswordRegist"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:background="@null" />
+
+                <ImageView
+                    android:id="@+id/ivEyeConfirm"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_eye"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="6dp"
+                    />
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/btnRegister"
+                android:backgroundTint="#AFA4A4"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/viewLine"
+                android:layout_centerHorizontal="true"
+                android:text="Register" />
+
+            <View
+                android:id="@+id/viewLine"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="50dp"
+                android:background="#fff" />
+
+            <TextView
+                android:id="@+id/tvAlreadyHaveAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:layout_toLeftOf="@+id/tvLogin"
+                android:text="Already Have Account ? "
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tvLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="90dp"
+                android:layout_marginBottom="10dp"
+                android:textStyle="bold"
+                android:text="Login Here"
+                android:textSize="15sp" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
+</layout>
