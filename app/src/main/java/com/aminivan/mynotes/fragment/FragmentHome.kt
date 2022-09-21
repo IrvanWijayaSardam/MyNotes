@@ -94,6 +94,13 @@ class FragmentHome : Fragment() {
                 override fun onDelete(note: Note) {
                     noteAddUpdateViewModel.delete(note)
                     Toast.makeText(context, "${note} DELETED", Toast.LENGTH_SHORT).show()
+                    observer()
+                }
+
+                override fun onUpdate(note: Note) {
+                    noteAddUpdateViewModel.update(note)
+                    Toast.makeText(context, "Notes updated", Toast.LENGTH_SHORT).show()
+                    observer()
                 }
             }
         )
@@ -101,6 +108,9 @@ class FragmentHome : Fragment() {
         binding?.rvNotes?.setHasFixedSize(true)
         binding?.rvNotes?.adapter = adapter
 
+        observer()
+    }
+    fun observer(){
         val mainViewModel = obtainViewModel(requireActivity())
         mainViewModel.getAllNotes().observe(requireActivity(), { noteList ->
             if (noteList != null) {
