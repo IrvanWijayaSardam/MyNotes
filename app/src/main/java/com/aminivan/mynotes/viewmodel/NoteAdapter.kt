@@ -26,7 +26,7 @@ import com.aminivan.mynotes.fragment.FragmentHome
 import com.aminivan.mynotes.helper.NoteDiffCallback
 import com.aminivan.mynotes.repository.NoteRepository
 
-class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
+class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
     private lateinit var context : Context
 
 
@@ -40,7 +40,7 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val binding = ItemNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return NoteViewHolder(binding)
+        return NoteViewHolder(binding,)
 
 
     }
@@ -51,7 +51,6 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
         return listNotes.size
     }
     inner class NoteViewHolder(private val binding: ItemNoteBinding) : RecyclerView.ViewHolder(binding.root) {
-        val fHome = FragmentHome()
         fun bind(note: Note) {
                 binding.dataNotes = note
                 binding.ivDelete.setOnClickListener{
@@ -60,11 +59,15 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
                     val btnDeleteYes : Button = dialog.findViewById(R.id.btnDeleteYes)
                     val btnDeleteNo : Button = dialog.findViewById(R.id.btnDeleteNo)
+
                         btnDeleteYes.setOnClickListener(){
-                            Toast.makeText(context, "Yes Clicked", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Yes Clicked , data ${binding.dataNotes}", Toast.LENGTH_SHORT).show()
+                            listener.onDelete(note)
+                            dialog.dismiss()
                         }
                         btnDeleteNo.setOnClickListener(){
                             Toast.makeText(context, "No Clicked", Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
                         }
                     dialog.show()
                 }
@@ -73,6 +76,9 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         context = recyclerView.context
+    }
+    interface OnAdapterListener {
+        fun onDelete(note: Note)
     }
 
 }

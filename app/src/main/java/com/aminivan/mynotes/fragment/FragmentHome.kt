@@ -89,7 +89,14 @@ class FragmentHome : Fragment() {
     }
 
     fun setAdapter(){
-        adapter = NoteAdapter()
+        adapter = NoteAdapter(
+            object : NoteAdapter.OnAdapterListener {
+                override fun onDelete(note: Note) {
+                    noteAddUpdateViewModel.delete(note)
+                    Toast.makeText(context, "${note} DELETED", Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
         binding?.rvNotes?.layoutManager = LinearLayoutManager(context)
         binding?.rvNotes?.setHasFixedSize(true)
         binding?.rvNotes?.adapter = adapter
