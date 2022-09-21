@@ -1,5 +1,7 @@
 package com.aminivan.mynotes.fragment
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -22,7 +24,7 @@ import com.bumptech.glide.Glide
 class FragmentLogin : Fragment() {
 
     lateinit var binding : FragmentLoginBinding
-    private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
+    lateinit var dataUserShared : SharedPreferences
 
     private var user: User? = null
 
@@ -42,6 +44,7 @@ class FragmentLogin : Fragment() {
             .load(R.drawable.login)
             .into(binding.ivLogin);
 
+        dataUserShared = requireActivity().getSharedPreferences("dataUser",Context.MODE_PRIVATE)
         user = User()
 
         binding.btnLogin.setOnClickListener(){
@@ -67,9 +70,19 @@ class FragmentLogin : Fragment() {
                 user!!.username = userData.username
                 user!!.email = userData.email
                 user!!.password = userData.password
-                Toast.makeText(context, "ID : ${user!!.id}", Toast.LENGTH_SHORT).show()
+                submitPref(user!!.id.toString(),user!!.username.toString(),user!!.email.toString(),user!!.password.toString())
+                Toast.makeText(context, "${dataUserShared.all}", Toast.LENGTH_LONG).show()
             }
         })
+    }
+    fun submitPref(id : String,username: String, email: String,password: String){
+        var addData = dataUserShared.edit()
+        addData.putString("id",id)
+        addData.putString("username",username)
+        addData.putString("email",email)
+        addData.putString("password",password)
+        addData.apply()
+
     }
 
     fun gotoHome(){
