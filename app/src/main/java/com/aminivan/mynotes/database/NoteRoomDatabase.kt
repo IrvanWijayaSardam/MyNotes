@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Note::class], version = 1)
+@Database(entities = [Note::class,User::class], version = 2)
 abstract class NoteRoomDatabase : RoomDatabase() {
     abstract fun noteDao(): NoteDao
     companion object {
@@ -17,6 +17,7 @@ abstract class NoteRoomDatabase : RoomDatabase() {
                 synchronized(NoteRoomDatabase::class.java) {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
                         NoteRoomDatabase::class.java, "note_database")
+                        .fallbackToDestructiveMigration()
                         .build()
                 }
             }
