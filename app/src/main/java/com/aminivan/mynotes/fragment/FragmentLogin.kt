@@ -63,7 +63,6 @@ class FragmentLogin : Fragment() {
     }
 
     fun observer(email : String){
-        Toast.makeText(context, "Observer Executed", Toast.LENGTH_SHORT).show()
         val mainViewModel = obtainViewModel(requireActivity())
         mainViewModel.authUser(email).observe(requireActivity(), { userData ->
             if (userData != null) {
@@ -74,6 +73,9 @@ class FragmentLogin : Fragment() {
                 submitPref(user!!.id.toString(),user!!.username.toString(),user!!.email.toString(),user!!.password.toString())
                 Toast.makeText(context, "${dataUserShared.getString("password","")}", Toast.LENGTH_LONG).show()
                 auth(binding.edtPasswordLogin.text.toString())
+                Toast.makeText(context, "Observer Executed", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Email Tidak Ditemukan , Silahkan Register", Toast.LENGTH_SHORT).show()
             }
         })
     }
