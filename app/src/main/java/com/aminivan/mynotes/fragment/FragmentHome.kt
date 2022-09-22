@@ -61,7 +61,8 @@ class FragmentHome : Fragment() {
 
         binding.fabAdd.setOnClickListener(){
             val dialog = Dialog(context)
-            dialog.setContentView(R.layout.custom_dialog)
+            dialog.setContentView(R.layout.custom_dialog);
+            dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             val judul : EditText = dialog.findViewById(R.id.edtJudul)
             val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
             val submit : Button = dialog.findViewById(R.id.btnSubmit)
@@ -69,11 +70,10 @@ class FragmentHome : Fragment() {
             submit.setOnClickListener{
                 when {
                     judul.text.toString().isEmpty() -> {
-                        dialogBinding.edtJudul.error = "Data Tidak Boleh Kosong !!"
+                        Toast.makeText(context, "Judul Masih Kosong", Toast.LENGTH_SHORT).show()
                     }
                     catatan.text.toString().isEmpty() -> {
-                        dialogBinding.edtCatatan.error = "Data Tidak Boleh Kosong !!"
-                    }
+                        Toast.makeText(context, "Catatan Masih Kosong", Toast.LENGTH_SHORT).show() }
 
                     else -> {
                         note.let { note ->

@@ -60,6 +60,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
                 binding.ivDelete.setOnClickListener{
                     val dialog = Dialog(context)
                     dialog.setContentView(R.layout.custom_dialog_delete)
+                    dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
                     val btnDeleteYes : Button = dialog.findViewById(R.id.btnDeleteYes)
                     val btnDeleteNo : Button = dialog.findViewById(R.id.btnDeleteNo)
@@ -78,6 +79,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
             binding.ivUpdate.setOnClickListener{
                 val dialog = Dialog(context)
                 dialog.setContentView(R.layout.custom_dialog)
+                dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
                 val tvInputCustomDialog : TextView = dialog.findViewById(R.id.tvInputCustomDialog)
                 val judul : EditText = dialog.findViewById(R.id.edtJudul)

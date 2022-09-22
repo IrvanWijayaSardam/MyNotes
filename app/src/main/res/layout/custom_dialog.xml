@@ -1,46 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
     <data>
 
     </data>
 
-    <androidx.cardview.widget.CardView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:cardCornerRadius="10dp">
+        android:layout_height="320dp"
+        android:gravity="center">
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="12dp"
+            android:backgroundTint="#ECE7E7"
+            >
 
-        <TextView
-            android:id="@+id/tvInputCustomDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Input Data"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center_horizontal" />
+            <TextView
+                android:id="@+id/tvInputCustomDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Input Data"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center_horizontal" />
 
-        <EditText
-            android:id="@+id/edtJudul"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:hint="Masukkan Judul"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="50dp" />
+            <EditText
+                android:id="@+id/edtJudul"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:hint="Masukkan Judul"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="50dp" />
 
-        <EditText
-            android:id="@+id/edtCatatan"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:hint="Masukkan Catatan"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="100dp" />
+            <EditText
+                android:id="@+id/edtCatatan"
+                android:layout_width="300dp"
+                android:layout_height="100dp"
+                android:hint="Masukkan Catatan"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="100dp" />
 
-        <Button
-            android:id="@+id/btnSubmit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
-            android:layout_gravity="center"
-            android:text="Input" />
-    </androidx.cardview.widget.CardView>
+            <Button
+                android:id="@+id/btnSubmit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="70dp"
+                android:layout_gravity="center"
+                android:text="Input" />
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
 </layout>
