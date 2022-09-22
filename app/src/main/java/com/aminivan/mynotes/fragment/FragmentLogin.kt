@@ -25,10 +25,10 @@ class FragmentLogin : Fragment() {
 
     lateinit var binding : FragmentLoginBinding
     lateinit var dataUserShared : SharedPreferences
+    private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
 
     private var user: User? = null
-
-
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -43,7 +43,7 @@ class FragmentLogin : Fragment() {
         Glide.with(this)
             .load(R.drawable.login)
             .into(binding.ivLogin);
-
+        noteAddUpdateViewModel = obtainViewModel(requireActivity())
         dataUserShared = requireActivity().getSharedPreferences("dataUser",Context.MODE_PRIVATE)
         user = User()
 
@@ -63,6 +63,7 @@ class FragmentLogin : Fragment() {
     }
 
     fun observer(email : String){
+        Toast.makeText(context, "Observer Executed", Toast.LENGTH_SHORT).show()
         val mainViewModel = obtainViewModel(requireActivity())
         mainViewModel.authUser(email).observe(requireActivity(), { userData ->
             if (userData != null) {

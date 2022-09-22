@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.database.Note
@@ -88,6 +89,13 @@ class FragmentHome : Fragment() {
             }
             dialog.show()
         }
+
+        binding.tvLogout.setOnClickListener(){
+            clearData()
+            gotoLogin()
+            Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     fun getData(){
@@ -135,5 +143,13 @@ class FragmentHome : Fragment() {
                 adapter.setListNotes(noteList)
             }
         })
+    }
+    fun clearData(){
+        var pref = dataUserShared.edit()
+        pref.clear()
+        pref.apply()
+    }
+    fun gotoLogin(){
+        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentLogin)
     }
 }
