@@ -53,10 +53,10 @@ class FragmentRegister : Fragment() {
                 binding.edtUsername.text.toString().isEmpty() -> {
                     binding.edtUsername.error = "Data Username Tidak Boleh Kosong !!"
                 }
-                binding.edtEmail.text.isEmpty() -> {
+                binding.edtEmail.text.toString().isEmpty() -> {
                     binding.edtEmail.error = "Data Tidak Boleh Kosong !!"
                 }
-                binding.edtPassword.text.isEmpty() -> {
+                binding.edtPassword.text.toString().isEmpty() -> {
                     binding.edtPassword.error = "Data Tidak Boleh Kosong !!"
                 }
                 else -> {
@@ -85,6 +85,10 @@ class FragmentRegister : Fragment() {
             } else {
                 binding.edtRepeatPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
+        }
+
+        binding.tvLogin.setOnClickListener{
+            gotoLogin()
         }
 
     }

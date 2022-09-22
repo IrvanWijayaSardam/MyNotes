@@ -10,7 +10,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragment.FragmentRegister">
+        tools:context=".fragment.FragmentRegister"
+        android:background="#D3D2D2"
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
