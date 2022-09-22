@@ -1,6 +1,8 @@
 package com.aminivan.mynotes.fragment
 
 import android.app.Dialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.database.NoteRoomDatabase
+import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.CustomDialogBinding
 import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.helper.DateHelper
@@ -28,11 +31,11 @@ class FragmentHome : Fragment() {
     lateinit var binding : FragmentHomeBinding
     lateinit var dialogBinding: CustomDialogBinding
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
+    lateinit var dataUserShared : SharedPreferences
 
     private var note: Note? = null
-
+    private var user : User? = null
     private lateinit var adapter: NoteAdapter
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,7 +51,10 @@ class FragmentHome : Fragment() {
         var context = binding.rvNotes.context
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
         note = Note()
+        user = User()
         dialogBinding = CustomDialogBinding.inflate(layoutInflater)
+        dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
+        getData()
 
         setAdapter()
 
@@ -81,6 +87,17 @@ class FragmentHome : Fragment() {
             }
             dialog.show()
         }
+    }
+
+    fun getData(){
+        user.let { user ->
+            user?.id = Integer.parseInt(dataUserShared.getString("id",""))
+            user?.username = dataUserShared.getString("username","")
+            user?.email = dataUserShared.getString("email","")
+            user?.password = dataUserShared.getString("password","")
+        }
+
+        binding.tvWelcomeHome.setText("Welcome , ${user?.username} !")
     }
 
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {

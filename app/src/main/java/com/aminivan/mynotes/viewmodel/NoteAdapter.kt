@@ -1,5 +1,6 @@
 package com.aminivan.mynotes.viewmodel
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.app.Dialog
 import android.content.Context
@@ -53,6 +54,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
         return listNotes.size
     }
     inner class NoteViewHolder(private val binding: ItemNoteBinding) : RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SuspiciousIndentation")
         fun bind(note: Note) {
                 binding.dataNotes = note
                 binding.ivDelete.setOnClickListener{

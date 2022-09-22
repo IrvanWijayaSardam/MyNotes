@@ -71,10 +71,21 @@ class FragmentLogin : Fragment() {
                 user!!.email = userData.email
                 user!!.password = userData.password
                 submitPref(user!!.id.toString(),user!!.username.toString(),user!!.email.toString(),user!!.password.toString())
-                Toast.makeText(context, "${dataUserShared.all}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "${dataUserShared.getString("password","")}", Toast.LENGTH_LONG).show()
+                auth(binding.edtPasswordLogin.text.toString())
             }
         })
     }
+    fun auth(password: String){
+        if(password.equals(dataUserShared.getString("password","").toString())){
+            Toast.makeText(context, "Login Berhasil !!", Toast.LENGTH_SHORT).show()
+            gotoHome()
+        } else {
+            Toast.makeText(context, "Password Salah !!!", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    
     fun submitPref(id : String,username: String, email: String,password: String){
         var addData = dataUserShared.edit()
         addData.putString("id",id)
