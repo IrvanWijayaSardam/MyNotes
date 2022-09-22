@@ -96,6 +96,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
                         note?.date = DateHelper.getCurrentDate()
                     }
                     listener.onUpdate(note)
+                    dialog.dismiss()
                 }
 
                 dialog.show()

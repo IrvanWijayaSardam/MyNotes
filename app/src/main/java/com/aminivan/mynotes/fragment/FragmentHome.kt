@@ -84,6 +84,7 @@ class FragmentHome : Fragment() {
                         }
                         noteAddUpdateViewModel.insert(note as Note)
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
                     }
                 }
             }
@@ -130,10 +131,6 @@ class FragmentHome : Fragment() {
                 }
             }
         )
-        binding?.rvNotes?.layoutManager = LinearLayoutManager(context)
-        binding?.rvNotes?.setHasFixedSize(true)
-        binding?.rvNotes?.adapter = adapter
-
         observer()
     }
     fun observer(){
@@ -143,6 +140,9 @@ class FragmentHome : Fragment() {
                 adapter.setListNotes(noteList)
             }
         })
+        binding?.rvNotes?.layoutManager = LinearLayoutManager(context)
+        binding?.rvNotes?.setHasFixedSize(true)
+        binding?.rvNotes?.adapter = adapter
     }
     fun clearData(){
         var pref = dataUserShared.edit()
