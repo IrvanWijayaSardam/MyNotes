@@ -17,28 +17,33 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tvWelcomeHome"
-                android:text="Welcome, Username!"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="20dp"
-                android:textSize="15dp"
-                android:textStyle="bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#AFA4A4"
+                >
+                <TextView
+                    android:id="@+id/tvWelcomeHome"
+                    android:text="Welcome, Username!"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/tvLogout"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="10dp"
-                android:text="Logout"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="20dp"
-                android:textSize="15dp"
-                android:textStyle="bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
+                <TextView
+                    android:id="@+id/tvLogout"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:text="Logout"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
             <TextView
                 android:id="@+id/tvHome"
                 android:layout_centerHorizontal="true"
@@ -54,7 +59,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_notes"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="595dp"
                 android:layout_below="@id/tvHome"
                 tools:listitem="@layout/item_note" />
 

@@ -45,11 +45,13 @@
 
             <Button
                 android:id="@+id/btnSubmit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="70dp"
+                android:layout_width="300dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="100dp"
                 android:layout_gravity="center"
-                android:text="Input" />
+                android:text="ADD NOTES"
+                android:backgroundTint="#AFA4A4"
+                />
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 </layout>

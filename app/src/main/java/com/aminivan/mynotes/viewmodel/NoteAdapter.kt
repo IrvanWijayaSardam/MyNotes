@@ -1,33 +1,23 @@
 package com.aminivan.mynotes.viewmodel
 
+import android.R.attr.label
 import android.annotation.SuppressLint
-import android.app.Application
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Adapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
+import android.widget.*
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.database.Note
-import com.aminivan.mynotes.databinding.CustomDialogBinding
-import com.aminivan.mynotes.databinding.CustomDialogDeleteBinding
-import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.databinding.ItemNoteBinding
-import com.aminivan.mynotes.fragment.FragmentHome
 import com.aminivan.mynotes.helper.DateHelper
 import com.aminivan.mynotes.helper.NoteDiffCallback
-import com.aminivan.mynotes.repository.NoteRepository
+
 
 class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
     private lateinit var context : Context
@@ -43,7 +33,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val binding = ItemNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return NoteViewHolder(binding,)
+        return NoteViewHolder(binding)
 
 
     }
@@ -100,11 +90,28 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
                     listener.onUpdate(note)
                     dialog.dismiss()
                 }
+                dialog.show()
+            }
 
+            binding.cvItemNote.setOnClickListener {
+                val dialog = Dialog(context)
+                dialog.setContentView(R.layout.custom_dialog_detail)
+                dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                val judul : EditText = dialog.findViewById(R.id.edtDetailJudul)
+                val catatan : EditText = dialog.findViewById(R.id.edtDetailCatatan)
+                val ivCopy : ImageView = dialog.findViewById(R.id.ivCopy)
+                judul.setText(note.title)
+                catatan.setText(note.description)
+                ivCopy.setOnClickListener {
+                    val clipboardManager = itemView.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clipData = ClipData.newPlainText("text", note.description)
+                    clipboardManager.setPrimaryClip(clipData)
+                    Toast.makeText(itemView.context, "Text copied to clipboard", Toast.LENGTH_LONG).show()
+                }
                 dialog.show()
 
             }
-
         }
     }
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {

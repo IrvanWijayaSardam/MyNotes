@@ -27,7 +27,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="50dp"
             android:layout_gravity="center"
-            android:text="YES" />
+            android:text="YES"
+            android:backgroundTint="#AFA4A4"
+            />
         <Button
             android:id="@+id/btnDeleteNo"
             android:layout_width="wrap_content"
@@ -35,6 +37,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="50dp"
             android:layout_gravity="center"
-            android:text="NO" />
+            android:text="NO"
+            android:backgroundTint="#AFA4A4"
+            />
     </androidx.cardview.widget.CardView>
 </layout>
