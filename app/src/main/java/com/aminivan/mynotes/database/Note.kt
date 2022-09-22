@@ -17,5 +17,7 @@ class Note (
     @ColumnInfo(name = "description")
     var description: String? = null,
     @ColumnInfo(name = "date")
-    var date: String? = null
+    var date: String? = null,
+    @ColumnInfo(name = "idUser")
+    var idUser : Int = 0,
     ) : Parcelable

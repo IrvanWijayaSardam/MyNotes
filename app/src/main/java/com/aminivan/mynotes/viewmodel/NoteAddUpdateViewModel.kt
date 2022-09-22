@@ -18,7 +18,7 @@ class NoteAddUpdateViewModel(application: Application) : ViewModel() {
     fun delete(note: Note) {
         mNoteRepository.delete(note)
     }
-    fun getAllNotes(): LiveData<List<Note>> = mNoteRepository.getAllNotes()
+    fun getAllNotes(idUser: String): LiveData<List<Note>> = mNoteRepository.getAllNotes(idUser)
 
     fun insertUser(user: User){
         mNoteRepository.insertUser(user)

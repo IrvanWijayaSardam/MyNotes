@@ -79,6 +79,7 @@ class FragmentHome : Fragment() {
                             note?.title = judul.text.toString()
                             note?.description = catatan.text.toString()
                             note?.date = DateHelper.getCurrentDate()
+                            note?.idUser = user!!.id
                         }
                         noteAddUpdateViewModel.insert(note as Note)
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
@@ -129,7 +130,7 @@ class FragmentHome : Fragment() {
     }
     fun observer(){
         val mainViewModel = obtainViewModel(requireActivity())
-        mainViewModel.getAllNotes().observe(requireActivity(), { noteList ->
+        mainViewModel.getAllNotes(user?.id.toString()).observe(requireActivity(), { noteList ->
             if (noteList != null) {
                 adapter.setListNotes(noteList)
             }

@@ -11,8 +11,8 @@ interface NoteDao {
     fun update(note: Note)
     @Delete
     fun delete(note: Note)
-    @Query("SELECT * from note ORDER BY id ASC")
-    fun getAllNotes(): LiveData<List<Note>>
+    @Query("SELECT * from note WHERE idUser LIKE:idUser ORDER BY id ASC ")
+    fun getAllNotes(idUser: String): LiveData<List<Note>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertUser(user: User)
