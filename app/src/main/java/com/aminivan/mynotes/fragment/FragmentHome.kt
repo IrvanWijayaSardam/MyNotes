@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
@@ -40,7 +41,6 @@ class FragmentHome : Fragment() {
 
     private var note: Note? = null
     private var user : User? = null
-    private var noteDelete: Note? = null
 
     private lateinit var adapter: NoteAdapter
 
@@ -53,16 +53,17 @@ class FragmentHome : Fragment() {
         return view
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         var context = binding.rvNotes.context
+
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
         note = Note()
         user = User()
         dialogBinding = CustomDialogBinding.inflate(layoutInflater)
         dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
         getData()
-
         setAdapter()
 
         binding.fabAdd.setOnClickListener(){
@@ -91,6 +92,7 @@ class FragmentHome : Fragment() {
                         noteAddUpdateViewModel.insert(note as Note)
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
+                        observer()
                     }
                 }
             }
@@ -144,8 +146,14 @@ class FragmentHome : Fragment() {
         mainViewModel.getAllNotes(user?.id.toString()).observe(requireActivity(), { noteList ->
             if (noteList != null) {
                 adapter.setListNotes(noteList)
+                if(noteList.size == 0) {
+                    binding.tvNoteEmpty.visibility = View.VISIBLE
+                } else {
+                    binding.tvNoteEmpty.visibility = View.INVISIBLE
+                }
             }
         })
+
         binding?.rvNotes?.layoutManager = LinearLayoutManager(context)
         binding?.rvNotes?.setHasFixedSize(true)
         binding?.rvNotes?.adapter = adapter
