@@ -83,9 +83,7 @@ class FragmentLogin : Fragment() {
                 user!!.email = userData.email
                 user!!.password = userData.password
                 submitPref(user!!.id.toString(),user!!.username.toString(),user!!.email.toString(),user!!.password.toString())
-                Toast.makeText(context, "${dataUserShared.getString("password","")}", Toast.LENGTH_LONG).show()
                 auth(binding.edtPasswordLogin.text.toString())
-                Toast.makeText(context, "Observer Executed", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "Email Tidak Ditemukan , Silahkan Register", Toast.LENGTH_SHORT).show()
             }

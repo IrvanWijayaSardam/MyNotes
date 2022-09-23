@@ -29,6 +29,7 @@ import com.aminivan.mynotes.helper.SwipeToDeleteCallback
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.aminivan.mynotes.viewmodel.NoteAdapter
+import com.google.android.material.snackbar.Snackbar
 
 class FragmentHome : Fragment() {
 
@@ -156,8 +157,13 @@ class FragmentHome : Fragment() {
 
                 noteAddUpdateViewModel.delete(dataDelete)
 
+                Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
+                    setAction("UNDO"){
+                        noteAddUpdateViewModel.insert(dataDelete)
+                    }
+                    show()
+                }
 
-                Toast.makeText(context, "DELETED", Toast.LENGTH_SHORT).show()
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)

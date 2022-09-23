@@ -59,6 +59,9 @@ class FragmentRegister : Fragment() {
                 binding.edtPassword.text.toString().isEmpty() -> {
                     binding.edtPassword.error = "Data Tidak Boleh Kosong !!"
                 }
+                binding.edtPassword.text.toString() != binding.edtRepeatPassword.text.toString() -> {
+                    binding.edtRepeatPassword.error = "Password tidak sama !!"
+                }
                 else -> {
                     user.let { note ->
                         note?.username = binding.edtUsername.text.toString()

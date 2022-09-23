@@ -9,11 +9,11 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="wrap_content"
         android:gravity="center">
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="370dp"
             app:cardCornerRadius="10dp"
             app:cardElevation="12dp"
             android:backgroundTint="#ECE7E7"
@@ -38,8 +38,9 @@
             <EditText
                 android:id="@+id/edtCatatan"
                 android:layout_width="300dp"
-                android:layout_height="100dp"
+                android:layout_height="200dp"
                 android:hint="Masukkan Catatan"
+                android:gravity="left"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="100dp" />
 
@@ -47,7 +48,7 @@
                 android:id="@+id/btnSubmit"
                 android:layout_width="300dp"
                 android:layout_height="70dp"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="150dp"
                 android:layout_gravity="center"
                 android:text="ADD NOTES"
                 android:backgroundTint="#AFA4A4"
