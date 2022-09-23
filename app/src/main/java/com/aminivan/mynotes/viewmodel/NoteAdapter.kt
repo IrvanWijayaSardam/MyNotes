@@ -10,20 +10,22 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.databinding.ItemNoteBinding
 import com.aminivan.mynotes.helper.DateHelper
 import com.aminivan.mynotes.helper.NoteDiffCallback
+import com.aminivan.mynotes.helper.SwipeToDeleteCallback
 
 
 class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
     private lateinit var context : Context
+    val listNotes = ArrayList<Note>()
 
-
-    private val listNotes = ArrayList<Note>()
     fun setListNotes(listNotes: List<Note>) {
         val diffCallback = NoteDiffCallback(this.listNotes, listNotes)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
@@ -31,6 +33,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
         this.listNotes.addAll(listNotes)
         diffResult.dispatchUpdatesTo(this)
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val binding = ItemNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return NoteViewHolder(binding)
@@ -44,6 +47,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
         return listNotes.size
     }
     inner class NoteViewHolder(private val binding: ItemNoteBinding) : RecyclerView.ViewHolder(binding.root) {
+
         @SuppressLint("SuspiciousIndentation")
         fun bind(note: Note) {
                 binding.dataNotes = note
@@ -110,7 +114,6 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
                     Toast.makeText(itemView.context, "Text copied to clipboard", Toast.LENGTH_LONG).show()
                 }
                 dialog.show()
-
             }
         }
     }

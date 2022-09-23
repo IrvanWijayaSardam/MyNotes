@@ -54,14 +54,17 @@
                         android:text="@{dataNotes.title}"
                         android:textSize="16sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/tv_item_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="start"
                         android:text="@{dataNotes.description}"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:maxLines="2"
+                        android:maxLength="200"
+                        android:ellipsize="end"
+                        />
                 </LinearLayout>
 
                 <LinearLayout

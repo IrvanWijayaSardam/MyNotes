@@ -15,7 +15,9 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.database.NoteRoomDatabase
@@ -23,6 +25,7 @@ import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.CustomDialogBinding
 import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.helper.DateHelper
+import com.aminivan.mynotes.helper.SwipeToDeleteCallback
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.aminivan.mynotes.viewmodel.NoteAdapter
@@ -36,6 +39,8 @@ class FragmentHome : Fragment() {
 
     private var note: Note? = null
     private var user : User? = null
+    private var noteDelete: Note? = null
+
     private lateinit var adapter: NoteAdapter
 
     override fun onCreateView(
@@ -143,6 +148,21 @@ class FragmentHome : Fragment() {
         binding?.rvNotes?.layoutManager = LinearLayoutManager(context)
         binding?.rvNotes?.setHasFixedSize(true)
         binding?.rvNotes?.adapter = adapter
+
+        val swipeToDeleteCallback = object : SwipeToDeleteCallback(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val dataDelete = adapter.listNotes[position]
+
+                noteAddUpdateViewModel.delete(dataDelete)
+
+
+                Toast.makeText(context, "DELETED", Toast.LENGTH_SHORT).show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(binding.rvNotes)
+
     }
     fun clearData(){
         var pref = dataUserShared.edit()
