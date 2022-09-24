@@ -2,7 +2,7 @@ package com.aminivan.mynotes.response
 
 import com.google.gson.annotations.SerializedName
 
-data class UserResponse(
+data class NoteResponse(
 
     @field:SerializedName("NoteResponse")
     val noteResponse: List<NoteResponseItem>

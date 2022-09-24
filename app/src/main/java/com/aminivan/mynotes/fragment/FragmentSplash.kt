@@ -64,7 +64,7 @@ class FragmentSplash : Fragment() {
     }
 
     private fun retriveNotes() {
-        val client = ApiConfig.getApiService().getusers()
+        val client = ApiConfig.getApiService().getNotes()
         client.enqueue(object : Callback<List<NoteResponseItem>> {
             override fun onResponse(
                 call: Call<List<NoteResponseItem>>,
