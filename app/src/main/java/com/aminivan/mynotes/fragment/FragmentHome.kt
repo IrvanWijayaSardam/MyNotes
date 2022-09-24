@@ -128,7 +128,7 @@ class FragmentHome : Fragment() {
             object : NoteAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {
                     noteAddUpdateViewModel.delete(note)
-                    Toast.makeText(context, "${note} DELETED", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
                 }
 

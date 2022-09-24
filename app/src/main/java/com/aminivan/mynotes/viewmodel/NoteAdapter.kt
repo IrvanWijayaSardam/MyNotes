@@ -47,7 +47,6 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
         return listNotes.size
     }
     inner class NoteViewHolder(private val binding: ItemNoteBinding) : RecyclerView.ViewHolder(binding.root) {
-
         @SuppressLint("SuspiciousIndentation")
         fun bind(note: Note) {
                 binding.dataNotes = note
@@ -60,7 +59,6 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
                     val btnDeleteNo : Button = dialog.findViewById(R.id.btnDeleteNo)
 
                         btnDeleteYes.setOnClickListener(){
-                            Toast.makeText(context, "Yes Clicked , data ${binding.dataNotes}", Toast.LENGTH_SHORT).show()
                             listener.onDelete(note)
                             dialog.dismiss()
                         }
