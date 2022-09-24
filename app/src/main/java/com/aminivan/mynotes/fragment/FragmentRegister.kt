@@ -14,10 +14,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
-import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.FragmentRegisterBinding
-import com.aminivan.mynotes.helper.DateHelper
+import com.aminivan.mynotes.helper.Encryptor
 import com.aminivan.mynotes.response.PostUserResponse
 import com.aminivan.mynotes.response.UserResponseItem
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
@@ -48,6 +47,7 @@ class FragmentRegister : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.edtPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         binding.edtRepeatPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        val encryptor = Encryptor()
 
         Glide.with(this)
             .load(R.drawable.document)
@@ -74,10 +74,10 @@ class FragmentRegister : Fragment() {
                     user.let { note ->
                         note?.username = binding.edtUsername.text.toString()
                         note?.email = binding.edtEmail.text.toString()
-                        note?.password = binding.edtPassword.text.toString()
+                        note?.password = encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString()
                     }
                     noteAddUpdateViewModel.insertUser(user as User)
-                    postUser(binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtUsername.text.toString())
+                    postUser(encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString(),binding.edtEmail.text.toString(),binding.edtUsername.text.toString())
                     Toast.makeText(context, "Registrasi Berhasil Silahkan Login", Toast.LENGTH_SHORT).show()
                     gotoLogin()
                 }
@@ -90,6 +90,7 @@ class FragmentRegister : Fragment() {
             } else {
                 binding.edtPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
+
         }
         binding.ivEyeConfirm.setOnClickListener{
             if (binding.edtRepeatPassword.inputType == InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD){
