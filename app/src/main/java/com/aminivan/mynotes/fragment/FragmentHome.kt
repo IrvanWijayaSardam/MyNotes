@@ -1,9 +1,11 @@
 package com.aminivan.mynotes.fragment
 
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aminivan.mynotes.R
+import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.database.NoteRoomDatabase
 import com.aminivan.mynotes.database.User
@@ -27,10 +30,17 @@ import com.aminivan.mynotes.databinding.CustomDialogBinding
 import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.helper.DateHelper
 import com.aminivan.mynotes.helper.SwipeToDeleteCallback
+import com.aminivan.mynotes.response.NoteResponseItem
+import com.aminivan.mynotes.response.PostNotesResponse
+import com.aminivan.mynotes.response.PostUserResponse
+import com.aminivan.mynotes.response.UserResponseItem
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.aminivan.mynotes.viewmodel.NoteAdapter
 import com.google.android.material.snackbar.Snackbar
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class FragmentHome : Fragment() {
 
@@ -66,6 +76,8 @@ class FragmentHome : Fragment() {
         getData()
         setAdapter()
 
+        Log.d("Id Grabbed : ",dataUserShared.getInt("id",0).toString())
+
         binding.fabAdd.setOnClickListener(){
             val dialog = Dialog(context)
             dialog.setContentView(R.layout.custom_dialog);
@@ -90,6 +102,7 @@ class FragmentHome : Fragment() {
                             note?.idUser = user!!.id
                         }
                         noteAddUpdateViewModel.insert(note as Note)
+                        postUser(0,judul.text.toString(),catatan.text.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0).toString())
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                         observer()
@@ -176,8 +189,29 @@ class FragmentHome : Fragment() {
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
-
     }
+    private fun postUser(id: Int,title:String,description:String,date: String,userid: String) {
+        val client = ApiConfig.getApiService().createNotes(NoteResponseItem(id,title,description,date, userid))
+        client.enqueue(object : Callback<PostNotesResponse> {
+            override fun onResponse(
+                call: Call<PostNotesResponse>,
+                response: Response<PostNotesResponse>
+            ) {
+                val responseBody = response.body()
+                if (response.isSuccessful && responseBody != null) {
+                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+                } else {
+                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<PostNotesResponse>, t: Throwable) {
+                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+            }
+
+        })
+    }
+
     fun clearData(){
         var pref = dataUserShared.edit()
         pref.clear()

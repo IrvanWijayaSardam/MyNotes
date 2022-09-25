@@ -22,3 +22,15 @@ data class UserResponseItem(
 	@field:SerializedName("username")
 	val username: String
 )
+
+data class PostUserResponse(
+
+	@field:SerializedName("listUser")
+	val listUsers: List<UserResponseItem>
+
+)
+
+data class UpdateUserResponse(
+	@field:SerializedName("updatedUser")
+	val updatedUser: UserResponseItem
+)

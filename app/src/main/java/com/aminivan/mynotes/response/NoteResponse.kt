@@ -26,14 +26,9 @@ data class NoteResponseItem(
     val userid: String,
 )
 
-data class PostUserResponse(
+data class PostNotesResponse(
 
-    @field:SerializedName("listUser")
-    val listUsers: List<NoteResponseItem>
+    @field:SerializedName("listNotes")
+    val listNotes: List<NoteResponseItem>
 
-)
-
-data class UpdateUserResponse(
-    @field:SerializedName("updatedUser")
-    val updatedUser: NoteResponseItem
 )

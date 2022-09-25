@@ -106,6 +106,7 @@ class FragmentLogin : Fragment() {
         if(password.equals(encryptor.getDecryptedPassword(requireContext(),rpassword))){
             var addData = dataUserShared.edit()
             addData.putInt("id",idUser)
+            addData.apply()
             Toast.makeText(context, "Login Berhasil !!", Toast.LENGTH_SHORT).show()
             gotoHome()
         } else {
@@ -124,6 +125,7 @@ class FragmentLogin : Fragment() {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
+                        idUser = responseBody.id
                         user!!.id = responseBody.id
                         user!!.username = responseBody.username
                         user!!.email = responseBody.email
