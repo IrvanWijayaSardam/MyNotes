@@ -48,7 +48,7 @@ class FragmentSplash : Fragment() {
         dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
 
         android.os.Handler(Looper.myLooper()!!).postDelayed({
-            if(dataUserShared.getString("id","").equals("")){
+            if(dataUserShared.getInt("id",0).equals("")){
                 gotoLogin()
             } else {
                 gotoHome()

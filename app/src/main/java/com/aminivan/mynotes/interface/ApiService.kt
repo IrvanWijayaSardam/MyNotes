@@ -28,4 +28,9 @@ interface ApiService {
         @Body body :UserResponseItem
     ) : Call<PostUserResponse>
 
+    @GET("auth/{email}")
+    fun getUser(
+        @Path("email") email : String,
+    ): Call<UserResponseItem>
+
 }

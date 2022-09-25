@@ -109,7 +109,7 @@ class FragmentHome : Fragment() {
 
     fun getData(){
         user.let { user ->
-            user?.id = Integer.parseInt(dataUserShared.getString("id",""))
+            user?.id = dataUserShared.getInt("id",0)
             user?.username = dataUserShared.getString("username","")
             user?.email = dataUserShared.getString("email","")
             user?.password = dataUserShared.getString("password","")
