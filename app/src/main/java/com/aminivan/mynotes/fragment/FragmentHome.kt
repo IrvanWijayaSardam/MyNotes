@@ -54,6 +54,7 @@ class FragmentHome : Fragment() {
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     lateinit var dataUserShared : SharedPreferences
     lateinit var selectedFile : String
+    lateinit var dialog : Dialog
 
     private val pickImage = 100
     lateinit var imageUri : Uri
@@ -72,11 +73,20 @@ class FragmentHome : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
+        tvAttachImage.text = selectedFile
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         var context = binding.rvNotes.context
-        selectedFile = "default"
+        dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.custom_dialog);
+        dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        selectedFile = "Attach File"
+
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
         note = Note()
         user = User()
@@ -88,19 +98,15 @@ class FragmentHome : Fragment() {
         Log.d("Id Grabbed : ",dataUserShared.getInt("id",0).toString())
 
         binding.fabAdd.setOnClickListener(){
-            val dialog = Dialog(context)
-            dialog.setContentView(R.layout.custom_dialog);
-            dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             val judul : EditText = dialog.findViewById(R.id.edtJudul)
             val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
             val submit : Button = dialog.findViewById(R.id.btnSubmit)
             val attachImage : LinearLayout = dialog.findViewById(R.id.linearAttachFile)
-            val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
-            tvAttachImage.text = selectedFile
 
             attachImage.setOnClickListener {
                 Log.d("AttachImage Onclick", "Clicked: ")
                 pickImageFromGallery()
+                dialog.dismiss()
             }
 
             submit.setOnClickListener{
@@ -232,16 +238,18 @@ class FragmentHome : Fragment() {
     private fun pickImageFromGallery() {
         val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         startActivityForResult(gallery, pickImage)
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == pickImage) {
             imageUri = data?.data!!
-            selectedFile = imageUri.toString()
             val uriPathHelper = URIPathHelper()
             val filePath = uriPathHelper.getPath(requireContext(), imageUri)
             Log.d(TAG, "onActivityResult: filepath : ${filePath} ")
+            selectedFile = filePath.toString()
+            dialog.show()
         }
     }
 
