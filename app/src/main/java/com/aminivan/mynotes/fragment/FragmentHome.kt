@@ -1,20 +1,23 @@
 package com.aminivan.mynotes.fragment
 
+import android.app.Activity.RESULT_OK
 import android.app.Dialog
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
-import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
+import android.widget.*
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
@@ -24,23 +27,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.database.Note
-import com.aminivan.mynotes.database.NoteRoomDatabase
 import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.CustomDialogBinding
 import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.helper.DateHelper
 import com.aminivan.mynotes.helper.SwipeToDeleteCallback
+import com.aminivan.mynotes.helper.URIPathHelper
 import com.aminivan.mynotes.response.NoteResponseItem
 import com.aminivan.mynotes.response.PostNotesResponse
-import com.aminivan.mynotes.response.PostUserResponse
-import com.aminivan.mynotes.response.UserResponseItem
+import com.aminivan.mynotes.viewmodel.NoteAdapter
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
-import com.aminivan.mynotes.viewmodel.NoteAdapter
 import com.google.android.material.snackbar.Snackbar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.ByteArrayOutputStream
+import java.util.*
+import kotlin.math.log
+
 
 class FragmentHome : Fragment() {
 
@@ -48,6 +53,10 @@ class FragmentHome : Fragment() {
     lateinit var dialogBinding: CustomDialogBinding
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     lateinit var dataUserShared : SharedPreferences
+    lateinit var selectedFile : String
+
+    private val pickImage = 100
+    lateinit var imageUri : Uri
 
     private var note: Note? = null
     private var user : User? = null
@@ -67,7 +76,7 @@ class FragmentHome : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         var context = binding.rvNotes.context
-
+        selectedFile = "default"
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
         note = Note()
         user = User()
@@ -85,6 +94,14 @@ class FragmentHome : Fragment() {
             val judul : EditText = dialog.findViewById(R.id.edtJudul)
             val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
             val submit : Button = dialog.findViewById(R.id.btnSubmit)
+            val attachImage : LinearLayout = dialog.findViewById(R.id.linearAttachFile)
+            val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
+            tvAttachImage.text = selectedFile
+
+            attachImage.setOnClickListener {
+                Log.d("AttachImage Onclick", "Clicked: ")
+                pickImageFromGallery()
+            }
 
             submit.setOnClickListener{
                 when {
@@ -211,6 +228,23 @@ class FragmentHome : Fragment() {
 
         })
     }
+
+    private fun pickImageFromGallery() {
+        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+        startActivityForResult(gallery, pickImage)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == pickImage) {
+            imageUri = data?.data!!
+            selectedFile = imageUri.toString()
+            val uriPathHelper = URIPathHelper()
+            val filePath = uriPathHelper.getPath(requireContext(), imageUri)
+            Log.d(TAG, "onActivityResult: filepath : ${filePath} ")
+        }
+    }
+
 
     fun clearData(){
         var pref = dataUserShared.edit()

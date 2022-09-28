@@ -13,7 +13,7 @@
         android:gravity="center">
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="370dp"
+            android:layout_height="450dp"
             app:cardCornerRadius="10dp"
             app:cardElevation="12dp"
             android:backgroundTint="#ECE7E7"
@@ -44,11 +44,34 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="100dp" />
 
+            <LinearLayout
+                android:id="@+id/linearAttachFile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="310dp"
+                android:layout_marginLeft="30dp"
+                android:gravity="center"
+                >
+                <ImageView
+                    android:id="@+id/ivAttachImage"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/attach_file"
+                    />
+                <TextView
+                    android:id="@+id/tvAttachFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Attach File"
+                    />
+            </LinearLayout>
+
             <Button
                 android:id="@+id/btnSubmit"
                 android:layout_width="300dp"
                 android:layout_height="70dp"
-                android:layout_marginTop="150dp"
+                android:layout_marginTop="170dp"
                 android:layout_gravity="center"
                 android:text="ADD NOTES"
                 android:backgroundTint="#AFA4A4"
