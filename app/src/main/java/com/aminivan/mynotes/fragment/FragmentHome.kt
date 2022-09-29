@@ -1,6 +1,7 @@
 package com.aminivan.mynotes.fragment
 
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.ContentValues
 import android.content.ContentValues.TAG
@@ -9,14 +10,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -59,7 +60,7 @@ class FragmentHome : Fragment() {
     lateinit var selectedFile : String
     lateinit var dialog : Dialog
     lateinit var profile : Bitmap
-
+    private val handler = Handler()
 
     private val pickImage = 100
     lateinit var imageUri : Uri
@@ -83,12 +84,43 @@ class FragmentHome : Fragment() {
         super.onResume()
         val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
         val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
+        val progressBar : ProgressBar = dialog.findViewById(R.id.progressBar)
+        val btnSubmit : Button = dialog.findViewById(R.id.btnSubmit)
         tvAttachImage.text = selectedFile
         if (selectedFile.length >30) {
             icCancel.visibility = View.VISIBLE
         } else {
             icCancel.visibility = View.INVISIBLE
         }
+
+        progressBar.visibility = View.VISIBLE
+
+        var i = progressBar.progress
+
+        Thread(Runnable {
+            // this loop will run until the value of i becomes 99
+            while (i < 50) {
+                i += 1
+                // Update the progress bar and display the current value
+                handler.post(Runnable {
+                    progressBar.progress = i
+                    btnSubmit.isClickable = false
+                })
+                try {
+                    Thread.sleep(100)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+            }
+
+            // setting the visibility of the progressbar to invisible
+            // or you can use View.GONE instead of invisible
+            // View.GONE will remove the progressbar
+            progressBar.visibility = View.INVISIBLE
+            btnSubmit.isClickable = true
+
+        }).start()
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -118,6 +150,7 @@ class FragmentHome : Fragment() {
             val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
             val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
 
+
             icCancel.setOnClickListener {
                 selectedFile = "Attach File"
                 tvAttachImage.text = selectedFile
@@ -129,7 +162,6 @@ class FragmentHome : Fragment() {
                 pickImageFromGallery()
                 dialog.dismiss()
             }
-
 
 
             submit.setOnClickListener{
