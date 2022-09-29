@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -39,10 +40,12 @@ import com.aminivan.mynotes.viewmodel.NoteAdapter
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.log
 
@@ -55,6 +58,8 @@ class FragmentHome : Fragment() {
     lateinit var dataUserShared : SharedPreferences
     lateinit var selectedFile : String
     lateinit var dialog : Dialog
+    lateinit var profile : Bitmap
+
 
     private val pickImage = 100
     lateinit var imageUri : Uri
@@ -76,7 +81,13 @@ class FragmentHome : Fragment() {
     override fun onResume() {
         super.onResume()
         val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
+        val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
         tvAttachImage.text = selectedFile
+        if (selectedFile.length >30) {
+            icCancel.visibility = View.VISIBLE
+        } else {
+            icCancel.visibility = View.INVISIBLE
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -102,12 +113,22 @@ class FragmentHome : Fragment() {
             val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
             val submit : Button = dialog.findViewById(R.id.btnSubmit)
             val attachImage : LinearLayout = dialog.findViewById(R.id.linearAttachFile)
+            val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
+            val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
+
+            icCancel.setOnClickListener {
+                selectedFile = "Attach File"
+                tvAttachImage.text = selectedFile
+                icCancel.visibility = View.INVISIBLE
+            }
 
             attachImage.setOnClickListener {
                 Log.d("AttachImage Onclick", "Clicked: ")
                 pickImageFromGallery()
                 dialog.dismiss()
             }
+
+
 
             submit.setOnClickListener{
                 when {
@@ -214,7 +235,7 @@ class FragmentHome : Fragment() {
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
     }
     private fun postUser(id: Int,title:String,description:String,date: String,userid: String) {
-        val client = ApiConfig.getApiService().createNotes(NoteResponseItem(id,title,description,date, userid))
+        val client = ApiConfig.getApiService().createNotes(NoteResponseItem(id,title,description,date, userid,"iniimage"))
         client.enqueue(object : Callback<PostNotesResponse> {
             override fun onResponse(
                 call: Call<PostNotesResponse>,
@@ -247,12 +268,30 @@ class FragmentHome : Fragment() {
             imageUri = data?.data!!
             val uriPathHelper = URIPathHelper()
             val filePath = uriPathHelper.getPath(requireContext(), imageUri)
+            profile = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(imageUri.toString()))
+            uploadToFirebase()
             Log.d(TAG, "onActivityResult: filepath : ${filePath} ")
             selectedFile = filePath.toString()
+            Log.d(TAG, "onActivityResult bitmap: ${profile}")
             dialog.show()
         }
     }
 
+    fun uploadToFirebase(){
+        val formatter = SimpleDateFormat("yyy_MM_dd_HH_mm_ss", Locale.getDefault())
+        val now = Date()
+        val fileName = formatter.format(now)
+
+        val storageReference = FirebaseStorage.getInstance().getReference("images/$fileName")
+
+        storageReference.putFile(imageUri).addOnSuccessListener {
+
+            Log.d(TAG, "uploadToFirebase: SUCCESS")
+
+        }.addOnFailureListener{
+            Log.d(TAG, "uploadToFirebase: YOU'RE SUCH A FAILURE")
+        }
+    }
 
     fun clearData(){
         var pref = dataUserShared.edit()

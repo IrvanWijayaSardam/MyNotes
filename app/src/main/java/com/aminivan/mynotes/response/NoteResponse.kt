@@ -24,6 +24,9 @@ data class NoteResponseItem(
 
     @field:SerializedName("userid")
     val userid: String,
+
+    @field:SerializedName("image")
+    val image: String,
 )
 
 data class PostNotesResponse(

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "586878392693",
+    "project_id": "mynotes-f6709",
+    "storage_bucket": "mynotes-f6709.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586878392693:android:4b59b6a1844886a499db3c",
+        "android_client_info": {
+          "package_name": "com.aminivan.mynotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "586878392693-am3nbg0j7dotve1a8remeg1rhinernhg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH5cMJ_swuOG09cfdztYadc9VZjHzsyT4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "586878392693-am3nbg0j7dotve1a8remeg1rhinernhg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

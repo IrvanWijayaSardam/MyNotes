@@ -20,4 +20,6 @@ class Note (
     var date: String? = null,
     @ColumnInfo(name = "idUser")
     var idUser : Int = 0,
+    @ColumnInfo(name = "image")
+    var image : String? = null,
     ) : Parcelable

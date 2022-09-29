@@ -46,27 +46,34 @@
 
             <LinearLayout
                 android:id="@+id/linearAttachFile"
-                android:layout_width="wrap_content"
+                android:layout_width="240dp"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="310dp"
                 android:layout_marginLeft="30dp"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 >
                 <ImageView
                     android:id="@+id/ivAttachImage"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:src="@drawable/attach_file"
                     />
                 <TextView
                     android:id="@+id/tvAttachFile"
-                    android:layout_width="wrap_content"
+                    android:layout_width="250dp"
                     android:layout_height="wrap_content"
-                    android:text="Attach File"
-                    />
+                    android:text="Attach File"/>
             </LinearLayout>
-
+            <ImageView
+                android:id="@+id/ivCancel"
+                android:layout_marginLeft="300dp"
+                android:layout_marginTop="315dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/ic_cancel"
+                android:visibility="visible"
+                />
             <Button
                 android:id="@+id/btnSubmit"
                 android:layout_width="300dp"
