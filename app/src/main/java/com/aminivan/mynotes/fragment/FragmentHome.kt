@@ -146,7 +146,7 @@ class FragmentHome : Fragment() {
                             note?.idUser = user!!.id
                         }
                         noteAddUpdateViewModel.insert(note as Note)
-                        postUser(0,judul.text.toString(),catatan.text.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0).toString())
+                        postUser(0,judul.text.toString(),catatan.text.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0).toString(),imageUri.toString())
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                         observer()
@@ -234,8 +234,8 @@ class FragmentHome : Fragment() {
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
     }
-    private fun postUser(id: Int,title:String,description:String,date: String,userid: String) {
-        val client = ApiConfig.getApiService().createNotes(NoteResponseItem(id,title,description,date, userid,"iniimage"))
+    private fun postUser(id: Int,title:String,description:String,date: String,userid: String, image : String) {
+        val client = ApiConfig.getApiService().createNotes(NoteResponseItem(id,title,description,date, userid,image))
         client.enqueue(object : Callback<PostNotesResponse> {
             override fun onResponse(
                 call: Call<PostNotesResponse>,
@@ -285,9 +285,13 @@ class FragmentHome : Fragment() {
         val storageReference = FirebaseStorage.getInstance().getReference("images/$fileName")
 
         storageReference.putFile(imageUri).addOnSuccessListener {
-
             Log.d(TAG, "uploadToFirebase: SUCCESS")
-
+            it.storage.downloadUrl.addOnCompleteListener {
+                Log.d("Get Download URL", "Get Download URL : ${it.result.toString()}")
+                imageUri = it.result
+            }.addOnFailureListener {
+                Log.d(TAG, "On Failure :${it.message.toString()} ")
+            }
         }.addOnFailureListener{
             Log.d(TAG, "uploadToFirebase: YOU'RE SUCH A FAILURE")
         }
