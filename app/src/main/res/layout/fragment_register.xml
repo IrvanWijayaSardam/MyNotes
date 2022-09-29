@@ -141,6 +141,42 @@
                     />
             </androidx.cardview.widget.CardView>
 
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvMan"
+                android:layout_marginTop="20dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:elevation="20dp"
+                app:cardCornerRadius="15dp"
+                android:layout_below="@+id/cvRepeatPassword"
+                android:layout_marginLeft="130dp"
+                >
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/man"
+                    android:layout_gravity="center"
+                    />
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvWoman"
+                android:layout_marginTop="20dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:elevation="20dp"
+                app:cardCornerRadius="15dp"
+                android:layout_below="@+id/cvRepeatPassword"
+                android:layout_toRightOf="@id/cvMan"
+                android:layout_marginLeft="20dp"
+                >
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/woman"
+                    android:layout_gravity="center"
+                    />
+            </androidx.cardview.widget.CardView>
+
             <Button
                 android:id="@+id/btnRegister"
                 android:backgroundTint="#AFA4A4"

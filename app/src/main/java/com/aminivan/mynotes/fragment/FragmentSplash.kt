@@ -73,7 +73,7 @@ class FragmentSplash : Fragment() {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
-                        Toast.makeText(context, "${responseBody}", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(context, "${responseBody}", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Log.e(ContentValues.TAG, "onFailure: ${response.message()}")

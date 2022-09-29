@@ -63,6 +63,7 @@ class FragmentHome : Fragment() {
 
     private val pickImage = 100
     lateinit var imageUri : Uri
+    lateinit var defaultUri : String
 
     private var note: Note? = null
     private var user : User? = null
@@ -97,7 +98,8 @@ class FragmentHome : Fragment() {
         dialog.setContentView(R.layout.custom_dialog);
         dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         selectedFile = "Attach File"
-
+        imageUri = Uri.parse("DefaultUri")
+        defaultUri = "Default"
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
         note = Note()
         user = User()
@@ -144,9 +146,14 @@ class FragmentHome : Fragment() {
                             note?.description = catatan.text.toString()
                             note?.date = DateHelper.getCurrentDate()
                             note?.idUser = user!!.id
+                            note?.image = defaultUri
                         }
                         noteAddUpdateViewModel.insert(note as Note)
-                        postUser(0,judul.text.toString(),catatan.text.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0).toString(),imageUri.toString())
+                        if(defaultUri.equals("Default")) {
+                            postUser(0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0).toString(),"Default")
+                        } else {
+                            postUser(0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0).toString(),defaultUri)
+                        }
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                         observer()
@@ -271,6 +278,7 @@ class FragmentHome : Fragment() {
             profile = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(imageUri.toString()))
             uploadToFirebase()
             Log.d(TAG, "onActivityResult: filepath : ${filePath} ")
+            Log.d(TAG, "GetImageUriDefault: ${imageUri.toString()}")
             selectedFile = filePath.toString()
             Log.d(TAG, "onActivityResult bitmap: ${profile}")
             dialog.show()
@@ -287,6 +295,7 @@ class FragmentHome : Fragment() {
         storageReference.putFile(imageUri).addOnSuccessListener {
             Log.d(TAG, "uploadToFirebase: SUCCESS")
             it.storage.downloadUrl.addOnCompleteListener {
+                defaultUri = it.result.toString()
                 Log.d("Get Download URL", "Get Download URL : ${it.result.toString()}")
                 imageUri = it.result
             }.addOnFailureListener {

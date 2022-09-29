@@ -1,6 +1,7 @@
 package com.aminivan.mynotes.fragment
 
 import android.content.ContentValues
+import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -30,7 +31,7 @@ import retrofit2.Response
 class FragmentRegister : Fragment() {
     lateinit var binding : FragmentRegisterBinding
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
-
+    lateinit var Jk: String
     private var user: User? = null
 
 
@@ -48,6 +49,7 @@ class FragmentRegister : Fragment() {
         binding.edtPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         binding.edtRepeatPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         val encryptor = Encryptor()
+        Jk = "N"
 
         Glide.with(this)
             .load(R.drawable.document)
@@ -70,6 +72,9 @@ class FragmentRegister : Fragment() {
                 binding.edtPassword.text.toString() != binding.edtRepeatPassword.text.toString() -> {
                     binding.edtRepeatPassword.error = "Password tidak sama !!"
                 }
+                Jk.equals("N")-> {
+                    Toast.makeText(context, "Silahkan pilih jenis kelamin", Toast.LENGTH_SHORT).show()
+                }
                 else -> {
                     user.let { note ->
                         note?.username = binding.edtUsername.text.toString()
@@ -77,7 +82,8 @@ class FragmentRegister : Fragment() {
                         note?.password = encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString()
                     }
                     noteAddUpdateViewModel.insertUser(user as User)
-                    postUser(encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString(),binding.edtEmail.text.toString(),binding.edtUsername.text.toString())
+                    
+                    postUser(encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString(),binding.edtEmail.text.toString(),binding.edtUsername.text.toString(),"DefaultProfile",Jk)
                     Toast.makeText(context, "Registrasi Berhasil Silahkan Login", Toast.LENGTH_SHORT).show()
                     gotoLogin()
                 }
@@ -104,10 +110,22 @@ class FragmentRegister : Fragment() {
             gotoLogin()
         }
 
+        binding.cvMan.setOnClickListener {
+            binding.cvMan.setCardBackgroundColor(Color.YELLOW)
+            binding.cvWoman.setCardBackgroundColor(Color.WHITE)
+            Jk = "M"
+        }
+
+        binding.cvWoman.setOnClickListener {
+            binding.cvMan.setCardBackgroundColor(Color.WHITE)
+            binding.cvWoman.setCardBackgroundColor(Color.YELLOW)
+            Jk = "W"
+        }
+
     }
 
-    private fun postUser(password: String,email:String,username:String) {
-        val client = ApiConfig.getApiService().createUser(UserResponseItem(password,0,email,username))
+    private fun postUser(password: String,email:String,username:String,profile: String, Jk: String) {
+        val client = ApiConfig.getApiService().createUser(UserResponseItem(password,0,email,username,"defaultprofile",Jk))
         client.enqueue(object : Callback<PostUserResponse> {
             override fun onResponse(
                 call: Call<PostUserResponse>,
