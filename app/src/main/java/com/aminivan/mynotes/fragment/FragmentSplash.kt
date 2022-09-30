@@ -98,10 +98,10 @@ class FragmentSplash : Fragment() {
                                 note?.date = responseBody[i].date
                                 note?.idUser = responseBody[i].userid.toInt()
                                 note?.image = responseBody[i].image
+                                noteAddUpdateViewModel.insert(Note(responseBody[i].id,responseBody[i].title,responseBody[i].description,responseBody[i].date,responseBody[i].userid.toInt(),responseBody[i].image))
                             }
                             Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
                             Log.d(TAG, "onResponse: ${responseBody[i].description}")
-                            noteAddUpdateViewModel.insert(note as Note)
                         }
                     }
                 } else {
