@@ -27,6 +27,11 @@ class NoteRepository(application: Application) {
         executorService.execute { mNotesDao.update(note) }
     }
 
+    fun deleteAllNotes(){
+        executorService.execute { mNotesDao.deleteAllNotes() }
+    }
+
+
     fun insertUser(user: User) {
         executorService.execute{mNotesDao.insertUser(user)}
     }

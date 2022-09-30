@@ -9,6 +9,11 @@ interface ApiService {
     fun getNotes(
     ): Call<List<NoteResponseItem>>
 
+    @GET("notes/{id}")
+    fun getNotesById(
+        @Path("id") id: String,
+    ): Call<List<NoteResponseItem>>
+
     @POST("notes/")
     fun createNotes(
         @Body body: NoteResponseItem

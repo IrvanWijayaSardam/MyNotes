@@ -99,7 +99,7 @@ class FragmentHome : Fragment() {
 
         Thread(Runnable {
             // this loop will run until the value of i becomes 99
-            while (i < 50) {
+            while (i < 100) {
                 i += 1
                 // Update the progress bar and display the current value
                 handler.post(Runnable {
