@@ -61,7 +61,7 @@ class FragmentSplash : Fragment() {
             if(dataUserShared.getInt("id",0).equals("")){
                 gotoLogin()
             } else {
-                noteAddUpdateViewModel.deleteAllNotes()
+                //noteAddUpdateViewModel.deleteAllNotes()
                 retriveNotes(dataUserShared.getInt("id",0).toString())
                 Toast.makeText(context, "All Notes Deleted", Toast.LENGTH_SHORT).show()
                 gotoHome()

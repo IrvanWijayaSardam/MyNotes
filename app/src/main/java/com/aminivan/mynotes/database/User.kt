@@ -18,5 +18,4 @@ class User(
     var email: String? = null,
     @ColumnInfo(name = "password")
     var password: String? = null
-
 ) : Parcelable

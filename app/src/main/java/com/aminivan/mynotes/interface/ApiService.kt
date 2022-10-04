@@ -35,4 +35,11 @@ interface ApiService {
         @Path("email") email : String,
     ): Call<UserResponseItem>
 
+    @FormUrlEncoded
+    @POST("api/auth/login")
+    fun auth(
+        @Field("email") email: String,
+        @Field("password") password : String
+    ):Call<LoginResponse>
+
 }

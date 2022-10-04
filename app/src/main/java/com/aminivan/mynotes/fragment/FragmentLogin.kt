@@ -1,6 +1,7 @@
 package com.aminivan.mynotes.fragment
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -21,6 +22,8 @@ import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.FragmentLoginBinding
 import com.aminivan.mynotes.databinding.FragmentSplashBinding
 import com.aminivan.mynotes.helper.Encryptor
+import com.aminivan.mynotes.response.Data
+import com.aminivan.mynotes.response.LoginResponse
 import com.aminivan.mynotes.response.NoteResponseItem
 import com.aminivan.mynotes.response.UserResponseItem
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
@@ -29,6 +32,7 @@ import com.bumptech.glide.Glide
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.log
 
 
 class FragmentLogin : Fragment() {
@@ -65,7 +69,7 @@ class FragmentLogin : Fragment() {
 
         binding.btnLogin.setOnClickListener(){
 //            observer(binding.edtEmailLogin.text.toString())
-            authApi(binding.edtEmailLogin.text.toString())
+            authApi(binding.edtEmailLogin.text.toString(),binding.edtPasswordLogin.text.toString())
         }
 
         binding.tvGotoRegister.setOnClickListener(){
@@ -102,53 +106,44 @@ class FragmentLogin : Fragment() {
 //            }
 //        })
 //    }
-    fun auth(password: String,rpassword : ByteArray){
-        if(password.equals(encryptor.getDecryptedPassword(requireContext(),rpassword))){
-            var addData = dataUserShared.edit()
-            addData.putInt("id",idUser)
-            addData.apply()
-            Toast.makeText(context, "Login Berhasil !!", Toast.LENGTH_SHORT).show()
-            gotoHome()
-        } else {
-            Log.d("Decrypted Password : ",encryptor.getDecryptedPassword(requireContext(),rpassword))
-            Toast.makeText(context, "Password Salah !!!", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun authApi(email : String){
-        val client = ApiConfig.getApiService().getUser(email)
-        client.enqueue(object : Callback<UserResponseItem> {
+    fun authApi(email : String,password: String){
+        val client = ApiConfig.getApiService().auth(email, password)
+        client.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(
-                call: Call<UserResponseItem>,
-                response: Response<UserResponseItem>
+                call: Call<LoginResponse>,
+                response: Response<LoginResponse>
             ) {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
-                        idUser = responseBody.id
-                        user!!.id = responseBody.id
-                        user!!.username = responseBody.username
-                        user!!.email = responseBody.email
-                        user!!.password = responseBody.password
-                        submitPref(user!!.username.toString(),user!!.email.toString(),user!!.password.toString())
-                        auth(binding.edtPasswordLogin.text.toString(),responseBody.password.toByteArray())
+                        Log.d(TAG, "UserToken: ${responseBody}")
+                        idUser = responseBody.data!!.id!!.toInt()
+                        user!!.id = responseBody.data!!.id!!.toInt()
+                        user!!.email = responseBody.data.email
+                        user!!.username = responseBody.data.name
+                        submitPref(user!!.username.toString(),user!!.email.toString(),responseBody.data.token.toString())
+                        Log.d(TAG, "UserToken: ${responseBody.data}")
+                        gotoHome()
                     }
                 } else {
                     Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+                    if (response.message().equals("Unauthorized")){
+                        Toast.makeText(context, "Email / Password salah", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
-            override fun onFailure(call: Call<UserResponseItem>, t: Throwable) {
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 Log.e(ContentValues.TAG, "onFailure: ${t.message}")
             }
         })
     }
     
     
-    fun submitPref(username: String, email: String,password: String){
+    fun submitPref(username: String, email: String,token: String){
         var addData = dataUserShared.edit()
         addData.putString("username",username)
         addData.putString("email",email)
-        addData.putString("password",password)
+        addData.putString("token",token)
         addData.apply()
 
     }
