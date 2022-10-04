@@ -120,8 +120,10 @@ class FragmentLogin : Fragment() {
                         idUser = responseBody.data!!.id!!.toInt()
                         user!!.id = responseBody.data!!.id!!.toInt()
                         user!!.email = responseBody.data.email
-                        user!!.username = responseBody.data.name
-                        submitPref(user!!.username.toString(),user!!.email.toString(),responseBody.data.token.toString())
+                        user!!.name = responseBody.data.name
+                        user!!.profile = responseBody.data.profile
+                        user!!.jk = responseBody.data.profile
+                        submitPref(user!!.name.toString(),user!!.email.toString(),responseBody.data.token.toString())
                         Log.d(TAG, "UserToken: ${responseBody.data}")
                         gotoHome()
                     }

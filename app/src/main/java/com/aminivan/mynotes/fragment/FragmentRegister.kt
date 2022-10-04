@@ -18,6 +18,8 @@ import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.FragmentRegisterBinding
 import com.aminivan.mynotes.helper.Encryptor
+import com.aminivan.mynotes.response.Data
+import com.aminivan.mynotes.response.LoginResponse
 import com.aminivan.mynotes.response.PostUserResponse
 import com.aminivan.mynotes.response.UserResponseItem
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
@@ -77,7 +79,7 @@ class FragmentRegister : Fragment() {
                 }
                 else -> {
                     user.let { note ->
-                        note?.username = binding.edtUsername.text.toString()
+                        note?.name = binding.edtUsername.text.toString()
                         note?.email = binding.edtEmail.text.toString()
                         note?.password = encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString()
                     }
@@ -124,12 +126,12 @@ class FragmentRegister : Fragment() {
 
     }
 
-    private fun postUser(password: String,email:String,username:String,profile: String, Jk: String) {
-        val client = ApiConfig.getApiService().createUser(UserResponseItem(password,0,email,username,"defaultprofile",Jk))
-        client.enqueue(object : Callback<PostUserResponse> {
+    private fun postUser(password: String,email:String,name:String,profile: String, Jk: String) {
+        val client = ApiConfig.getApiService().createUser(User(0,name,email,password,"default",Jk))
+        client.enqueue(object : Callback<User> {
             override fun onResponse(
-                call: Call<PostUserResponse>,
-                response: Response<PostUserResponse>
+                call: Call<User>,
+                response: Response<User>
             ) {
                 val responseBody = response.body()
                 if (response.isSuccessful && responseBody != null) {
@@ -139,7 +141,7 @@ class FragmentRegister : Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<PostUserResponse>, t: Throwable) {
+            override fun onFailure(call: Call<User>, t: Throwable) {
                 Log.e(ContentValues.TAG, "onFailure: ${t.message}")
             }
 

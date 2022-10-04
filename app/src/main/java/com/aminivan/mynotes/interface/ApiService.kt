@@ -1,5 +1,6 @@
 package com.aminivan.mynotes.`interface`
 
+import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.response.*
 import retrofit2.Call
 import retrofit2.http.*
@@ -25,10 +26,10 @@ interface ApiService {
         @Body body: NoteResponseItem
     ): Call<UpdateUserResponse>
 
-    @POST("user")
+    @POST("api/auth/register")
     fun createUser(
-        @Body body :UserResponseItem
-    ) : Call<PostUserResponse>
+        @Body body :User
+    ) : Call<User>
 
     @GET("auth/{email}")
     fun getUser(
@@ -41,5 +42,6 @@ interface ApiService {
         @Field("email") email: String,
         @Field("password") password : String
     ):Call<LoginResponse>
+
 
 }

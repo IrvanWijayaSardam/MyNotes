@@ -206,12 +206,12 @@ class FragmentHome : Fragment() {
     fun getData(){
         user.let { user ->
             user?.id = dataUserShared.getInt("id",0)
-            user?.username = dataUserShared.getString("username","")
+            user?.name = dataUserShared.getString("username","")
             user?.email = dataUserShared.getString("email","")
             user?.password = dataUserShared.getString("password","")
         }
 
-        binding.tvWelcomeHome.setText("Welcome , ${user?.username} !")
+        binding.tvWelcomeHome.setText("Welcome , ${user?.name} !")
     }
 
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
