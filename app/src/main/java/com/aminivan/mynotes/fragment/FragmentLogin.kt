@@ -69,7 +69,13 @@ class FragmentLogin : Fragment() {
 
         binding.btnLogin.setOnClickListener(){
 //            observer(binding.edtEmailLogin.text.toString())
-            authApi(binding.edtEmailLogin.text.toString(),binding.edtPasswordLogin.text.toString())
+            if(binding.edtEmailLogin.text.toString().isEmpty()) {
+                binding.edtEmailLogin.error = "Silahkan isi email"
+            } else if (binding.edtPasswordLogin.text.toString().isEmpty()){
+                binding.edtPasswordLogin.error = "Silahkan isi password"
+            } else {
+                authApi(binding.edtEmailLogin.text.toString(),binding.edtPasswordLogin.text.toString())
+            }
         }
 
         binding.tvGotoRegister.setOnClickListener(){

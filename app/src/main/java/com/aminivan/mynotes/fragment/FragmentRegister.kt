@@ -84,8 +84,7 @@ class FragmentRegister : Fragment() {
                         note?.password = encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString()
                     }
                     noteAddUpdateViewModel.insertUser(user as User)
-                    
-                    postUser(encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString(),binding.edtEmail.text.toString(),binding.edtUsername.text.toString(),"DefaultProfile",Jk)
+                    postUser(binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtUsername.text.toString(),"",Jk)
                     Toast.makeText(context, "Registrasi Berhasil Silahkan Login", Toast.LENGTH_SHORT).show()
                     gotoLogin()
                 }
