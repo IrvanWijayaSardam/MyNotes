@@ -6,9 +6,10 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface ApiService {
-    @GET("notes/")
+    @GET("api/user/profile")
     fun getNotes(
-    ): Call<List<NoteResponseItem>>
+        @Header("Authorization") authorization : String,
+        ): Call<ResponseFetchAll>
 
     @GET("notes/{id}")
     fun getNotesById(

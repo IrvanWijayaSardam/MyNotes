@@ -20,7 +20,10 @@ import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.databinding.FragmentSplashBinding
+import com.aminivan.mynotes.response.DataNotes
 import com.aminivan.mynotes.response.NoteResponseItem
+import com.aminivan.mynotes.response.NotesItem
+import com.aminivan.mynotes.response.ResponseFetchAll
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.bumptech.glide.Glide
@@ -61,9 +64,11 @@ class FragmentSplash : Fragment() {
             if(dataUserShared.getInt("id",0).equals("")){
                 gotoLogin()
             } else {
-                //noteAddUpdateViewModel.deleteAllNotes()
+                noteAddUpdateViewModel.deleteAllNotes()
                 retriveNotes(dataUserShared.getInt("id",0).toString())
                 Toast.makeText(context, "All Notes Deleted", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "onViewCreated: ${dataUserShared.getString("token","").toString()}")
+                retriveNotes(dataUserShared.getString("token","").toString())
                 gotoHome()
             }
         },5000)
@@ -80,35 +85,37 @@ class FragmentSplash : Fragment() {
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
     }
     
-    private fun retriveNotes(id : String) {
-        val client = ApiConfig.getApiService().getNotesById(id)
-        client.enqueue(object : Callback<List<NoteResponseItem>> {
+    private fun retriveNotes(token : String) {
+        val client = ApiConfig.getApiService().getNotes(token)
+        client.enqueue(object : Callback<ResponseFetchAll> {
             override fun onResponse(
-                call: Call<List<NoteResponseItem>>,
-                response: Response<List<NoteResponseItem>>
+                call: Call<ResponseFetchAll>,
+                response: Response<ResponseFetchAll>
             ) {
                 if (response.isSuccessful) {
-                    val responseBody = response.body()
+                    val responseBody = response.body()!!.data!!.notes
                     if (responseBody != null) {
                         Log.d(TAG, "onResponse: ${responseBody}")
                         for (i in 0 until responseBody.size) {
                             note.let { note ->
-                                note?.title = responseBody[i].title
-                                note?.description = responseBody[i].description
-                                note?.date = responseBody[i].date
-                                note?.idUser = responseBody[i].userid.toInt()
-                                note?.image = responseBody[i].image
-                                noteAddUpdateViewModel.insert(Note(responseBody[i].id,responseBody[i].title,responseBody[i].description,responseBody[i].date,responseBody[i].userid.toInt(),responseBody[i].image))
+                                note?.id = responseBody[i]!!.id!!.toInt()
+                                note?.title = responseBody[i]!!.title
+                                note?.description = responseBody[i]!!.description
+                                note?.date = responseBody[i]!!.date
+                                note?.idUser = responseBody[i]!!.user!!.id!!.toInt()
+                                note?.image = responseBody[i]!!.image
+                                noteAddUpdateViewModel.insert(Note(responseBody[i]!!.id!!.toInt(),responseBody[i]!!.title,responseBody[i]!!.description,
+                                    responseBody[i]!!.date,responseBody[i]!!.user!!.id!!.toInt(),responseBody[i]!!.image))
                             }
-                            Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
-                            Log.d(TAG, "onResponse: ${responseBody[i].description}")
+//                            Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
+//                            Log.d(TAG, "onResponse: ${responseBody[i]!!.description}")
                         }
                     }
                 } else {
                     Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
                 }
             }
-            override fun onFailure(call: Call<List<NoteResponseItem>>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
                 Log.e(ContentValues.TAG, "onFailure: ${t.message}")
             }
         })
