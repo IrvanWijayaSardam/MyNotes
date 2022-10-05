@@ -129,7 +129,7 @@ class FragmentLogin : Fragment() {
                         user!!.name = responseBody.data.name
                         user!!.profile = responseBody.data.profile
                         user!!.jk = responseBody.data.profile
-                        submitPref(user!!.name.toString(),user!!.email.toString(),responseBody.data.token.toString())
+                        submitPref(user!!.id,user!!.name.toString(),user!!.email.toString(),responseBody.data.token.toString())
                         Log.d(TAG, "UserToken: ${responseBody.data}")
                         gotoHome()
                     }
@@ -147,8 +147,9 @@ class FragmentLogin : Fragment() {
     }
     
     
-    fun submitPref(username: String, email: String,token: String){
+    fun submitPref(id: Int,username: String, email: String,token: String){
         var addData = dataUserShared.edit()
+        addData.putInt("id",id)
         addData.putString("username",username)
         addData.putString("email",email)
         addData.putString("token",token)

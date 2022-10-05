@@ -23,7 +23,7 @@ data class NoteResponseItem(
     val date: String,
 
     @field:SerializedName("userid")
-    val userid: String,
+    val userid: Int,
 
     @field:SerializedName("image")
     val image: String,

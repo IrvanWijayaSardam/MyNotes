@@ -1,7 +1,6 @@
 package com.aminivan.mynotes.fragment
 
 import android.app.Activity.RESULT_OK
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.ContentValues
 import android.content.ContentValues.TAG
@@ -9,13 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -45,10 +41,8 @@ import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.log
 
 
 class FragmentHome : Fragment() {
@@ -182,9 +176,9 @@ class FragmentHome : Fragment() {
                         }
                         noteAddUpdateViewModel.insert(note as Note)
                         if(defaultUri.equals("Default")) {
-                            postUser(0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0).toString(),"Default")
+                            postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0),"Default")
                         } else {
-                            postUser(0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0).toString(),defaultUri)
+                            postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0),defaultUri)
                         }
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
@@ -273,8 +267,8 @@ class FragmentHome : Fragment() {
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
     }
-    private fun postUser(id: Int,title:String,description:String,date: String,userid: String, image : String) {
-        val client = ApiConfig.getApiService().createNotes(NoteResponseItem(id,title,description,date, userid,image))
+    private fun postUser(token : String,id: Int,title:String,description:String,date: String,userid: Int, image : String) {
+        val client = ApiConfig.getApiService().createNotes(token,NoteResponseItem(id,title,description,date, userid,image))
         client.enqueue(object : Callback<PostNotesResponse> {
             override fun onResponse(
                 call: Call<PostNotesResponse>,

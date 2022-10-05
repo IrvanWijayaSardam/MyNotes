@@ -15,8 +15,9 @@ interface ApiService {
         @Path("id") id: String,
     ): Call<List<NoteResponseItem>>
 
-    @POST("notes/")
+    @POST("api/notes/")
     fun createNotes(
+        @Header("Authorization") authorization : String,
         @Body body: NoteResponseItem
     ) : Call<PostNotesResponse>
 
