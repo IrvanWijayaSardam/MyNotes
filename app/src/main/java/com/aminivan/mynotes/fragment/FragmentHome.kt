@@ -139,6 +139,10 @@ class FragmentHome : Fragment() {
 
         Log.d("Id Grabbed : ",dataUserShared.getInt("id",0).toString())
 
+        binding.tvWelcomeHome.setOnClickListener {
+            gotoProfile()
+        }
+
         binding.fabAdd.setOnClickListener(){
             val judul : EditText = dialog.findViewById(R.id.edtJudul)
             val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
@@ -208,6 +212,7 @@ class FragmentHome : Fragment() {
             user?.name = dataUserShared.getString("username","")
             user?.email = dataUserShared.getString("email","")
             user?.password = dataUserShared.getString("password","")
+            user?.profile = dataUserShared.getString("profile","")
         }
 
         binding.tvWelcomeHome.setText("Welcome , ${user?.name} !")
@@ -401,6 +406,10 @@ class FragmentHome : Fragment() {
     }
     fun gotoLogin(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentLogin)
+    }
+
+    fun gotoProfile(){
+        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentProfile)
     }
 
     private fun retriveNotes(token : String) {
