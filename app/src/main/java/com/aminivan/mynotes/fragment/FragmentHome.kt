@@ -33,9 +33,12 @@ import com.aminivan.mynotes.helper.SwipeToDeleteCallback
 import com.aminivan.mynotes.helper.URIPathHelper
 import com.aminivan.mynotes.response.NoteResponseItem
 import com.aminivan.mynotes.response.PostNotesResponse
+import com.aminivan.mynotes.response.ResponseFetchAll
+import com.aminivan.mynotes.response.UpdateNotesResponse
 import com.aminivan.mynotes.viewmodel.NoteAdapter
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
+import com.google.android.gms.common.api.Api
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
@@ -176,13 +179,14 @@ class FragmentHome : Fragment() {
                         }
                         noteAddUpdateViewModel.insert(note as Note)
                         if(defaultUri.equals("Default")) {
-                            postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0),"Default")
+                            postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
                         } else {
-                            postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),dataUserShared.getInt("id",0),defaultUri)
+                            postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                         }
+                        noteAddUpdateViewModel.insert(note!!)
+                        retriveNotes(dataUserShared.getString("token","").toString())
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
-                        observer()
                     }
                 }
             }
@@ -214,6 +218,7 @@ class FragmentHome : Fragment() {
     }
 
     fun setAdapter(){
+        retriveNotes(dataUserShared.getString("token","").toString())
         adapter = NoteAdapter(
             object : NoteAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {
@@ -224,7 +229,10 @@ class FragmentHome : Fragment() {
 
                 override fun onUpdate(note: Note) {
                     noteAddUpdateViewModel.update(note)
-                    Toast.makeText(context, "Notes updated", Toast.LENGTH_SHORT).show()
+                    updateNote(dataUserShared.getString("token","").toString(),note.id,
+                        note.title.toString(),
+                        note.description.toString(), note.date.toString(), note.image.toString()
+                    )
                     observer()
                 }
             }
@@ -267,12 +275,42 @@ class FragmentHome : Fragment() {
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
     }
-    private fun postUser(token : String,id: Int,title:String,description:String,date: String,userid: Int, image : String) {
-        val client = ApiConfig.getApiService().createNotes(token,NoteResponseItem(id,title,description,date, userid,image))
+    private fun postUser(token : String,id: Int,title:String,description:String,date: String, image : String) {
+        val client = ApiConfig.getApiService().createNotes(token,NoteResponseItem(id,title,description,date, dataUserShared.getInt("id",0),image))
         client.enqueue(object : Callback<PostNotesResponse> {
             override fun onResponse(
                 call: Call<PostNotesResponse>,
                 response: Response<PostNotesResponse>
+            ) {
+                val responseBody = response.body()
+                if (response.isSuccessful && responseBody != null) {
+                    Toast.makeText(context, "Notes updated", Toast.LENGTH_SHORT).show()
+                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+                } else {
+                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+                    Log.d(TAG, "onResponse: ${token}")
+                    Log.d(TAG, "onResponse: ${id}")
+                    Log.d(TAG, "onResponse: ${title}")
+                    Log.d(TAG, "onResponse: ${description}")
+                    Log.d(TAG, "onResponse: ${date}")
+                    Log.d(TAG, "onResponse: ${image}")
+                }
+            }
+
+            override fun onFailure(call: Call<PostNotesResponse>, t: Throwable) {
+                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+            }
+
+        })
+    }
+
+    private fun updateNote(token: String,id: Int,title: String,description: String,date: String,image: String){
+        val client = ApiConfig.getApiService().updateNotes(token,id.toString(),
+            NoteResponseItem(id, title, description, date, dataUserShared.getInt("id",0), image))
+        client.enqueue(object : Callback<UpdateNotesResponse> {
+            override fun onResponse(
+                call: Call<UpdateNotesResponse>,
+                response: Response<UpdateNotesResponse>
             ) {
                 val responseBody = response.body()
                 if (response.isSuccessful && responseBody != null) {
@@ -282,7 +320,7 @@ class FragmentHome : Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<PostNotesResponse>, t: Throwable) {
+            override fun onFailure(call: Call<UpdateNotesResponse>, t: Throwable) {
                 Log.e(ContentValues.TAG, "onFailure: ${t.message}")
             }
 
@@ -339,5 +377,41 @@ class FragmentHome : Fragment() {
     }
     fun gotoLogin(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentLogin)
+    }
+
+    private fun retriveNotes(token : String) {
+        val client = ApiConfig.getApiService().getNotes(token)
+        client.enqueue(object : Callback<ResponseFetchAll> {
+            override fun onResponse(
+                call: Call<ResponseFetchAll>,
+                response: Response<ResponseFetchAll>
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()!!.data!!.notes
+                    if (responseBody != null) {
+                        Log.d(TAG, "onResponse: ${responseBody}")
+                        for (i in 0 until responseBody.size) {
+                            note.let { note ->
+                                note?.id = responseBody[i]!!.id!!.toInt()
+                                note?.title = responseBody[i]!!.title
+                                note?.description = responseBody[i]!!.description
+                                note?.date = responseBody[i]!!.date
+                                note?.idUser = responseBody[i]!!.user!!.id!!.toInt()
+                                note?.image = responseBody[i]!!.image
+                                noteAddUpdateViewModel.insert(Note(responseBody[i]!!.id!!.toInt(),responseBody[i]!!.title,responseBody[i]!!.description,
+                                    responseBody[i]!!.date,responseBody[i]!!.user!!.id!!.toInt(),responseBody[i]!!.image))
+                            }
+//                            Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
+//                            Log.d(TAG, "onResponse: ${responseBody[i]!!.description}")
+                        }
+                    }
+                } else {
+                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
+                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+            }
+        })
     }
 }

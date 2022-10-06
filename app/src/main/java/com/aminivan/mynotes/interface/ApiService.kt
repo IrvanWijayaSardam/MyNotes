@@ -22,11 +22,12 @@ interface ApiService {
         @Body body: NoteResponseItem
     ) : Call<PostNotesResponse>
 
-    @PUT("notes/{id}")
+    @PUT("api/notes/{id}")
     fun updateNotes(
+        @Header("Authorization") authorization : String,
         @Path("id") id : String,
         @Body body: NoteResponseItem
-    ): Call<UpdateUserResponse>
+    ): Call<UpdateNotesResponse>
 
     @POST("api/auth/register")
     fun createUser(

@@ -85,9 +85,12 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
 
                 submit.setOnClickListener(){
                     note.let { note ->
+                        note?.id = note.id
                         note?.title = judul.text.toString()
                         note?.description = catatan.text.toString()
                         note?.date = DateHelper.getCurrentDate()
+                        note?.idUser = note.idUser
+                        note?.image = note.image
                     }
                     listener.onUpdate(note)
                     dialog.dismiss()
