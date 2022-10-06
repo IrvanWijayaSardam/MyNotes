@@ -224,6 +224,7 @@ class FragmentHome : Fragment() {
             object : NoteAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {
                     noteAddUpdateViewModel.delete(note)
+                    deleteNote(dataUserShared.getString("token","").toString(),note.id)
                     Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
                 }
@@ -322,6 +323,28 @@ class FragmentHome : Fragment() {
             }
 
             override fun onFailure(call: Call<UpdateNotesResponse>, t: Throwable) {
+                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+            }
+
+        })
+    }
+
+    private fun deleteNote(token: String,id: Int) {
+        val client = ApiConfig.getApiService().deleteNotes(token,id.toString())
+        client.enqueue(object : Callback<ResponseFetchAll> {
+            override fun onResponse(
+                call: Call<ResponseFetchAll>,
+                response: Response<ResponseFetchAll>
+            ) {
+                val responseBody = response.body()
+                if (response.isSuccessful && responseBody != null) {
+                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+                } else {
+                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
                 Log.e(ContentValues.TAG, "onFailure: ${t.message}")
             }
 

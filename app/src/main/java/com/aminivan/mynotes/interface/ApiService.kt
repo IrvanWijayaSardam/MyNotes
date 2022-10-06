@@ -16,6 +16,7 @@ interface ApiService {
         @Path("id") id: String,
     ): Call<List<NoteResponseItem>>
 
+
     @POST("api/notes/")
     fun createNotes(
         @Header("Authorization") authorization : String,
@@ -28,6 +29,12 @@ interface ApiService {
         @Path("id") id : String,
         @Body body: NoteResponseItem
     ): Call<UpdateNotesResponse>
+
+    @DELETE("api/notes/{id}")
+    fun deleteNotes(
+        @Header("Authorization") authorization : String,
+        @Path("id") id : String,
+    ) : Call<ResponseFetchAll>
 
     @POST("api/auth/register")
     fun createUser(
