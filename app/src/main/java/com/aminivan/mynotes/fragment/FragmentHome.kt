@@ -264,7 +264,7 @@ class FragmentHome : Fragment() {
                 val dataDelete = adapter.listNotes[position]
 
                 noteAddUpdateViewModel.delete(dataDelete)
-
+                deleteNote(dataUserShared.getString("token","").toString(),dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
                         noteAddUpdateViewModel.insert(dataDelete)
