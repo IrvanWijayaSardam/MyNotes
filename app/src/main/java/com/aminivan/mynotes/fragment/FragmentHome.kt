@@ -180,10 +180,11 @@ class FragmentHome : Fragment() {
                         noteAddUpdateViewModel.insert(note as Note)
                         if(defaultUri.equals("Default")) {
                             postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
+                            noteAddUpdateViewModel.insert(note!!)
                         } else {
                             postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
+                            noteAddUpdateViewModel.insert(note!!)
                         }
-                        noteAddUpdateViewModel.insert(note!!)
                         retriveNotes(dataUserShared.getString("token","").toString())
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
@@ -241,7 +242,7 @@ class FragmentHome : Fragment() {
     }
     fun observer(){
         val mainViewModel = obtainViewModel(requireActivity())
-        mainViewModel.getAllNotes(user?.id.toString()).observe(requireActivity(), { noteList ->
+        mainViewModel.getAllNotes(dataUserShared.getInt("id",0).toString()).observe(requireActivity(), { noteList ->
             if (noteList != null) {
                 adapter.setListNotes(noteList)
                 if(noteList.size == 0) {
