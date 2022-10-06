@@ -135,13 +135,13 @@
                             android:id="@+id/rbMan"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Man" />
+                            android:text="@string/man" />
 
                         <RadioButton
                             android:id="@+id/rbWoman"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Woman" />
+                            android:text="@string/woman" />
                         </RadioGroup>
 
                     </LinearLayout>
@@ -151,7 +151,7 @@
                     android:id="@+id/btnUpdateUser"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:text="Update Data"
+                    android:text="@string/update_data"
                     android:backgroundTint="#AFA4A4"
                     android:layout_centerHorizontal="true" />
 

@@ -61,7 +61,7 @@ class FragmentSplash : Fragment() {
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
 
         android.os.Handler(Looper.myLooper()!!).postDelayed({
-            if(dataUserShared.getInt("id",0).equals("")){
+            if(dataUserShared.getInt("id",0).equals(0)){
                 gotoLogin()
             } else {
                 noteAddUpdateViewModel.deleteAllNotes()

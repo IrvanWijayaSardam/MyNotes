@@ -77,11 +77,16 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
                 val judul : EditText = dialog.findViewById(R.id.edtJudul)
                 val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
                 val submit : Button = dialog.findViewById(R.id.btnSubmit)
+                val attachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
 
                 tvInputCustomDialog.setText("Update Notes")
                 submit.setText("Update")
                 judul.setText(note.title)
                 catatan.setText(note.description)
+
+                attachImage.setOnClickListener {
+                    listener.onAttach()
+                }
 
                 submit.setOnClickListener(){
                     note.let { note ->
@@ -125,6 +130,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
     interface OnAdapterListener {
         fun onDelete(note: Note)
         fun onUpdate(note: Note)
+        fun onAttach()
     }
 
 }

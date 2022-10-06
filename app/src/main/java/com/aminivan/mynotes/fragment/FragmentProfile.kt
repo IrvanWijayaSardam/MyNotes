@@ -81,13 +81,20 @@ class FragmentProfile : Fragment() {
             updateUser(dataUserShared.getString("token","").toString(),"",dataUserShared.getString("email","").toString(),dataUserShared.getString("username","").toString(),imageUri.toString(),dataUserShared.getString("jk","").toString())
         }
         binding.btnUpdateUser.setOnClickListener {
-            if(binding.rbMan.isChecked) {
-                updateUser(dataUserShared.getString("token","").toString(),binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),imageUri.toString(),"M")
+            if(binding.edtPassword.text!!.isEmpty()){
+                updateUser(dataUserShared.getString("token","").toString(),"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),dataUserShared.getString("profile","").toString(),"M")
             } else {
-                updateUser(dataUserShared.getString("token","").toString(),binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),imageUri.toString(),"W")
+                if(binding.rbMan.isChecked) {
+                    updateUser(dataUserShared.getString("token","").toString(),binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),dataUserShared.getString("profile","").toString(),"M")
+                    clearData()
+                    gotoSplash()
+                } else {
+                    updateUser(dataUserShared.getString("token","").toString(),binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),dataUserShared.getString("profile","").toString(),"W")
+                    clearData()
+                    gotoSplash()
+                }
             }
         }
-
     }
 
     fun showData(){
@@ -186,4 +193,9 @@ class FragmentProfile : Fragment() {
         res.updateConfiguration(conf, res.displayMetrics)
     }
 
+    fun clearData(){
+        var pref = dataUserShared.edit()
+        pref.clear()
+        pref.apply()
+    }
 }

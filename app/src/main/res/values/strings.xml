@@ -34,4 +34,7 @@
     <string name="logout">Logout</string>
     <string name="home">Home</string>
     <string name="delete_data">Delete Data</string>
+    <string name="woman">Woman</string>
+    <string name="update_data">Update Data</string>
+    <string name="man">Man</string>
 </resources>

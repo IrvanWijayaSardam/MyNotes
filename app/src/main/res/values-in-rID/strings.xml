@@ -35,4 +35,7 @@
     <string name="logout">Keluar</string>
     <string name="home">Halaman Utama</string>
     <string name="delete_data">Hapus Data</string>
+    <string name="woman">Perempuan</string>
+    <string name="update_data">Perbarui Data</string>
+    <string name="man">Laki Laki</string>
 </resources>

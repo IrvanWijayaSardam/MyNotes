@@ -183,17 +183,17 @@ class FragmentHome : Fragment() {
                             note?.image = defaultUri
                         }
                         if(defaultUri.equals("Default")) {
-                            postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
+                            postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
                             noteAddUpdateViewModel.insert(note!!)
-                            Thread.sleep(300)
+                            Thread.sleep(100)
                             setAdapter()
                             judul.text.clear()
                             catatan.text.clear()
                             defaultUri = "Default"
                         } else {
-                            postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
+                            postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                             noteAddUpdateViewModel.insert(note!!)
-                            Thread.sleep(300)
+                            Thread.sleep(100)
                             setAdapter()
                             judul.text.clear()
                             catatan.text.clear()
@@ -243,15 +243,25 @@ class FragmentHome : Fragment() {
                     Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
                 }
-
                 override fun onUpdate(note: Note) {
                     noteAddUpdateViewModel.update(note)
-                    updateNote(dataUserShared.getString("token","").toString(),note.id,
-                        note.title.toString(),
-                        note.description.toString(), note.date.toString(), note.image.toString()
+                    if (selectedFile.equals("Attach File")){
+                        updateNote(dataUserShared.getString("token","").toString(),note.id,
+                            note.title.toString(),
+                            note.description.toString(), note.date.toString(), note.image.toString()
+                        )
+                    } else {
+                        updateNote(dataUserShared.getString("token","").toString(),note.id,
+                            note.title.toString(),
+                            note.description.toString(), note.date.toString(), imageUri.toString()
+                        )
+                    }
 
-                    )
                     observer()
+                }
+
+                override fun onAttach() {
+                    pickImageFromGallery()
                 }
             }
         )
@@ -283,6 +293,7 @@ class FragmentHome : Fragment() {
                 deleteNote(dataUserShared.getString("token","").toString(),dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
+                        postNotes(dataUserShared.getString("token","").toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),dataDelete.image.toString())
                         noteAddUpdateViewModel.insert(dataDelete)
                     }
                     show()
@@ -321,7 +332,7 @@ class FragmentHome : Fragment() {
 
     }
 
-    private fun postUser(token : String,id: Int,title:String,description:String,date: String, image : String) {
+    private fun postNotes(token : String,id: Int,title:String,description:String,date: String, image : String) {
         val client = ApiConfig.getApiService().createNotes(token,NoteResponseItem(id,title,description,date, dataUserShared.getInt("id",0),image))
         client.enqueue(object : Callback<PostNotesResponse> {
             override fun onResponse(
