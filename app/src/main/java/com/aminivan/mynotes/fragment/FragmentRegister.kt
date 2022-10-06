@@ -86,6 +86,7 @@ class FragmentRegister : Fragment() {
                     noteAddUpdateViewModel.insertUser(user as User)
                     postUser(binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtUsername.text.toString(),"",Jk)
                     Toast.makeText(context, "Registrasi Berhasil Silahkan Login", Toast.LENGTH_SHORT).show()
+                    noteAddUpdateViewModel.deleteAllNotes()
                     gotoLogin()
                 }
             }

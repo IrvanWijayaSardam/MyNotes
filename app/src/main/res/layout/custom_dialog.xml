@@ -67,11 +67,12 @@
                     android:layout_height="30dp"
                     android:src="@drawable/attach_file"
                     />
+
                 <TextView
                     android:id="@+id/tvAttachFile"
-                    android:layout_width="250dp"
+                    android:layout_width="252dp"
                     android:layout_height="wrap_content"
-                    android:text="Attach File"/>
+                    android:text="Attach File" />
             </LinearLayout>
             <ImageView
                 android:id="@+id/ivCancel"

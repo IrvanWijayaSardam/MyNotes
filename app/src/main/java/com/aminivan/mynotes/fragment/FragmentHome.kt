@@ -40,7 +40,6 @@ import com.aminivan.mynotes.viewmodel.NoteAdapter
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.bumptech.glide.Glide
-import com.google.android.gms.common.api.Api
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
@@ -48,6 +47,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.log
 
 
 class FragmentHome : Fragment() {
@@ -60,6 +60,7 @@ class FragmentHome : Fragment() {
     lateinit var dialog : Dialog
     lateinit var profile : Bitmap
     private val handler = Handler()
+
 
     private val pickImage = 100
     lateinit var imageUri : Uri
@@ -111,10 +112,6 @@ class FragmentHome : Fragment() {
                     e.printStackTrace()
                 }
             }
-
-            // setting the visibility of the progressbar to invisible
-            // or you can use View.GONE instead of invisible
-            // View.GONE will remove the progressbar
             progressBar.visibility = View.INVISIBLE
             btnSubmit.isClickable = true
 
@@ -124,6 +121,7 @@ class FragmentHome : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         var context = binding.rvNotes.context
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.custom_dialog);
@@ -153,11 +151,12 @@ class FragmentHome : Fragment() {
             val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
             val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
 
-
             icCancel.setOnClickListener {
                 selectedFile = "Attach File"
                 tvAttachImage.text = selectedFile
                 icCancel.visibility = View.INVISIBLE
+                deleteImage(defaultUri)
+                defaultUri = "Default"
             }
 
             attachImage.setOnClickListener {
@@ -183,18 +182,19 @@ class FragmentHome : Fragment() {
                             note?.idUser = user!!.id
                             note?.image = defaultUri
                         }
-                        noteAddUpdateViewModel.insert(note as Note)
                         if(defaultUri.equals("Default")) {
                             postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
                             noteAddUpdateViewModel.insert(note!!)
-                            Thread.sleep(100)
+                            Thread.sleep(200)
                             setAdapter()
+
                         } else {
                             postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                             noteAddUpdateViewModel.insert(note!!)
-                            Thread.sleep(100)
+                            Thread.sleep(200)
                             setAdapter()
                         }
+                        setAdapter()
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                     }
@@ -244,6 +244,7 @@ class FragmentHome : Fragment() {
                     updateNote(dataUserShared.getString("token","").toString(),note.id,
                         note.title.toString(),
                         note.description.toString(), note.date.toString(), note.image.toString()
+
                     )
                     observer()
                 }
@@ -287,7 +288,6 @@ class FragmentHome : Fragment() {
         val swipeToSeeCallBack = object : SwipeToSeeCallBack(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val dataDelete = adapter.listNotes[position]
                 dialog = Dialog(requireContext())
                 dialog.setContentView(R.layout.custom_dialog_attachment);
                 val ivAttachment : ImageView = dialog.findViewById(R.id.imageDialogue)
@@ -297,15 +297,6 @@ class FragmentHome : Fragment() {
                 dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 dialog.show()
                 observer()
-//                noteAddUpdateViewModel.delete(dataDelete)
-//                deleteNote(dataUserShared.getString("token","").toString(),dataDelete.id)
-                Snackbar.make(view!!,"${adapter.listNotes[position].image.toString()}Notes Deleted",Snackbar.LENGTH_LONG).apply {
-                    setAction("UNDO"){
-                        observer()
-                    }
-                    show()
-                }
-
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
@@ -313,6 +304,18 @@ class FragmentHome : Fragment() {
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
         itemTouchHelperSee.attachToRecyclerView(binding.rvNotes)
     }
+
+    fun deleteImage(downloadLink : String){
+        val mFirebaseStorage = FirebaseStorage.getInstance().getReference().getStorage();
+        val photoRef = mFirebaseStorage.getReferenceFromUrl(downloadLink)
+        photoRef.delete().addOnSuccessListener {
+            Log.d(TAG, "deleteImage: Image Deleted")
+        }.addOnFailureListener {
+            Log.d(TAG, "deleteImage: Failed deleting image "+it.message)
+        }
+
+    }
+
     private fun postUser(token : String,id: Int,title:String,description:String,date: String, image : String) {
         val client = ApiConfig.getApiService().createNotes(token,NoteResponseItem(id,title,description,date, dataUserShared.getInt("id",0),image))
         client.enqueue(object : Callback<PostNotesResponse> {

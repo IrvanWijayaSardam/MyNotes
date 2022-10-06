@@ -19,8 +19,8 @@ data class UserResponseItem(
 	@field:SerializedName("email")
 	val email: String,
 
-	@field:SerializedName("username")
-	val username: String,
+	@field:SerializedName("name")
+	val name: String,
 
 	@field:SerializedName("Profile")
 	val profile: String,

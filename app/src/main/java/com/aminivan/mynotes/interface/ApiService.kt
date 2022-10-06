@@ -53,5 +53,11 @@ interface ApiService {
         @Field("password") password : String
     ):Call<LoginResponse>
 
+    @PUT("api/user/profile")
+    fun updateUser(
+        @Header("Authorization") authorization : String,
+        @Body body : UserResponseItem
+    ): Call<UserResponseItem>
+
 
 }
