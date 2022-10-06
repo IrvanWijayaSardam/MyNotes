@@ -30,6 +30,7 @@ import com.aminivan.mynotes.databinding.CustomDialogBinding
 import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.helper.DateHelper
 import com.aminivan.mynotes.helper.SwipeToDeleteCallback
+import com.aminivan.mynotes.helper.SwipeToSeeCallBack
 import com.aminivan.mynotes.helper.URIPathHelper
 import com.aminivan.mynotes.response.NoteResponseItem
 import com.aminivan.mynotes.response.PostNotesResponse
@@ -38,6 +39,7 @@ import com.aminivan.mynotes.response.UpdateNotesResponse
 import com.aminivan.mynotes.viewmodel.NoteAdapter
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
+import com.bumptech.glide.Glide
 import com.google.android.gms.common.api.Api
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.storage.FirebaseStorage
@@ -279,8 +281,34 @@ class FragmentHome : Fragment() {
 
             }
         }
+        val swipeToSeeCallBack = object : SwipeToSeeCallBack(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val dataDelete = adapter.listNotes[position]
+                dialog = Dialog(requireContext())
+                dialog.setContentView(R.layout.custom_dialog_attachment);
+                val ivAttachment : ImageView = dialog.findViewById(R.id.imageDialogue)
+
+                Glide.with(requireContext()).load(adapter.listNotes[position].image.toString()).into(ivAttachment)
+
+                dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.show()
+                observer()
+//                noteAddUpdateViewModel.delete(dataDelete)
+//                deleteNote(dataUserShared.getString("token","").toString(),dataDelete.id)
+                Snackbar.make(view!!,"${adapter.listNotes[position].image.toString()}Notes Deleted",Snackbar.LENGTH_LONG).apply {
+                    setAction("UNDO"){
+                        observer()
+                    }
+                    show()
+                }
+
+            }
+        }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        val itemTouchHelperSee = ItemTouchHelper(swipeToSeeCallBack)
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
+        itemTouchHelperSee.attachToRecyclerView(binding.rvNotes)
     }
     private fun postUser(token : String,id: Int,title:String,description:String,date: String, image : String) {
         val client = ApiConfig.getApiService().createNotes(token,NoteResponseItem(id,title,description,date, dataUserShared.getInt("id",0),image))

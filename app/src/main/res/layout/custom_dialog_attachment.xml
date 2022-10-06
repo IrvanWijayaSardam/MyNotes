@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="#4F545454"
+        >
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            android:backgroundTint="#ECE7E7"
+            >
+
+            <ImageView
+                android:id="@+id/imageDialogue"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                />
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+</layout>
