@@ -54,5 +54,9 @@
         android:id="@+id/fragmentProfile"
         android:name="com.aminivan.mynotes.fragment.FragmentProfile"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_fragmentProfile_to_fragmentSplash"
+            app:destination="@id/fragmentSplash" />
+    </fragment>
 </navigation>

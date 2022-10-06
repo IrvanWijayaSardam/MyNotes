@@ -154,9 +154,26 @@
                     android:text="Update Data"
                     android:backgroundTint="#AFA4A4"
                     android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/tvEN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="EN"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="20dp"
+                    />
+                <TextView
+                    android:id="@+id/tvID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID"
+                    android:layout_toRightOf="@+id/tvEN"
+                    android:layout_alignParentBottom="true"
+                    android:layout_margin="20dp"
+                    />
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
-
-
     </FrameLayout>
 </layout>

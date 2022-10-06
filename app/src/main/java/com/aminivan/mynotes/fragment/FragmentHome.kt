@@ -185,14 +185,19 @@ class FragmentHome : Fragment() {
                         if(defaultUri.equals("Default")) {
                             postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
                             noteAddUpdateViewModel.insert(note!!)
-                            Thread.sleep(200)
+                            Thread.sleep(300)
                             setAdapter()
-
+                            judul.text.clear()
+                            catatan.text.clear()
+                            defaultUri = "Default"
                         } else {
                             postUser(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                             noteAddUpdateViewModel.insert(note!!)
-                            Thread.sleep(200)
+                            Thread.sleep(300)
                             setAdapter()
+                            judul.text.clear()
+                            catatan.text.clear()
+                            defaultUri = "Default"
                         }
                         setAdapter()
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()

@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="100dp"
-                android:text="Login"
+                android:text="@string/login"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -53,7 +53,7 @@
                     android:layout_height="match_parent"
                     android:layout_below="@+id/tvLogin"
                     android:gravity="center"
-                    android:hint="Email"
+                    android:hint="@string/email"
                     android:background="@null"
                     android:inputType="text|textNoSuggestions" />
             </androidx.cardview.widget.CardView>
@@ -75,7 +75,7 @@
                     android:layout_height="match_parent"
                     android:layout_below="@+id/cvUsername"
                     android:gravity="center"
-                    android:hint="Password"
+                    android:hint="@string/password"
                     android:inputType="textPassword"
                     android:background="@null" />
 
@@ -97,7 +97,7 @@
                 android:layout_above="@+id/viewLine"
                 android:layout_centerHorizontal="true"
                 android:backgroundTint="#AFA4A4"
-                android:text="Login" />
+                android:text="@string/login" />
 
             <View
                 android:id="@+id/viewLine"
@@ -114,7 +114,7 @@
                 android:layout_marginBottom="10dp"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:text="Not Yet Have Account ? "
+                android:text="@string/not_yet_have_account"
                 android:layout_toLeftOf="@+id/tvGotoRegister"
                 android:textSize="15sp" />
 
@@ -126,7 +126,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="80dp"
                 android:layout_marginBottom="10dp"
-                android:text=" Register Here"
+                android:text="@string/register_here"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 

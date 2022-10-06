@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.Navigation
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.databinding.FragmentHomeBinding
@@ -64,6 +65,16 @@ class FragmentProfile : Fragment() {
 
         binding.btnUploadProfile.setOnClickListener {
             pickImageFromGallery()
+        }
+
+        binding.tvEN.setOnClickListener {
+            setLocale("en")
+            gotoSplash()
+        }
+
+        binding.tvID.setOnClickListener {
+            setLocale("id")
+            gotoSplash()
         }
 
         binding.btnSave.setOnClickListener {
@@ -161,6 +172,18 @@ class FragmentProfile : Fragment() {
             }
 
         })
+    }
+
+    fun gotoSplash(){
+        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentProfile_to_fragmentSplash)
+    }
+
+    fun setLocale(lang: String?) {
+        val myLocale = Locale(lang)
+        val res = resources
+        val conf = res.configuration
+        conf.locale = myLocale
+        res.updateConfiguration(conf, res.displayMetrics)
     }
 
 }
