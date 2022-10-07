@@ -39,7 +39,7 @@
                 android:id="@+id/edtJudul"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:hint="Masukkan Judul"
+                android:hint="@string/title"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="50dp" />
 
@@ -47,7 +47,7 @@
                 android:id="@+id/edtCatatan"
                 android:layout_width="300dp"
                 android:layout_height="200dp"
-                android:hint="Masukkan Catatan"
+                android:hint="@string/input_notes"
                 android:gravity="left"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="100dp" />
@@ -72,7 +72,7 @@
                     android:id="@+id/tvAttachFile"
                     android:layout_width="252dp"
                     android:layout_height="wrap_content"
-                    android:text="Attach File" />
+                    android:text="@string/attach_file" />
             </LinearLayout>
             <ImageView
                 android:id="@+id/ivCancel"
@@ -89,7 +89,7 @@
                 android:layout_height="70dp"
                 android:layout_marginTop="170dp"
                 android:layout_gravity="center"
-                android:text="ADD NOTES"
+                android:text="@string/add_notes"
                 android:backgroundTint="#AFA4A4"
 
                 />

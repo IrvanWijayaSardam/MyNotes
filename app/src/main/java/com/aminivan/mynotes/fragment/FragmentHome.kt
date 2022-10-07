@@ -225,7 +225,7 @@ class FragmentHome : Fragment() {
             user?.profile = dataUserShared.getString("profile","")
         }
 
-        binding.tvWelcomeHome.setText("Welcome , ${user?.name} !")
+        binding.tvWelcomeHome.setText("${user?.name} !")
     }
 
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {

@@ -38,4 +38,8 @@
     <string name="woman">Perempuan</string>
     <string name="update_data">Perbarui Data</string>
     <string name="man">Laki Laki</string>
+    <string name="add_notes">Tambahkan Notes</string>
+    <string name="attach_file">Sisipkan File</string>
+    <string name="input_notes">Masukkan Notes</string>
+    <string name="welcome">Selamat Datang,</string>
 </resources>

@@ -23,14 +23,25 @@
                 android:background="#AFA4A4"
                 >
                 <TextView
+                    android:id="@+id/welcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/welcome"
+                    android:textStyle="bold"
+                    android:layout_marginTop="20dp"
+                    />
+
+                <TextView
                     android:id="@+id/tvWelcomeHome"
-                    android:text="Welcome, Username!"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="20dp"
+                    android:layout_toRightOf="@+id/welcome"
+                    android:text="Username!"
                     android:textSize="15dp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvLogout"
