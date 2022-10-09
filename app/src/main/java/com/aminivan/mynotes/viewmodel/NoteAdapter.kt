@@ -69,38 +69,7 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
                     dialog.show()
                 }
             binding.ivUpdate.setOnClickListener{
-                val dialog = Dialog(context)
-                dialog.setContentView(R.layout.custom_dialog)
-                dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                val tvInputCustomDialog : TextView = dialog.findViewById(R.id.tvInputCustomDialog)
-                val judul : EditText = dialog.findViewById(R.id.edtJudul)
-                val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
-                val submit : Button = dialog.findViewById(R.id.btnSubmit)
-                val attachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
-
-                tvInputCustomDialog.setText("Update Notes")
-                submit.setText("Update")
-                judul.setText(note.title)
-                catatan.setText(note.description)
-
-                attachImage.setOnClickListener {
-                    listener.onAttach()
-                }
-
-                submit.setOnClickListener(){
-                    note.let { note ->
-                        note?.id = note.id
-                        note?.title = judul.text.toString()
-                        note?.description = catatan.text.toString()
-                        note?.date = DateHelper.getCurrentDate()
-                        note?.idUser = note.idUser
-                        note?.image = note.image
-                    }
-                    listener.onUpdate(note)
-                    dialog.dismiss()
-                }
-                dialog.show()
+                listener.onUpdate(note)
             }
 
             binding.cvItemNote.setOnClickListener {
@@ -130,7 +99,6 @@ class NoteAdapter(var listener : OnAdapterListener) : RecyclerView.Adapter<NoteA
     interface OnAdapterListener {
         fun onDelete(note: Note)
         fun onUpdate(note: Note)
-        fun onAttach()
     }
 
 }

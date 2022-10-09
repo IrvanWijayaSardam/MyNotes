@@ -58,11 +58,13 @@ class FragmentHome : Fragment() {
     lateinit var dataUserShared : SharedPreferences
     lateinit var selectedFile : String
     lateinit var dialog : Dialog
+    lateinit var dialogUpdate : Dialog
     lateinit var profile : Bitmap
     private val handler = Handler()
 
 
     private val pickImage = 100
+    private val updateImage = 69
     lateinit var imageUri : Uri
     lateinit var defaultUri : String
 
@@ -82,50 +84,14 @@ class FragmentHome : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
-        val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
-        val progressBar : ProgressBar = dialog.findViewById(R.id.progressBar)
-        val btnSubmit : Button = dialog.findViewById(R.id.btnSubmit)
-        tvAttachImage.text = selectedFile
-        if (selectedFile.length >30) {
-            icCancel.visibility = View.VISIBLE
-        } else {
-            icCancel.visibility = View.INVISIBLE
-        }
-
-        progressBar.visibility = View.VISIBLE
-
-        var i = progressBar.progress
-
-        Thread(Runnable {
-            // this loop will run until the value of i becomes 99
-            while (i < 100) {
-                i += 1
-                // Update the progress bar and display the current value
-                handler.post(Runnable {
-                    progressBar.progress = i
-                    btnSubmit.isClickable = false
-                })
-                try {
-                    Thread.sleep(100)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-            }
-            progressBar.visibility = View.INVISIBLE
-            btnSubmit.isClickable = true
-
-        }).start()
-
+        onResumeHandler()
+        onResumeUpdateHandler()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        setDialog()
         var context = binding.rvNotes.context
-        dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.custom_dialog);
-        dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         selectedFile = "Attach File"
         imageUri = Uri.parse("DefaultUri")
         defaultUri = "Default"
@@ -161,7 +127,7 @@ class FragmentHome : Fragment() {
 
             attachImage.setOnClickListener {
                 Log.d("AttachImage Onclick", "Clicked: ")
-                pickImageFromGallery()
+                pickImageFromGallery(pickImage)
                 dialog.dismiss()
             }
 
@@ -244,24 +210,34 @@ class FragmentHome : Fragment() {
                     observer()
                 }
                 override fun onUpdate(note: Note) {
-                    noteAddUpdateViewModel.update(note)
-                    if (selectedFile.equals("Attach File")){
-                        updateNote(dataUserShared.getString("token","").toString(),note.id,
-                            note.title.toString(),
-                            note.description.toString(), note.date.toString(), note.image.toString()
-                        )
-                    } else {
-                        updateNote(dataUserShared.getString("token","").toString(),note.id,
-                            note.title.toString(),
-                            note.description.toString(), note.date.toString(), imageUri.toString()
-                        )
+                    note.let { note ->
+                        note?.title = note.title
+                        note?.description = note.description
+                        note?.date = note.date
+                        note?.idUser = note.idUser
+                        note?.image = note.image
+                    }
+                    var dialogUpdate = Dialog(requireContext())
+                    dialogUpdate.setContentView(R.layout.custom_dialog_update);
+                    var tvTitleUpdate : EditText = dialogUpdate.findViewById(R.id.edtJudulUpdate)
+                    var tvDeskripsi : EditText = dialogUpdate.findViewById(R.id.edtCatatanUpdate)
+                    var btnSubmitUpdate : Button = dialogUpdate.findViewById(R.id.btnSubmitUpdate)
+                    var linearUpdate : LinearLayout = dialogUpdate.findViewById(R.id.linearAttachFileUpdate)
+
+                    tvTitleUpdate.setText(note.title)
+                    tvDeskripsi.setText(note.description)
+
+                    dialogUpdate.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    dialogUpdate.show()
+
+
+
+                    linearUpdate.setOnClickListener{
+                        pickImageFromGallery(updateImage)
+                        dialogUpdate.dismiss()
                     }
 
                     observer()
-                }
-
-                override fun onAttach() {
-                    pickImageFromGallery()
                 }
             }
         )
@@ -319,6 +295,15 @@ class FragmentHome : Fragment() {
         val itemTouchHelperSee = ItemTouchHelper(swipeToSeeCallBack)
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
         itemTouchHelperSee.attachToRecyclerView(binding.rvNotes)
+    }
+
+    fun setDialog(){
+        dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.custom_dialog);
+        dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialogUpdate = Dialog(requireContext())
+        dialogUpdate.setContentView(R.layout.custom_dialog_update);
+        dialogUpdate.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     fun deleteImage(downloadLink : String){
@@ -406,10 +391,9 @@ class FragmentHome : Fragment() {
         })
     }
 
-    private fun pickImageFromGallery() {
+    private fun pickImageFromGallery(code : Int) {
         val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-        startActivityForResult(gallery, pickImage)
-
+        startActivityForResult(gallery, code)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -425,6 +409,17 @@ class FragmentHome : Fragment() {
             selectedFile = filePath.toString()
             Log.d(TAG, "onActivityResult bitmap: ${profile}")
             dialog.show()
+        } else if (resultCode == RESULT_OK && requestCode == updateImage) {
+            imageUri = data?.data!!
+            val uriPathHelper = URIPathHelper()
+            val filePath = uriPathHelper.getPath(requireContext(), imageUri)
+            profile = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(imageUri.toString()))
+            uploadToFirebase()
+            Log.d(TAG, "onActivityResult: filepath : ${filePath} ")
+            Log.d(TAG, "GetImageUriDefault: ${imageUri.toString()}")
+            selectedFile = filePath.toString()
+            Log.d(TAG, "onActivityResult bitmap: ${profile}")
+            dialogUpdate.show()
         }
     }
 
@@ -496,5 +491,103 @@ class FragmentHome : Fragment() {
                 Log.e(ContentValues.TAG, "onFailure: ${t.message}")
             }
         })
+    }
+
+    fun onResumeHandler(){
+        dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.custom_dialog);
+
+        val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
+        val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
+        val progressBar : ProgressBar = dialog.findViewById(R.id.progressBar)
+        val btnSubmit : Button = dialog.findViewById(R.id.btnSubmit)
+        tvAttachImage.text = selectedFile
+        if (selectedFile.length >30) {
+            icCancel.visibility = View.VISIBLE
+        } else {
+            icCancel.visibility = View.INVISIBLE
+        }
+
+        progressBar.visibility = View.VISIBLE
+
+        var i = progressBar.progress
+
+        Thread(Runnable {
+            // this loop will run until the value of i becomes 99
+            while (i < 100) {
+                i += 1
+                // Update the progress bar and display the current value
+                handler.post(Runnable {
+                    progressBar.progress = i
+                    btnSubmit.isClickable = false
+                })
+                try {
+                    Thread.sleep(100)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+            }
+            progressBar.visibility = View.INVISIBLE
+            btnSubmit.isClickable = true
+
+        }).start()
+    }
+    fun onResumeUpdateHandler(){
+        val tvAttachImage : TextView = dialogUpdate.findViewById(R.id.tvAttachFileUpdate)
+        val icCancel : ImageView = dialogUpdate.findViewById(R.id.ivCancelUpdate)
+        val progressBar : ProgressBar = dialogUpdate.findViewById(R.id.progressBar)
+        val btnSubmit : Button = dialogUpdate.findViewById(R.id.btnSubmitUpdate)
+        val edtTitleUpdate : EditText = dialogUpdate.findViewById(R.id.edtJudulUpdate)
+        val edtDescription : EditText = dialogUpdate.findViewById(R.id.edtCatatanUpdate)
+
+        edtTitleUpdate.setText(note!!.title)
+        edtDescription.setText(note!!.description)
+        tvAttachImage.text = selectedFile
+        if (selectedFile.length >30) {
+            icCancel.visibility = View.VISIBLE
+        } else {
+            icCancel.visibility = View.INVISIBLE
+        }
+
+        progressBar.visibility = View.VISIBLE
+
+        var i = progressBar.progress
+
+        Thread(Runnable {
+            // this loop will run until the value of i becomes 99
+            while (i < 100) {
+                i += 1
+                // Update the progress bar and display the current value
+                handler.post(Runnable {
+                    progressBar.progress = i
+                    btnSubmit.isClickable = false
+                })
+                try {
+                    Thread.sleep(100)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+            }
+            progressBar.visibility = View.INVISIBLE
+            btnSubmit.isClickable = true
+
+        }).start()
+
+        btnSubmit.setOnClickListener {
+            noteAddUpdateViewModel.update(note!!)
+            if (selectedFile.equals("Attach File")){
+                updateNote(dataUserShared.getString("token","").toString(),note!!.id,
+                    edtTitleUpdate.text.toString(),
+                    edtDescription.text.toString(), note!!.date.toString(), note!!.image.toString()
+                )
+                dialogUpdate.dismiss()
+            } else {
+                updateNote(dataUserShared.getString("token","").toString(),note!!.id,
+                    edtTitleUpdate.text.toString(),
+                    edtDescription.text.toString(), note!!.date.toString(), imageUri.toString()
+                )
+                dialogUpdate.dismiss()
+            }
+        }
     }
 }

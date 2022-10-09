@@ -58,6 +58,4 @@ interface ApiService {
         @Header("Authorization") authorization : String,
         @Body body : UserResponseItem
     ): Call<UserResponseItem>
-
-
 }
