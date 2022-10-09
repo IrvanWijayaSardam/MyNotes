@@ -221,7 +221,7 @@ class FragmentHome : Fragment() {
                     dialogUpdate.setContentView(R.layout.custom_dialog_update);
                     var tvTitleUpdate : EditText = dialogUpdate.findViewById(R.id.edtJudulUpdate)
                     var tvDeskripsi : EditText = dialogUpdate.findViewById(R.id.edtCatatanUpdate)
-                    var btnSubmitUpdate : Button = dialogUpdate.findViewById(R.id.btnSubmitUpdate)
+                    var btnSubmit : Button = dialogUpdate.findViewById(R.id.btnSubmitUpdate)
                     var linearUpdate : LinearLayout = dialogUpdate.findViewById(R.id.linearAttachFileUpdate)
 
                     tvTitleUpdate.setText(note.title)
@@ -230,7 +230,42 @@ class FragmentHome : Fragment() {
                     dialogUpdate.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     dialogUpdate.show()
 
-
+                    btnSubmit.setOnClickListener {
+                        note.let { note ->
+                            note?.title = tvTitleUpdate.text.toString()
+                            note?.description = tvDeskripsi.text.toString()
+                            note?.date = note.date
+                            note?.idUser = note.idUser
+                            note?.image = note.image
+                        }
+                        if (selectedFile.equals("Attach File")){
+                            noteAddUpdateViewModel.update(note!!)
+                            updateNote(dataUserShared.getString("token","").toString(),note!!.id,
+                                tvTitleUpdate.text.toString(),
+                                tvDeskripsi.text.toString(), note!!.date.toString(), note!!.image.toString()
+                            )
+                            try {
+                                Thread.sleep(3000)
+                            } catch (e : InterruptedException){
+                                e.printStackTrace()
+                            }
+                            setAdapter()
+                            dialogUpdate.dismiss()
+                        } else {
+                            noteAddUpdateViewModel.update(note!!)
+                            updateNote(dataUserShared.getString("token","").toString(),note!!.id,
+                                tvTitleUpdate.text.toString(),
+                                tvDeskripsi.text.toString(), note!!.date.toString(), imageUri.toString()
+                            )
+                            try {
+                                Thread.sleep(3000)
+                            } catch (e : InterruptedException){
+                                e.printStackTrace()
+                            }
+                            setAdapter()
+                            dialogUpdate.dismiss()
+                        }
+                    }
 
                     linearUpdate.setOnClickListener{
                         pickImageFromGallery(updateImage)
@@ -574,18 +609,37 @@ class FragmentHome : Fragment() {
         }).start()
 
         btnSubmit.setOnClickListener {
-            noteAddUpdateViewModel.update(note!!)
             if (selectedFile.equals("Attach File")){
+                note.let { note ->
+                    note?.title = edtTitleUpdate.text.toString()
+                    note?.description = edtDescription.text.toString()
+                    note?.date = note!!.date
+                    note?.idUser = note!!.idUser
+                    note?.image = note!!.image
+                }
+                noteAddUpdateViewModel.update(note!!)
                 updateNote(dataUserShared.getString("token","").toString(),note!!.id,
                     edtTitleUpdate.text.toString(),
                     edtDescription.text.toString(), note!!.date.toString(), note!!.image.toString()
                 )
+
+                setAdapter()
                 dialogUpdate.dismiss()
             } else {
+                note.let { note ->
+                note?.title = edtTitleUpdate.text.toString()
+                note?.description = edtDescription.text.toString()
+                note?.date = note!!.date
+                note?.idUser = note!!.idUser
+                note?.image = imageUri.toString()
+                }
+                noteAddUpdateViewModel.update(note!!)
                 updateNote(dataUserShared.getString("token","").toString(),note!!.id,
                     edtTitleUpdate.text.toString(),
                     edtDescription.text.toString(), note!!.date.toString(), imageUri.toString()
                 )
+
+                setAdapter()
                 dialogUpdate.dismiss()
             }
         }
