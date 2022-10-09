@@ -84,7 +84,7 @@ class FragmentHome : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        onResumeHandler()
+        //onResumeHandler()
         onResumeUpdateHandler()
     }
 
@@ -110,6 +110,7 @@ class FragmentHome : Fragment() {
         }
 
         binding.fabAdd.setOnClickListener(){
+            setDialog()
             val judul : EditText = dialog.findViewById(R.id.edtJudul)
             val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
             val submit : Button = dialog.findViewById(R.id.btnSubmit)
@@ -127,7 +128,7 @@ class FragmentHome : Fragment() {
 
             attachImage.setOnClickListener {
                 Log.d("AttachImage Onclick", "Clicked: ")
-                pickImageFromGallery(pickImage)
+                pickImageFromGallery(100)
                 dialog.dismiss()
             }
 
@@ -156,6 +157,7 @@ class FragmentHome : Fragment() {
                             judul.text.clear()
                             catatan.text.clear()
                             defaultUri = "Default"
+                            dialog.dismiss()
                         } else {
                             postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                             noteAddUpdateViewModel.insert(note!!)
@@ -164,6 +166,7 @@ class FragmentHome : Fragment() {
                             judul.text.clear()
                             catatan.text.clear()
                             defaultUri = "Default"
+                            dialog.dismiss()
                         }
                         setAdapter()
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
@@ -363,6 +366,7 @@ class FragmentHome : Fragment() {
                 if (response.isSuccessful && responseBody != null) {
                     Toast.makeText(context, "Notes updated", Toast.LENGTH_SHORT).show()
                     Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+                    dialog.dismiss()
                 } else {
                     Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
                     Log.d(TAG, "onResponse: ${token}")
@@ -433,18 +437,7 @@ class FragmentHome : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == pickImage) {
-            imageUri = data?.data!!
-            val uriPathHelper = URIPathHelper()
-            val filePath = uriPathHelper.getPath(requireContext(), imageUri)
-            profile = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(imageUri.toString()))
-            uploadToFirebase()
-            Log.d(TAG, "onActivityResult: filepath : ${filePath} ")
-            Log.d(TAG, "GetImageUriDefault: ${imageUri.toString()}")
-            selectedFile = filePath.toString()
-            Log.d(TAG, "onActivityResult bitmap: ${profile}")
-            dialog.show()
-        } else if (resultCode == RESULT_OK && requestCode == updateImage) {
+       if (resultCode == RESULT_OK && requestCode == 69) {
             imageUri = data?.data!!
             val uriPathHelper = URIPathHelper()
             val filePath = uriPathHelper.getPath(requireContext(), imageUri)
@@ -455,7 +448,20 @@ class FragmentHome : Fragment() {
             selectedFile = filePath.toString()
             Log.d(TAG, "onActivityResult bitmap: ${profile}")
             dialogUpdate.show()
-        }
+        } else {
+           imageUri = data?.data!!
+           val uriPathHelper = URIPathHelper()
+           val filePath = uriPathHelper.getPath(requireContext(), imageUri)
+           profile = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(imageUri.toString()))
+           uploadToFirebase()
+           Log.d(TAG, "onActivityResult: filepath : ${filePath} ")
+           Log.d(TAG, "GetImageUriDefault: ${imageUri.toString()}")
+           selectedFile = filePath.toString()
+           Log.d(TAG, "onActivityResult bitmap: ${profile}")
+           Log.d(TAG, "onActivityResult: LEWAT ON ACTIVITY RESULT INSERT")
+           onResumeHandler()
+           dialog.show()
+       }
     }
 
     fun uploadToFirebase(){
@@ -531,8 +537,10 @@ class FragmentHome : Fragment() {
     fun onResumeHandler(){
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.custom_dialog);
-
+        dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
+        val edtJudul : EditText = dialog.findViewById(R.id.edtJudul)
+        val edtDescription : EditText = dialog.findViewById(R.id.edtCatatan)
         val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
         val progressBar : ProgressBar = dialog.findViewById(R.id.progressBar)
         val btnSubmit : Button = dialog.findViewById(R.id.btnSubmit)
@@ -566,8 +574,52 @@ class FragmentHome : Fragment() {
             btnSubmit.isClickable = true
 
         }).start()
+
+        btnSubmit.setOnClickListener{
+            when {
+                edtJudul.text.toString().isEmpty() -> {
+                    Toast.makeText(context, "Judul Masih Kosong", Toast.LENGTH_SHORT).show()
+                }
+                edtDescription.text.toString().isEmpty() -> {
+                    Toast.makeText(context, "Catatan Masih Kosong", Toast.LENGTH_SHORT).show() }
+
+                else -> {
+                    note.let { note ->
+                        note?.title = edtJudul.text.toString()
+                        note?.description = edtDescription.text.toString()
+                        note?.date = DateHelper.getCurrentDate()
+                        note?.idUser = user!!.id
+                        note?.image = defaultUri
+                    }
+                    if(defaultUri.equals("Default")) {
+                        postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
+                        noteAddUpdateViewModel.insert(note!!)
+                        Thread.sleep(100)
+                        setAdapter()
+                        edtJudul.text.clear()
+                        edtDescription.text.clear()
+                        defaultUri = "Default"
+                        dialog.dismiss()
+                    } else {
+                        postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
+                        noteAddUpdateViewModel.insert(note!!)
+                        Thread.sleep(100)
+                        setAdapter()
+                        edtJudul.text.clear()
+                        edtDescription.text.clear()
+                        defaultUri = "Default"
+                        dialog.dismiss()
+                    }
+                    setAdapter()
+                    Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+            }
+        }
     }
     fun onResumeUpdateHandler(){
+        dialogUpdate.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
         val tvAttachImage : TextView = dialogUpdate.findViewById(R.id.tvAttachFileUpdate)
         val icCancel : ImageView = dialogUpdate.findViewById(R.id.ivCancelUpdate)
         val progressBar : ProgressBar = dialogUpdate.findViewById(R.id.progressBar)
