@@ -27,6 +27,7 @@ import com.aminivan.mynotes.response.LoginResponse
 import com.aminivan.mynotes.response.NoteResponseItem
 import com.aminivan.mynotes.response.UserResponseItem
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
+import com.aminivan.mynotes.viewmodel.UserViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.bumptech.glide.Glide
 import retrofit2.Call
@@ -41,6 +42,7 @@ class FragmentLogin : Fragment() {
     lateinit var dataUserShared : SharedPreferences
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     lateinit var encryptor: Encryptor
+    lateinit var viewModeluser : UserViewModel
 
     private var user: User? = null
     var idUser : Int = 0
@@ -56,7 +58,9 @@ class FragmentLogin : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated: Sudah masuk login")
         binding.edtPasswordLogin.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
 
         encryptor = Encryptor()
 
@@ -66,6 +70,16 @@ class FragmentLogin : Fragment() {
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
         dataUserShared = requireActivity().getSharedPreferences("dataUser",Context.MODE_PRIVATE)
         user = User()
+
+        viewModeluser.dataUser.observe(requireActivity(),{
+            Log.d(TAG, "onResponseLogin: ${it.id}")
+            Log.d(TAG, "onResponseLogin: ${it.name}")
+            Log.d(TAG, "onResponseLogin: ${it.email}")
+            Log.d(TAG, "onResponseLogin: ${it.password}")
+            Log.d(TAG, "onResponseLogin: ${it.jk}")
+            Log.d(TAG, "onResponseLogin: ${it.token}")
+        })
+
 
         binding.btnLogin.setOnClickListener(){
 //            observer(binding.edtEmailLogin.text.toString())
@@ -97,21 +111,6 @@ class FragmentLogin : Fragment() {
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
     }
 
-//    fun observer(email : String){
-//        val mainViewModel = obtainViewModel(requireActivity())
-//        mainViewModel.authUser(email).observe(requireActivity(), { userData ->
-//            if (userData != null) {
-//                user!!.id = userData.id
-//                user!!.username = userData.username
-//                user!!.email = userData.email
-//                user!!.password = userData.password
-//                submitPref(user!!.id.toString(),user!!.username.toString(),user!!.email.toString(),user!!.password.toString())
-//                auth(binding.edtPasswordLogin.text.toString())
-//            } else {
-//                Toast.makeText(context, "Email Tidak Ditemukan , Silahkan Register", Toast.LENGTH_SHORT).show()
-//            }
-//        })
-//    }
     fun authApi(email : String,password: String){
         val client = ApiConfig.getApiService().auth(email, password)
         client.enqueue(object : Callback<LoginResponse> {
@@ -129,7 +128,10 @@ class FragmentLogin : Fragment() {
                         user!!.name = responseBody.data.name
                         user!!.profile = responseBody.data.profile
                         user!!.jk = responseBody.data.jk
-                        submitPref(user!!.id,user!!.name.toString(),user!!.email.toString(),responseBody.data.token.toString(),responseBody.data.profile.toString(),responseBody.data.jk.toString())
+                        //submitPref(user!!.id,user!!.name.toString(),user!!.email.toString(),responseBody.data.token.toString(),responseBody.data.profile.toString(),responseBody.data.jk.toString())
+                        viewModeluser.editData(user!!.id,
+                            user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),responseBody.data.jk.toString(),responseBody.data.token.toString())
+
                         Log.d(TAG, "UserToken: ${responseBody.data}")
                         gotoHome()
                     }
@@ -147,17 +149,17 @@ class FragmentLogin : Fragment() {
     }
     
     
-    fun submitPref(id: Int,username: String, email: String,token: String,profile : String,jk: String){
-        var addData = dataUserShared.edit()
-        addData.putInt("id",id)
-        addData.putString("username",username)
-        addData.putString("email",email)
-        addData.putString("token",token)
-        addData.putString("profile",profile)
-        addData.putString("jk",jk)
-        addData.apply()
+//    fun submitPref(id: Int,username: String, email: String,token: String,profile : String,jk: String){
+//        var addData = dataUserShared.edit()
+//        addData.putInt("id",id)
+//        addData.putString("username",username)
+//        addData.putString("email",email)
+//        addData.putString("token",token)
+//        addData.putString("profile",profile)
+//        addData.putString("jk",jk)
+//        addData.apply()
+//    }
 
-    }
 
     fun gotoHome(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentHome)

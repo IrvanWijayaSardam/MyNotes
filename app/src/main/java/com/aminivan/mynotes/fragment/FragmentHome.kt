@@ -38,6 +38,7 @@ import com.aminivan.mynotes.response.ResponseFetchAll
 import com.aminivan.mynotes.response.UpdateNotesResponse
 import com.aminivan.mynotes.viewmodel.NoteAdapter
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
+import com.aminivan.mynotes.viewmodel.UserViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -55,19 +56,20 @@ class FragmentHome : Fragment() {
     lateinit var binding : FragmentHomeBinding
     lateinit var dialogBinding: CustomDialogBinding
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
-    lateinit var dataUserShared : SharedPreferences
+//    lateinit var dataUserShared : SharedPreferences
     lateinit var selectedFile : String
     lateinit var dialog : Dialog
     lateinit var dialogUpdate : Dialog
     lateinit var profile : Bitmap
     private val handler = Handler()
+    lateinit var viewModeluser : UserViewModel
 
 
     private val pickImage = 100
     private val updateImage = 69
     lateinit var imageUri : Uri
     lateinit var defaultUri : String
-
+    lateinit var token : String
     private var note: Note? = null
     private var user : User? = null
 
@@ -99,11 +101,38 @@ class FragmentHome : Fragment() {
         note = Note()
         user = User()
         dialogBinding = CustomDialogBinding.inflate(layoutInflater)
-        dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
-        getData()
-        setAdapter()
 
-        Log.d("Id Grabbed : ",dataUserShared.getInt("id",0).toString())
+        Log.d(TAG, "onViewCreated: Sudah Masuk Home")
+        token = ""
+        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
+        viewModeluser.dataUser.observe(requireActivity(),{
+            Log.d(TAG, "FragmentHome: ${it.id}")
+            Log.d(TAG, "FragmentHome: ${it.name}")
+            Log.d(TAG, "FragmentHome: ${it.email}")
+            Log.d(TAG, "FragmentHome: ${it.password}")
+            Log.d(TAG, "FragmentHome: ${it.jk}")
+            Log.d(TAG, "FragmentHome: ${it.token}")
+
+            binding.tvWelcomeHome.setText(it.name)
+
+            user.let {
+                    user ->
+                user!!.id = it.id
+                user!!.name = it.name
+                user!!.email = it.email
+                user!!.password = it.password
+                user!!.jk = it.jk
+                user!!.profile = it.profile
+            }
+            token = it.token
+            setAdapter()
+        })
+
+        //dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
+        //getData()
+
+
+        //Log.d("Id Grabbed : ",dataUserShared.getInt("id",0).toString())
 
         binding.tvWelcomeHome.setOnClickListener {
             gotoProfile()
@@ -154,7 +183,7 @@ class FragmentHome : Fragment() {
                             note?.image = defaultUri
                         }
                         if(defaultUri.equals("Default")) {
-                            postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
+                            postNotes(token,0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
                             noteAddUpdateViewModel.insert(note!!)
                             Thread.sleep(100)
                             setAdapter()
@@ -163,7 +192,7 @@ class FragmentHome : Fragment() {
                             defaultUri = "Default"
                             dialog.dismiss()
                         } else {
-                            postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
+                            postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                             noteAddUpdateViewModel.insert(note!!)
                             Thread.sleep(100)
                             setAdapter()
@@ -185,30 +214,18 @@ class FragmentHome : Fragment() {
 
     }
 
-    fun getData(){
-        user.let { user ->
-            user?.id = dataUserShared.getInt("id",0)
-            user?.name = dataUserShared.getString("username","")
-            user?.email = dataUserShared.getString("email","")
-            user?.password = dataUserShared.getString("password","")
-            user?.profile = dataUserShared.getString("profile","")
-        }
-
-        binding.tvWelcomeHome.setText("${user?.name} !")
-    }
-
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
         val factory = ViewModelFactory.getInstance(activity.application)
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
     }
 
     fun setAdapter(){
-        retriveNotes(dataUserShared.getString("token","").toString())
+        retriveNotes(token)
         adapter = NoteAdapter(
             object : NoteAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {
                     noteAddUpdateViewModel.delete(note)
-                    deleteNote(dataUserShared.getString("token","").toString(),note.id)
+                    deleteNote(token,note.id)
                     Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
                 }
@@ -243,7 +260,7 @@ class FragmentHome : Fragment() {
                         }
                         if (selectedFile.equals("Attach File")){
                             noteAddUpdateViewModel.update(note!!)
-                            updateNote(dataUserShared.getString("token","").toString(),note!!.id,
+                            updateNote(token.toString(),note!!.id,
                                 tvTitleUpdate.text.toString(),
                                 tvDeskripsi.text.toString(), note!!.date.toString(), note!!.image.toString()
                             )
@@ -256,7 +273,7 @@ class FragmentHome : Fragment() {
                             dialogUpdate.dismiss()
                         } else {
                             noteAddUpdateViewModel.update(note!!)
-                            updateNote(dataUserShared.getString("token","").toString(),note!!.id,
+                            updateNote(token.toString(),note!!.id,
                                 tvTitleUpdate.text.toString(),
                                 tvDeskripsi.text.toString(), note!!.date.toString(), imageUri.toString()
                             )
@@ -274,7 +291,6 @@ class FragmentHome : Fragment() {
                         pickImageFromGallery(updateImage)
                         dialogUpdate.dismiss()
                     }
-
                     observer()
                 }
             }
@@ -283,13 +299,15 @@ class FragmentHome : Fragment() {
     }
     fun observer(){
         val mainViewModel = obtainViewModel(requireActivity())
-        mainViewModel.getAllNotes(dataUserShared.getInt("id",0).toString()).observe(requireActivity(), { noteList ->
+        mainViewModel.getAllNotes(user!!.id.toString()).observe(requireActivity(), { noteList ->
             if (noteList != null) {
                 adapter.setListNotes(noteList)
                 if(noteList.size == 0) {
                     binding.tvNoteEmpty.visibility = View.VISIBLE
+                    Log.d(TAG, "observer: $noteList")
                 } else {
                     binding.tvNoteEmpty.visibility = View.INVISIBLE
+                    Log.d(TAG, "observerEmpty: $noteList")
                 }
             }
         })
@@ -304,10 +322,10 @@ class FragmentHome : Fragment() {
                 val dataDelete = adapter.listNotes[position]
 
                 noteAddUpdateViewModel.delete(dataDelete)
-                deleteNote(dataUserShared.getString("token","").toString(),dataDelete.id)
+                deleteNote(token.toString(),dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
-                        postNotes(dataUserShared.getString("token","").toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),dataDelete.image.toString())
+                        postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),dataDelete.image.toString())
                         noteAddUpdateViewModel.insert(dataDelete)
                     }
                     show()
@@ -356,7 +374,7 @@ class FragmentHome : Fragment() {
     }
 
     private fun postNotes(token : String,id: Int,title:String,description:String,date: String, image : String) {
-        val client = ApiConfig.getApiService().createNotes(token,NoteResponseItem(id,title,description,date, dataUserShared.getInt("id",0),image))
+        val client = ApiConfig.getApiService().createNotes(token,NoteResponseItem(id,title,description,date, user!!.id,image))
         client.enqueue(object : Callback<PostNotesResponse> {
             override fun onResponse(
                 call: Call<PostNotesResponse>,
@@ -387,7 +405,7 @@ class FragmentHome : Fragment() {
 
     private fun updateNote(token: String,id: Int,title: String,description: String,date: String,image: String){
         val client = ApiConfig.getApiService().updateNotes(token,id.toString(),
-            NoteResponseItem(id, title, description, date, dataUserShared.getInt("id",0), image))
+            NoteResponseItem(id, title, description, date, user!!.id, image))
         client.enqueue(object : Callback<UpdateNotesResponse> {
             override fun onResponse(
                 call: Call<UpdateNotesResponse>,
@@ -484,13 +502,6 @@ class FragmentHome : Fragment() {
             Log.d(TAG, "uploadToFirebase: YOU'RE SUCH A FAILURE")
         }
     }
-
-    fun clearData(){
-        var pref = dataUserShared.edit()
-        pref.clear()
-        pref.apply()
-    }
-
 
     fun gotoProfile(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentProfile)
@@ -590,7 +601,7 @@ class FragmentHome : Fragment() {
                         note?.image = defaultUri
                     }
                     if(defaultUri.equals("Default")) {
-                        postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
+                        postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
                         noteAddUpdateViewModel.insert(note!!)
                         Thread.sleep(100)
                         setAdapter()
@@ -599,7 +610,7 @@ class FragmentHome : Fragment() {
                         defaultUri = "Default"
                         dialog.dismiss()
                     } else {
-                        postNotes(dataUserShared.getString("token","").toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
+                        postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                         noteAddUpdateViewModel.insert(note!!)
                         Thread.sleep(100)
                         setAdapter()
@@ -668,7 +679,7 @@ class FragmentHome : Fragment() {
                     note?.image = note!!.image
                 }
                 noteAddUpdateViewModel.update(note!!)
-                updateNote(dataUserShared.getString("token","").toString(),note!!.id,
+                updateNote(token.toString(),note!!.id,
                     edtTitleUpdate.text.toString(),
                     edtDescription.text.toString(), note!!.date.toString(), note!!.image.toString()
                 )
@@ -684,7 +695,7 @@ class FragmentHome : Fragment() {
                 note?.image = imageUri.toString()
                 }
                 noteAddUpdateViewModel.update(note!!)
-                updateNote(dataUserShared.getString("token","").toString(),note!!.id,
+                updateNote(token.toString(),note!!.id,
                     edtTitleUpdate.text.toString(),
                     edtDescription.text.toString(), note!!.date.toString(), imageUri.toString()
                 )

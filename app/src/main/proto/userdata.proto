@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_package = "com.aminivan.mynotes";
+option java_multiple_files = true;
+
+message UserDataProto {
+  // filter for showing / hiding completed tasks
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+  string profile = 5;
+  string jk = 6;
+  string token = 7;
+
+}

@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
@@ -25,6 +26,7 @@ import com.aminivan.mynotes.helper.URIPathHelper
 import com.aminivan.mynotes.response.DataUpdate
 import com.aminivan.mynotes.response.User
 import com.aminivan.mynotes.response.UserResponseItem
+import com.aminivan.mynotes.viewmodel.UserViewModel
 import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
@@ -44,6 +46,7 @@ class FragmentProfile : Fragment() {
     lateinit var profile : Bitmap
     lateinit var selectedFile : String
     lateinit var defaultUri : String
+    lateinit var viewModeluser : UserViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,8 +62,10 @@ class FragmentProfile : Fragment() {
         imageUri = Uri.parse("DefaultUri")
         selectedFile = "Attach File"
         defaultUri = "Default"
+        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
 
         dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
+
         showData()
 
         binding.btnUploadProfile.setOnClickListener {
@@ -75,6 +80,7 @@ class FragmentProfile : Fragment() {
         binding.tvLogout.setOnClickListener(){
             clearData()
             gotoLogin()
+            viewModeluser.clearData()
             Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
         }
 

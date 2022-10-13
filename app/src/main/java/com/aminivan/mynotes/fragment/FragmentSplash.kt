@@ -25,6 +25,7 @@ import com.aminivan.mynotes.response.NoteResponseItem
 import com.aminivan.mynotes.response.NotesItem
 import com.aminivan.mynotes.response.ResponseFetchAll
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
+import com.aminivan.mynotes.viewmodel.UserViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.bumptech.glide.Glide
 import retrofit2.Call
@@ -38,6 +39,7 @@ class FragmentSplash : Fragment() {
     lateinit var dataUserShared : SharedPreferences
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     private var note: Note? = null
+    lateinit var viewModeluser : UserViewModel
 
 
     override fun onCreateView(
@@ -53,6 +55,7 @@ class FragmentSplash : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         note = Note()
+        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
 
         Glide.with(this)
             .load(R.drawable.notebook)
@@ -61,16 +64,26 @@ class FragmentSplash : Fragment() {
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
 
         android.os.Handler(Looper.myLooper()!!).postDelayed({
-            if(dataUserShared.getInt("id",0).equals(0)){
-                gotoLogin()
-            } else {
-                noteAddUpdateViewModel.deleteAllNotes()
-                retriveNotes(dataUserShared.getInt("id",0).toString())
-                Toast.makeText(context, "All Notes Deleted", Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "onViewCreated: ${dataUserShared.getString("token","").toString()}")
-                retriveNotes(dataUserShared.getString("token","").toString())
-                gotoHome()
-            }
+            viewModeluser.dataUser.observe(requireActivity(),{
+                Log.d(TAG, "onResponseLogin: ${it.id}")
+                Log.d(TAG, "onResponseLogin: ${it.name}")
+                Log.d(TAG, "onResponseLogin: ${it.email}")
+                Log.d(TAG, "onResponseLogin: ${it.password}")
+                Log.d(TAG, "onResponseLogin: ${it.jk}")
+                Log.d(TAG, "onResponseLogin: ${it.token}")
+                if(it.id.equals(0)){
+                    gotoLogin()
+                } else {
+                    noteAddUpdateViewModel.deleteAllNotes()
+                    retriveNotes(it.id.toString())
+                    Toast.makeText(context, "All Notes Deleted", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "onViewCreated: ${it.token}.toString()}")
+                    retriveNotes(it.token.toString())
+                    gotoHome()
+                }
+            })
+
+
         },5000)
     }
 
