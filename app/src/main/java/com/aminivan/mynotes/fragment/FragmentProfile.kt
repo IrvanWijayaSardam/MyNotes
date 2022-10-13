@@ -72,6 +72,12 @@ class FragmentProfile : Fragment() {
             gotoSplash()
         }
 
+        binding.tvLogout.setOnClickListener(){
+            clearData()
+            gotoLogin()
+            Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
+        }
+
         binding.tvID.setOnClickListener {
             setLocale("id")
             gotoSplash()
@@ -183,6 +189,10 @@ class FragmentProfile : Fragment() {
 
     fun gotoSplash(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentProfile_to_fragmentSplash)
+    }
+
+    fun gotoLogin(){
+        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentProfile_to_fragmentLogin)
     }
 
     fun setLocale(lang: String?) {

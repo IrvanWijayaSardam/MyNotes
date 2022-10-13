@@ -109,6 +109,10 @@ class FragmentHome : Fragment() {
             gotoProfile()
         }
 
+        binding.ivMan.setOnClickListener{
+            gotoProfile()
+        }
+
         binding.fabAdd.setOnClickListener(){
             setDialog()
             val judul : EditText = dialog.findViewById(R.id.edtJudul)
@@ -177,11 +181,7 @@ class FragmentHome : Fragment() {
             dialog.show()
         }
 
-        binding.tvLogout.setOnClickListener(){
-            clearData()
-            gotoLogin()
-            Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
-        }
+
 
     }
 
@@ -490,9 +490,7 @@ class FragmentHome : Fragment() {
         pref.clear()
         pref.apply()
     }
-    fun gotoLogin(){
-        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentLogin)
-    }
+
 
     fun gotoProfile(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentProfile)

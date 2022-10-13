@@ -17,11 +17,21 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:background="#AFA4A4"
                 >
+                <ImageView
+                    android:id="@+id/ivMan"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/account"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    />
                 <TextView
                     android:id="@+id/welcome"
                     android:layout_width="wrap_content"
@@ -30,6 +40,7 @@
                     android:text="@string/welcome"
                     android:textStyle="bold"
                     android:layout_marginTop="20dp"
+                    android:layout_toRightOf="@+id/ivMan"
                     />
 
                 <TextView
@@ -43,17 +54,6 @@
                     android:textSize="15dp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tvLogout"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="10dp"
-                    android:text="@string/logout"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="20dp"
-                    android:textSize="15dp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
             </RelativeLayout>
             <TextView
                 android:id="@+id/tvHome"
