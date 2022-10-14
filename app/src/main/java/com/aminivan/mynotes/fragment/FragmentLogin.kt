@@ -38,8 +38,8 @@ import kotlin.math.log
 
 class FragmentLogin : Fragment() {
 
-    lateinit var binding : FragmentLoginBinding
-    lateinit var dataUserShared : SharedPreferences
+    private var _binding : FragmentLoginBinding? = null
+    private val binding get() = _binding!!
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     lateinit var encryptor: Encryptor
     lateinit var viewModeluser : UserViewModel
@@ -51,14 +51,12 @@ class FragmentLogin : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentLoginBinding.inflate(layoutInflater)
-        val view = binding.root
-        return view
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "onViewCreated: Sudah masuk login")
         binding.edtPasswordLogin.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
 
@@ -68,7 +66,6 @@ class FragmentLogin : Fragment() {
             .load(R.drawable.login)
             .into(binding.ivLogin);
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
-        dataUserShared = requireActivity().getSharedPreferences("dataUser",Context.MODE_PRIVATE)
         user = User()
 
         viewModeluser.dataUser.observe(requireActivity(),{
@@ -82,7 +79,6 @@ class FragmentLogin : Fragment() {
 
 
         binding.btnLogin.setOnClickListener(){
-//            observer(binding.edtEmailLogin.text.toString())
             if(binding.edtEmailLogin.text.toString().isEmpty()) {
                 binding.edtEmailLogin.error = "Silahkan isi email"
             } else if (binding.edtPasswordLogin.text.toString().isEmpty()){
@@ -147,27 +143,10 @@ class FragmentLogin : Fragment() {
             }
         })
     }
-    
-    
-//    fun submitPref(id: Int,username: String, email: String,token: String,profile : String,jk: String){
-//        var addData = dataUserShared.edit()
-//        addData.putInt("id",id)
-//        addData.putString("username",username)
-//        addData.putString("email",email)
-//        addData.putString("token",token)
-//        addData.putString("profile",profile)
-//        addData.putString("jk",jk)
-//        addData.apply()
-//    }
-
-
     fun gotoHome(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentHome)
     }
     fun gotoRegister(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentRegister)
     }
-
-
-
 }

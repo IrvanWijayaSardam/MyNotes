@@ -53,7 +53,8 @@ import kotlin.math.log
 
 class FragmentHome : Fragment() {
 
-    lateinit var binding : FragmentHomeBinding
+    private var _binding : FragmentHomeBinding? = null
+    private val binding get() = _binding!!
     lateinit var dialogBinding: CustomDialogBinding
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
 //    lateinit var dataUserShared : SharedPreferences
@@ -79,9 +80,8 @@ class FragmentHome : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentHomeBinding.inflate(layoutInflater)
-        val view = binding.root
-        return view
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onResume() {
@@ -115,8 +115,7 @@ class FragmentHome : Fragment() {
 
             binding.tvWelcomeHome.setText(it.name)
 
-            user.let {
-                    user ->
+            user.let { user ->
                 user!!.id = it.id
                 user!!.name = it.name
                 user!!.email = it.email

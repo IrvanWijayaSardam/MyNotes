@@ -36,17 +36,20 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
+
 class FragmentProfile : Fragment() {
 
 
     lateinit var binding : FragmentProfileBinding
-    lateinit var dataUserShared : SharedPreferences
+    //lateinit var dataUserShared : SharedPreferences
     private val pickImage = 100
     lateinit var imageUri : Uri
     lateinit var profile : Bitmap
     lateinit var selectedFile : String
     lateinit var defaultUri : String
     lateinit var viewModeluser : UserViewModel
+    private var user : com.aminivan.mynotes.database.User? = null
+    lateinit var token : String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,9 +65,31 @@ class FragmentProfile : Fragment() {
         imageUri = Uri.parse("DefaultUri")
         selectedFile = "Attach File"
         defaultUri = "Default"
-        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
+        user = com.aminivan.mynotes.database.User()
 
-        dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
+        token = ""
+
+        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
+        viewModeluser.dataUser.observe(requireActivity(),{
+            Log.d(TAG, "FragmentHome: ${it.id}")
+            Log.d(TAG, "FragmentHome: ${it.name}")
+            Log.d(TAG, "FragmentHome: ${it.email}")
+            Log.d(TAG, "FragmentHome: ${it.password}")
+            Log.d(TAG, "FragmentHome: ${it.jk}")
+            Log.d(TAG, "FragmentHome: ${it.token}")
+
+            user.let {
+                    user ->
+                user!!.id = it.id
+                user!!.name = it.name
+                user!!.email = it.email
+                user!!.password = it.password
+                user!!.jk = it.jk
+                user!!.profile = it.profile
+            }
+            token = it.token
+        })
+        //dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
 
         showData()
 
@@ -78,9 +103,9 @@ class FragmentProfile : Fragment() {
         }
 
         binding.tvLogout.setOnClickListener(){
-            clearData()
             gotoLogin()
             viewModeluser.clearData()
+            clearUser()
             Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
         }
 
@@ -90,19 +115,21 @@ class FragmentProfile : Fragment() {
         }
 
         binding.btnSave.setOnClickListener {
-            updateUser(dataUserShared.getString("token","").toString(),"",dataUserShared.getString("email","").toString(),dataUserShared.getString("username","").toString(),imageUri.toString(),dataUserShared.getString("jk","").toString())
+            updateUser(token,"",user!!.email.toString(),user!!.name.toString(),imageUri.toString(),user!!.jk.toString())
         }
         binding.btnUpdateUser.setOnClickListener {
             if(binding.edtPassword.text!!.isEmpty()){
-                updateUser(dataUserShared.getString("token","").toString(),"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),dataUserShared.getString("profile","").toString(),"M")
+                updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
             } else {
                 if(binding.rbMan.isChecked) {
-                    updateUser(dataUserShared.getString("token","").toString(),binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),dataUserShared.getString("profile","").toString(),"M")
-                    clearData()
+                    updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
+                    viewModeluser.clearData()
+                    clearUser()
                     gotoSplash()
                 } else {
-                    updateUser(dataUserShared.getString("token","").toString(),binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),dataUserShared.getString("profile","").toString(),"W")
-                    clearData()
+                    updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
+                    viewModeluser.clearData()
+                    clearUser()
                     gotoSplash()
                 }
             }
@@ -110,12 +137,10 @@ class FragmentProfile : Fragment() {
     }
 
     fun showData(){
-        Glide.with(this).load(dataUserShared.getString("profile","").toString()).circleCrop().into(binding.ivProfile)
-        binding.dataUser = User(dataUserShared.getString("jk",""),"",dataUserShared.getString("username",""),dataUserShared.getInt("id",0),dataUserShared.getString("email",""))
-        Log.d(TAG, "showData: ${dataUserShared.getString("jk","")}")
-        Log.d(TAG, "showData: ${dataUserShared.getString("profile","").toString()}")
+        Glide.with(this).load(user!!.profile.toString()).circleCrop().into(binding.ivProfile)
+        binding.dataUser = User(user!!.jk.toString(),"",user!!.name,user!!.id,user!!.email)
 
-        if(dataUserShared.getString("jk","").toString().equals("M")){
+        if(user!!.jk.toString().equals("M")){
             binding.rbMan.isChecked = true
             binding.rbWoman.isChecked = false
         } else {
@@ -146,7 +171,7 @@ class FragmentProfile : Fragment() {
     }
 
     fun uploadToFirebase(){
-        val fileName = dataUserShared.getInt("id",0)
+        val fileName = user!!.id
 
         val storageReference = FirebaseStorage.getInstance().getReference("profile/$fileName")
 
@@ -176,9 +201,8 @@ class FragmentProfile : Fragment() {
                 val responseBody = response.body()
                 if (response.isSuccessful && responseBody != null) {
                     Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                    var addData = dataUserShared.edit()
-                    addData.putString("profile",profile)
-                    addData.apply()
+                    viewModeluser.editData(user!!.id,
+                        user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),user!!.jk.toString(),token)
                     Toast.makeText(context, "Upload Profile Success", Toast.LENGTH_SHORT).show()
                     binding.btnSave.visibility = View.GONE
                 } else {
@@ -201,17 +225,23 @@ class FragmentProfile : Fragment() {
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentProfile_to_fragmentLogin)
     }
 
+    fun clearUser(){
+        user.let {
+                user ->
+            user!!.id = 0
+            user!!.name = ""
+            user!!.email = ""
+            user!!.password = ""
+            user!!.jk = ""
+            user!!.profile = ""
+        }
+    }
+
     fun setLocale(lang: String?) {
         val myLocale = Locale(lang)
         val res = resources
         val conf = res.configuration
         conf.locale = myLocale
         res.updateConfiguration(conf, res.displayMetrics)
-    }
-
-    fun clearData(){
-        var pref = dataUserShared.edit()
-        pref.clear()
-        pref.apply()
     }
 }

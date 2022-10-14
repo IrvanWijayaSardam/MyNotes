@@ -19,6 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.database.Note
+import com.aminivan.mynotes.database.User
+import com.aminivan.mynotes.databinding.FragmentHomeBinding
+import com.aminivan.mynotes.databinding.FragmentLoginBinding
 import com.aminivan.mynotes.databinding.FragmentSplashBinding
 import com.aminivan.mynotes.response.DataNotes
 import com.aminivan.mynotes.response.NoteResponseItem
@@ -35,32 +38,32 @@ import retrofit2.Response
 
 class FragmentSplash : Fragment() {
 
-    lateinit var binding : FragmentSplashBinding
-    lateinit var dataUserShared : SharedPreferences
+    private var _binding : FragmentSplashBinding? = null
+    private val binding get() = _binding!!
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     private var note: Note? = null
+    private var user : User? = null
     lateinit var viewModeluser : UserViewModel
-
+    private var token : String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentSplashBinding.inflate(layoutInflater)
-        val view = binding.root
-        return view
+        _binding = FragmentSplashBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         note = Note()
+        user = User()
         viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
 
         Glide.with(this)
             .load(R.drawable.notebook)
             .into(binding.ivSplash);
-        dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
 
         android.os.Handler(Looper.myLooper()!!).postDelayed({
@@ -71,19 +74,27 @@ class FragmentSplash : Fragment() {
                 Log.d(TAG, "onResponseLogin: ${it.password}")
                 Log.d(TAG, "onResponseLogin: ${it.jk}")
                 Log.d(TAG, "onResponseLogin: ${it.token}")
-                if(it.id.equals(0)){
-                    gotoLogin()
-                } else {
-                    noteAddUpdateViewModel.deleteAllNotes()
-                    retriveNotes(it.id.toString())
-                    Toast.makeText(context, "All Notes Deleted", Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, "onViewCreated: ${it.token}.toString()}")
-                    retriveNotes(it.token.toString())
-                    gotoHome()
+                user.let { user ->
+                    user!!.id = it.id
+                    user!!.name = it.name
+                    user!!.email = it.email
+                    user!!.password = it.password
+                    user!!.profile = it.profile
+                    user!!.jk = it.jk
+                    token = it.token
                 }
+
             })
-
-
+            if(user!!.id.equals(0)){
+                gotoLogin()
+            } else {
+                noteAddUpdateViewModel.deleteAllNotes()
+                retriveNotes(user!!.id.toString())
+                Toast.makeText(context, "All Notes Deleted", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "onViewCreated: ${token}.toString()}")
+                retriveNotes(token)
+                gotoHome()
+            }
         },5000)
     }
 
