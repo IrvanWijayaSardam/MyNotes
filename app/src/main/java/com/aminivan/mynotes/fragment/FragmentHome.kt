@@ -76,6 +76,7 @@ class FragmentHome : Fragment() {
     var secret : Boolean = false
 
     private var note: Note? = null
+    private var noteUpdate : Note? = null
     private var user : User? = null
 
     private lateinit var adapter: NoteAdapter
@@ -103,6 +104,7 @@ class FragmentHome : Fragment() {
         defaultUri = "Default"
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
         note = Note()
+        noteUpdate = Note()
         user = User()
         dialogBinding = CustomDialogBinding.inflate(layoutInflater)
 
@@ -250,20 +252,42 @@ class FragmentHome : Fragment() {
                     observer()
                 }
                 override fun onUpdate(note: Note) {
-                    note.let { note ->
-                        note?.title = note.title
-                        note?.description = note.description
-                        note?.date = note.date
-                        note?.idUser = note.idUser
-                        note?.image = note.image
-                        note?.secret = note.secret
+                    noteUpdate.let { noteUpdate ->
+                        noteUpdate!!.title = note.title
+                        noteUpdate!!.description = note.description
+                        noteUpdate!!.date = note.date
+                        noteUpdate!!.idUser = note.idUser
+                        noteUpdate!!.image = note.image
+                        noteUpdate!!.secret = note.secret
                     }
+
+                    Log.d(TAG, "onUpdate: noteUpdate title ${noteUpdate!!.title}")
                     var dialogUpdate = Dialog(requireContext())
                     dialogUpdate.setContentView(R.layout.custom_dialog_update);
                     var tvTitleUpdate : EditText = dialogUpdate.findViewById(R.id.edtJudulUpdate)
                     var tvDeskripsi : EditText = dialogUpdate.findViewById(R.id.edtCatatanUpdate)
                     var btnSubmit : Button = dialogUpdate.findViewById(R.id.btnSubmitUpdate)
                     var linearUpdate : LinearLayout = dialogUpdate.findViewById(R.id.linearAttachFileUpdate)
+                    val ivLockUpdate : ImageView = dialogUpdate.findViewById(R.id.ivLockUpdate)
+                    val ivUnlockUpdate : ImageView = dialogUpdate.findViewById(R.id.ivUnlockUpdate)
+
+
+                    ivLockUpdate.visibility = View.VISIBLE
+                    ivLockUpdate.setOnClickListener {
+                        secret = true
+                        ivLockUpdate.visibility = View.INVISIBLE
+                        ivUnlockUpdate.visibility = View.VISIBLE
+                        Toast.makeText(context, "This Notes Will Be Added As Secret Notes", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
+                    }
+
+                    ivUnlockUpdate.setOnClickListener {
+                        secret = false
+                        ivLockUpdate.visibility = View.VISIBLE
+                        ivUnlockUpdate.visibility = View.INVISIBLE
+                        Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
+                    }
+
 
                     tvTitleUpdate.setText(note.title)
                     tvDeskripsi.setText(note.description)
@@ -278,6 +302,7 @@ class FragmentHome : Fragment() {
                             note?.date = note.date
                             note?.idUser = note.idUser
                             note?.image = note.image
+                            note?.secret = secret
                         }
                         if (selectedFile.equals("Attach File")){
                             noteAddUpdateViewModel.update(note!!)
@@ -488,6 +513,7 @@ class FragmentHome : Fragment() {
             Log.d(TAG, "GetImageUriDefault: ${imageUri.toString()}")
             selectedFile = filePath.toString()
             Log.d(TAG, "onActivityResult bitmap: ${profile}")
+            onResumeUpdateHandler()
             dialogUpdate.show()
         } else {
            imageUri = data?.data!!
@@ -593,7 +619,6 @@ class FragmentHome : Fragment() {
         }
 
         ivLock.visibility = View.VISIBLE
-
         ivLock.setOnClickListener {
             secret = true
             ivLock.visibility = View.INVISIBLE
@@ -685,9 +710,28 @@ class FragmentHome : Fragment() {
         val btnSubmit : Button = dialogUpdate.findViewById(R.id.btnSubmitUpdate)
         val edtTitleUpdate : EditText = dialogUpdate.findViewById(R.id.edtJudulUpdate)
         val edtDescription : EditText = dialogUpdate.findViewById(R.id.edtCatatanUpdate)
+        val ivLockUpdate : ImageView = dialogUpdate.findViewById(R.id.ivLockUpdate)
+        val ivUnlockUpdate : ImageView = dialogUpdate.findViewById(R.id.ivUnlockUpdate)
 
-        edtTitleUpdate.setText(note!!.title)
-        edtDescription.setText(note!!.description)
+
+        ivLockUpdate.visibility = View.VISIBLE
+        ivLockUpdate.setOnClickListener {
+            secret = true
+            ivLockUpdate.visibility = View.INVISIBLE
+            ivUnlockUpdate.visibility = View.VISIBLE
+            Toast.makeText(context, "This Notes Will Be Added As Secret Notes", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
+        }
+
+        ivUnlockUpdate.setOnClickListener {
+            secret = false
+            ivLockUpdate.visibility = View.VISIBLE
+            ivUnlockUpdate.visibility = View.INVISIBLE
+            Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
+        }
+
+        edtTitleUpdate.setText(noteUpdate!!.title)
+        edtDescription.setText(noteUpdate!!.description)
         tvAttachImage.text = selectedFile
         if (selectedFile.length >30) {
             icCancel.visibility = View.VISIBLE
@@ -721,38 +765,39 @@ class FragmentHome : Fragment() {
 
         btnSubmit.setOnClickListener {
             if (selectedFile.equals("Attach File")){
-                note.let { note ->
-                    note?.title = edtTitleUpdate.text.toString()
-                    note?.description = edtDescription.text.toString()
-                    note?.date = note!!.date
-                    note?.idUser = note!!.idUser
-                    note?.image = note!!.image
-                    note?.secret = secret
+                noteUpdate.let { noteUpdate ->
+                    noteUpdate?.title = edtTitleUpdate.text.toString()
+                    noteUpdate?.description = edtDescription.text.toString()
+                    noteUpdate?.date = noteUpdate!!.date
+                    noteUpdate?.idUser = noteUpdate!!.idUser
+                    noteUpdate?.image = noteUpdate!!.image
+                    noteUpdate?.secret = secret
                 }
-                noteAddUpdateViewModel.update(note!!)
+                noteAddUpdateViewModel.update(Note(0,noteUpdate!!.title,noteUpdate!!.description,noteUpdate!!.date,noteUpdate!!.idUser,noteUpdate!!.image,noteUpdate!!.secret))
                 updateNote(token.toString(),note!!.id,
                     edtTitleUpdate.text.toString(),
                     edtDescription.text.toString(), note!!.date.toString(), note!!.image.toString()
                 )
-
-                setAdapter()
+                Toast.makeText(context, "Masuk Btn Submit OnUpdateResume If Attach File", Toast.LENGTH_SHORT).show()
+                //setAdapter()
                 dialogUpdate.dismiss()
             } else {
-                note.let { note ->
-                note?.title = edtTitleUpdate.text.toString()
-                note?.description = edtDescription.text.toString()
-                note?.date = note!!.date
-                note?.idUser = note!!.idUser
-                note?.image = imageUri.toString()
-                note?.secret = secret
-
+                noteUpdate.let { noteUpdate ->
+                    noteUpdate?.title = edtTitleUpdate.text.toString()
+                    noteUpdate?.description = edtDescription.text.toString()
+                    noteUpdate?.date = noteUpdate!!.date
+                    noteUpdate?.idUser = noteUpdate!!.idUser
+                    noteUpdate?.image = imageUri.toString()
+                    noteUpdate?.secret = secret
                 }
-                noteAddUpdateViewModel.update(note!!)
+                noteAddUpdateViewModel.update(noteUpdate!!)
+                //noteAddUpdateViewModel.update(Note(0,edtTitleUpdate.text.toString(),edtDescription.text.toString(),noteUpdate!!.date,noteUpdate!!.idUser,imageUri.toString(),noteUpdate!!.secret))
                 updateNote(token.toString(),note!!.id,
                     edtTitleUpdate.text.toString(),
                     edtDescription.text.toString(), note!!.date.toString(), imageUri.toString()
                 )
-
+                Toast.makeText(context, "Masuk Btn Submit OnUpdateResume if With Image", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "onResumeUpdateHandler: ${noteUpdate!!.title} uri ${noteUpdate!!.image}")
                 setAdapter()
                 dialogUpdate.dismiss()
             }
