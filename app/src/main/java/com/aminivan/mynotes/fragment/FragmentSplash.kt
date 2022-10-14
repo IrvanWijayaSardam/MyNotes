@@ -78,11 +78,6 @@ class FragmentSplash : Fragment() {
                     if(user?.email?.length == 0){
                         gotoLogin()
                     } else {
-                        noteAddUpdateViewModel.deleteAllNotes()
-                        retriveNotes(user!!.id.toString())
-                        Toast.makeText(context, "All Notes Deleted", Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "onViewCreated: ${token}.toString()}")
-                        retriveNotes(token)
                         gotoHome()
                     }
             })
@@ -100,39 +95,4 @@ class FragmentSplash : Fragment() {
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
     }
     
-    private fun retriveNotes(token : String) {
-        val client = ApiConfig.getApiService().getNotes(token)
-        client.enqueue(object : Callback<ResponseFetchAll> {
-            override fun onResponse(
-                call: Call<ResponseFetchAll>,
-                response: Response<ResponseFetchAll>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()!!.data!!.notes
-                    if (responseBody != null) {
-                        Log.d(TAG, "onResponse: ${responseBody}")
-                        for (i in 0 until responseBody.size) {
-                            note.let { note ->
-                                note?.id = responseBody[i]!!.id!!.toInt()
-                                note?.title = responseBody[i]!!.title
-                                note?.description = responseBody[i]!!.description
-                                note?.date = responseBody[i]!!.date
-                                note?.idUser = responseBody[i]!!.user!!.id!!.toInt()
-                                note?.image = responseBody[i]!!.image
-                                noteAddUpdateViewModel.insert(Note(responseBody[i]!!.id!!.toInt(),responseBody[i]!!.title,responseBody[i]!!.description,
-                                    responseBody[i]!!.date,responseBody[i]!!.user!!.id!!.toInt(),responseBody[i]!!.image))
-                            }
-//                            Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
-//                            Log.d(TAG, "onResponse: ${responseBody[i]!!.description}")
-                        }
-                    }
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                }
-            }
-            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-        })
-    }
 }

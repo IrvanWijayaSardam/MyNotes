@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_fragmentHome_to_fragmentProfile"
             app:destination="@id/fragmentProfile" />
+        <action
+            android:id="@+id/action_fragmentHome_to_fragmentSecret"
+            app:destination="@id/fragmentSecret" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSplash"
@@ -62,4 +65,9 @@
             android:id="@+id/action_fragmentProfile_to_fragmentLogin"
             app:destination="@id/fragmentLogin" />
     </fragment>
+    <fragment
+        android:id="@+id/fragmentSecret"
+        android:name="com.aminivan.mynotes.FragmentSecret"
+        android:label="fragment_secret"
+        tools:layout="@layout/fragment_secret" />
 </navigation>

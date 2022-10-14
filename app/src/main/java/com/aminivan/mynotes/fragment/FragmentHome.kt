@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -15,6 +16,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
@@ -71,6 +73,8 @@ class FragmentHome : Fragment() {
     lateinit var imageUri : Uri
     lateinit var defaultUri : String
     lateinit var token : String
+    var secret : Boolean = false
+
     private var note: Note? = null
     private var user : User? = null
 
@@ -127,18 +131,16 @@ class FragmentHome : Fragment() {
             setAdapter()
         })
 
-        //dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
-        //getData()
-
-
-        //Log.d("Id Grabbed : ",dataUserShared.getInt("id",0).toString())
-
         binding.tvWelcomeHome.setOnClickListener {
             gotoProfile()
         }
 
         binding.ivMan.setOnClickListener{
             gotoProfile()
+        }
+
+        binding.ivSecret.setOnClickListener{
+            gotoSecret()
         }
 
         binding.fabAdd.setOnClickListener(){
@@ -149,6 +151,26 @@ class FragmentHome : Fragment() {
             val attachImage : LinearLayout = dialog.findViewById(R.id.linearAttachFile)
             val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
             val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
+            val ivLock : ImageView = dialog.findViewById(R.id.ivLock)
+            val ivUnlock : ImageView = dialog.findViewById(R.id.ivUnlock)
+
+            ivLock.visibility = View.VISIBLE
+
+            ivLock.setOnClickListener {
+                secret = true
+                ivLock.visibility = View.INVISIBLE
+                ivUnlock.visibility = View.VISIBLE
+                Toast.makeText(context, "This Notes Will Be Added As Secret Notes", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
+            }
+
+            ivUnlock.setOnClickListener {
+                secret = false
+                ivLock.visibility = View.VISIBLE
+                ivUnlock.visibility = View.INVISIBLE
+                Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
+            }
+
 
             icCancel.setOnClickListener {
                 selectedFile = "Attach File"
@@ -172,7 +194,6 @@ class FragmentHome : Fragment() {
                     }
                     catatan.text.toString().isEmpty() -> {
                         Toast.makeText(context, "Catatan Masih Kosong", Toast.LENGTH_SHORT).show() }
-
                     else -> {
                         note.let { note ->
                             note?.title = judul.text.toString()
@@ -180,11 +201,12 @@ class FragmentHome : Fragment() {
                             note?.date = DateHelper.getCurrentDate()
                             note?.idUser = user!!.id
                             note?.image = defaultUri
+                            note?.secret = secret
                         }
                         if(defaultUri.equals("Default")) {
                             postNotes(token,0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
                             Thread.sleep(100)
-                            setAdapter()
+                            //setAdapter()
                             judul.text.clear()
                             catatan.text.clear()
                             defaultUri = "Default"
@@ -192,17 +214,21 @@ class FragmentHome : Fragment() {
                         } else {
                             postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                             Thread.sleep(100)
-                            setAdapter()
+                            //setAdapter()
                             judul.text.clear()
                             catatan.text.clear()
                             defaultUri = "Default"
                             dialog.dismiss()
                         }
-                        noteAddUpdateViewModel.insert(note!!)
-                        Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Secret Status : ${note?.secret}", Toast.LENGTH_SHORT).show()
+                        noteAddUpdateViewModel.insert(Note(0,note?.title.toString(),note?.description.toString(),note?.date.toString(),note?.idUser!!.toInt(),imageUri.toString(),note?.secret))
+                        //setAdapter()
+                        Toast.makeText(context, "Berhasil menambahkan satu data ${note!!.description}${note!!.secret}", Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, "onViewCreated: Berhasil Menambahkan ${note!!.description}${note!!.secret}")
                         dialog.dismiss()
                     }
                 }
+
             }
             dialog.show()
         }
@@ -230,6 +256,7 @@ class FragmentHome : Fragment() {
                         note?.date = note.date
                         note?.idUser = note.idUser
                         note?.image = note.image
+                        note?.secret = note.secret
                     }
                     var dialogUpdate = Dialog(requireContext())
                     dialogUpdate.setContentView(R.layout.custom_dialog_update);
@@ -354,6 +381,8 @@ class FragmentHome : Fragment() {
         dialogUpdate = Dialog(requireContext())
         dialogUpdate.setContentView(R.layout.custom_dialog_update);
         dialogUpdate.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+
     }
 
     fun deleteImage(downloadLink : String){
@@ -501,6 +530,10 @@ class FragmentHome : Fragment() {
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentProfile)
     }
 
+    fun gotoSecret(){
+        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentHome_to_fragmentSecret)
+    }
+
     private fun retriveNotes(token : String) {
         val client = ApiConfig.getApiService().getNotes(token)
         client.enqueue(object : Callback<ResponseFetchAll> {
@@ -520,8 +553,9 @@ class FragmentHome : Fragment() {
                                 note?.date = responseBody[i]!!.date
                                 note?.idUser = responseBody[i]!!.user!!.id!!.toInt()
                                 note?.image = responseBody[i]!!.image
+                                note?.secret = false
                                 noteAddUpdateViewModel.insert(Note(responseBody[i]!!.id!!.toInt(),responseBody[i]!!.title,responseBody[i]!!.description,
-                                    responseBody[i]!!.date,responseBody[i]!!.user!!.id!!.toInt(),responseBody[i]!!.image))
+                                    responseBody[i]!!.date,responseBody[i]!!.user!!.id!!.toInt(),responseBody[i]!!.image,note?.secret))
                             }
 //                            Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
 //                            Log.d(TAG, "onResponse: ${responseBody[i]!!.description}")
@@ -547,11 +581,32 @@ class FragmentHome : Fragment() {
         val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
         val progressBar : ProgressBar = dialog.findViewById(R.id.progressBar)
         val btnSubmit : Button = dialog.findViewById(R.id.btnSubmit)
+        val ivLock : ImageView = dialog.findViewById(R.id.ivLock)
+        val ivUnlock : ImageView = dialog.findViewById(R.id.ivUnlock)
+
+
         tvAttachImage.text = selectedFile
         if (selectedFile.length >30) {
             icCancel.visibility = View.VISIBLE
         } else {
             icCancel.visibility = View.INVISIBLE
+        }
+
+        ivLock.visibility = View.VISIBLE
+
+        ivLock.setOnClickListener {
+            secret = true
+            ivLock.visibility = View.INVISIBLE
+            ivUnlock.visibility = View.VISIBLE
+            Toast.makeText(context, "This Notes Will Be Added As Secret Notes", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
+        }
+
+        ivUnlock.setOnClickListener {
+            secret = false
+            ivLock.visibility = View.VISIBLE
+            ivUnlock.visibility = View.INVISIBLE
+            Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
         }
 
         progressBar.visibility = View.VISIBLE
@@ -593,6 +648,7 @@ class FragmentHome : Fragment() {
                         note?.date = DateHelper.getCurrentDate()
                         note?.idUser = user!!.id
                         note?.image = defaultUri
+                        note?.secret = secret
                     }
                     if(defaultUri.equals("Default")) {
                         postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
@@ -611,9 +667,10 @@ class FragmentHome : Fragment() {
                         defaultUri = "Default"
                         dialog.dismiss()
                     }
-                    noteAddUpdateViewModel.insert(note!!)
+                    noteAddUpdateViewModel.insert(Note(0,note?.title.toString(),note?.description.toString(),note?.date.toString(),note?.idUser!!.toInt(),imageUri.toString(),note?.secret))
+
                     setAdapter()
-                    Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Berhasil menambahkan satu data ${note!!.toString()}", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                 }
             }
@@ -670,6 +727,7 @@ class FragmentHome : Fragment() {
                     note?.date = note!!.date
                     note?.idUser = note!!.idUser
                     note?.image = note!!.image
+                    note?.secret = secret
                 }
                 noteAddUpdateViewModel.update(note!!)
                 updateNote(token.toString(),note!!.id,
@@ -686,6 +744,8 @@ class FragmentHome : Fragment() {
                 note?.date = note!!.date
                 note?.idUser = note!!.idUser
                 note?.image = imageUri.toString()
+                note?.secret = secret
+
                 }
                 noteAddUpdateViewModel.update(note!!)
                 updateNote(token.toString(),note!!.id,

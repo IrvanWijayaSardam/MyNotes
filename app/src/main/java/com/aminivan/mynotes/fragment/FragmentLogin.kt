@@ -22,10 +22,7 @@ import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.FragmentLoginBinding
 import com.aminivan.mynotes.databinding.FragmentSplashBinding
 import com.aminivan.mynotes.helper.Encryptor
-import com.aminivan.mynotes.response.Data
-import com.aminivan.mynotes.response.LoginResponse
-import com.aminivan.mynotes.response.NoteResponseItem
-import com.aminivan.mynotes.response.UserResponseItem
+import com.aminivan.mynotes.response.*
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
 import com.aminivan.mynotes.viewmodel.UserViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
@@ -43,7 +40,7 @@ class FragmentLogin : Fragment() {
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     lateinit var encryptor: Encryptor
     lateinit var viewModeluser : UserViewModel
-
+    private var note: Note? = null
     private var user: User? = null
     var idUser : Int = 0
 
@@ -66,17 +63,8 @@ class FragmentLogin : Fragment() {
             .load(R.drawable.login)
             .into(binding.ivLogin);
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
+        note = Note()
         user = User()
-
-        viewModeluser.dataUser.observe(requireActivity(),{
-//            Log.d(TAG, "onResponseLogin: ${it.id}")
-//            Log.d(TAG, "onResponseLogin: ${it.name}")
-//            Log.d(TAG, "onResponseLogin: ${it.email}")
-//            Log.d(TAG, "onResponseLogin: ${it.password}")
-//            Log.d(TAG, "onResponseLogin: ${it.jk}")
-//            Log.d(TAG, "onResponseLogin: ${it.token}")
-        })
-
 
         binding.btnLogin.setOnClickListener(){
             if(binding.edtEmailLogin.text.toString().isEmpty()) {
@@ -124,10 +112,10 @@ class FragmentLogin : Fragment() {
                         user!!.name = responseBody.data.name
                         user!!.profile = responseBody.data.profile
                         user!!.jk = responseBody.data.jk
-                        //submitPref(user!!.id,user!!.name.toString(),user!!.email.toString(),responseBody.data.token.toString(),responseBody.data.profile.toString(),responseBody.data.jk.toString())
+                        noteAddUpdateViewModel.deleteAllNotes()
                         viewModeluser.editData(user!!.id,
                             user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),responseBody.data.jk.toString(),responseBody.data.token.toString())
-
+                        retriveNotes(responseBody.data.token.toString())
                         Log.d(TAG, "UserToken: ${responseBody.data}")
                         gotoHome()
                     }
@@ -143,6 +131,44 @@ class FragmentLogin : Fragment() {
             }
         })
     }
+
+    private fun retriveNotes(token : String) {
+        val client = ApiConfig.getApiService().getNotes(token)
+        client.enqueue(object : Callback<ResponseFetchAll> {
+            override fun onResponse(
+                call: Call<ResponseFetchAll>,
+                response: Response<ResponseFetchAll>
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()!!.data!!.notes
+                    if (responseBody != null) {
+                        Log.d(TAG, "onResponse: ${responseBody}")
+                        for (i in 0 until responseBody.size) {
+                            note.let { note ->
+                                note?.id = responseBody[i]!!.id!!.toInt()
+                                note?.title = responseBody[i]!!.title
+                                note?.description = responseBody[i]!!.description
+                                note?.date = responseBody[i]!!.date
+                                note?.idUser = responseBody[i]!!.user!!.id!!.toInt()
+                                note?.image = responseBody[i]!!.image
+                                noteAddUpdateViewModel.insert(Note(responseBody[i]!!.id!!.toInt(),responseBody[i]!!.title,responseBody[i]!!.description,
+                                    responseBody[i]!!.date,responseBody[i]!!.user!!.id!!.toInt(),responseBody[i]!!.image,false))
+                            }
+//                            Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
+//                            Log.d(TAG, "onResponse: ${responseBody[i]!!.description}")
+                        }
+                    }
+                } else {
+                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
+                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+            }
+        })
+    }
+
+
     fun gotoHome(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentHome)
     }

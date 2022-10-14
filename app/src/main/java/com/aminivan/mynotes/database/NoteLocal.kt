@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 @Entity
 @Parcelize
-class Note (
+class NoteLocal (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     var id: Int = 0,
@@ -24,4 +24,4 @@ class Note (
     var image : String? = null,
     @ColumnInfo(name = "secret")
     var secret : Boolean? = null,
-    ) : Parcelable
+) : Parcelable
