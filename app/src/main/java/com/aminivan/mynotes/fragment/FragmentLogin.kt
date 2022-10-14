@@ -69,12 +69,12 @@ class FragmentLogin : Fragment() {
         user = User()
 
         viewModeluser.dataUser.observe(requireActivity(),{
-            Log.d(TAG, "onResponseLogin: ${it.id}")
-            Log.d(TAG, "onResponseLogin: ${it.name}")
-            Log.d(TAG, "onResponseLogin: ${it.email}")
-            Log.d(TAG, "onResponseLogin: ${it.password}")
-            Log.d(TAG, "onResponseLogin: ${it.jk}")
-            Log.d(TAG, "onResponseLogin: ${it.token}")
+//            Log.d(TAG, "onResponseLogin: ${it.id}")
+//            Log.d(TAG, "onResponseLogin: ${it.name}")
+//            Log.d(TAG, "onResponseLogin: ${it.email}")
+//            Log.d(TAG, "onResponseLogin: ${it.password}")
+//            Log.d(TAG, "onResponseLogin: ${it.jk}")
+//            Log.d(TAG, "onResponseLogin: ${it.token}")
         })
 
 
