@@ -66,33 +66,10 @@ class FragmentProfile : Fragment() {
         selectedFile = "Attach File"
         defaultUri = "Default"
         user = com.aminivan.mynotes.database.User()
-
         token = ""
-
         viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
-        viewModeluser.dataUser.observe(requireActivity(),{
-            Log.d(TAG, "FragmentHome: ${it.id}")
-            Log.d(TAG, "FragmentHome: ${it.name}")
-            Log.d(TAG, "FragmentHome: ${it.email}")
-            Log.d(TAG, "FragmentHome: ${it.password}")
-            Log.d(TAG, "FragmentHome: ${it.jk}")
-            Log.d(TAG, "FragmentHome: ${it.token}")
 
-            user.let {
-                    user ->
-                user!!.id = it.id
-                user!!.name = it.name
-                user!!.email = it.email
-                user!!.password = it.password
-                user!!.jk = it.jk
-                user!!.profile = it.profile
-            }
-            token = it.token
-        })
-        //dataUserShared = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
-
-        showData()
-
+        fetchDataUser()
         binding.btnUploadProfile.setOnClickListener {
             pickImageFromGallery()
         }
@@ -105,7 +82,6 @@ class FragmentProfile : Fragment() {
         binding.tvLogout.setOnClickListener(){
             gotoLogin()
             viewModeluser.clearData()
-            clearUser()
             Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
         }
 
@@ -116,20 +92,29 @@ class FragmentProfile : Fragment() {
 
         binding.btnSave.setOnClickListener {
             updateUser(token,"",user!!.email.toString(),user!!.name.toString(),imageUri.toString(),user!!.jk.toString())
+            viewModeluser.editData(user!!.id,
+                user!!.name.toString(),user!!.email.toString(),user!!.password.toString(),imageUri.toString(),user!!.jk.toString(),token)
         }
         binding.btnUpdateUser.setOnClickListener {
             if(binding.edtPassword.text!!.isEmpty()){
-                updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
+                if(binding.rbMan.isChecked) {
+                    updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
+                    viewModeluser.editData(user!!.id,
+                        binding.edtName.text.toString(),binding.edtEmail.text.toString(),user!!.password.toString(),user!!.profile.toString(),"M",token)
+                } else {
+                    updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
+                    viewModeluser.editData(user!!.id,
+                        binding.edtName.text.toString(),binding.edtEmail.text.toString(),user!!.password.toString(),user!!.profile.toString(),"W",token)
+                }
+
             } else {
                 if(binding.rbMan.isChecked) {
                     updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
                     viewModeluser.clearData()
-                    clearUser()
                     gotoSplash()
                 } else {
                     updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
                     viewModeluser.clearData()
-                    clearUser()
                     gotoSplash()
                 }
             }
@@ -137,16 +122,7 @@ class FragmentProfile : Fragment() {
     }
 
     fun showData(){
-        Glide.with(this).load(user!!.profile.toString()).circleCrop().into(binding.ivProfile)
-        binding.dataUser = User(user!!.jk.toString(),"",user!!.name,user!!.id,user!!.email)
 
-        if(user!!.jk.toString().equals("M")){
-            binding.rbMan.isChecked = true
-            binding.rbWoman.isChecked = false
-        } else {
-            binding.rbMan.isChecked = false
-            binding.rbWoman.isChecked = true
-        }
     }
 
     private fun pickImageFromGallery() {
@@ -217,24 +193,41 @@ class FragmentProfile : Fragment() {
         })
     }
 
+    fun fetchDataUser() {
+        viewModeluser.dataUser.observe(requireActivity(),{
+            Log.d(TAG, "FragmentProfile: ${it.id}")
+            Log.d(TAG, "FragmentProfile: ${it.name}")
+            Log.d(TAG, "FragmentProfile: ${it.email}")
+            Log.d(TAG, "FragmentProfile: ${it.password}")
+            Log.d(TAG, "FragmentProfile: ${it.jk}")
+            Log.d(TAG, "FragmentProfile: ${it.token}")
+            user!!.id = it.id
+            user!!.name = it.name
+            user!!.email = it.email
+            user!!.password = it.password
+            user!!.jk = it.jk
+            user!!.profile = it.profile
+            token = it.token
+
+            Glide.with(this).load(it.profile).circleCrop().into(binding.ivProfile)
+            binding.dataUser = User(user!!.jk.toString(),"",user!!.name,user!!.id,user!!.email)
+
+            if(user!!.jk.toString().equals("M")){
+                binding.rbMan.isChecked = true
+                binding.rbWoman.isChecked = false
+            } else {
+                binding.rbMan.isChecked = false
+                binding.rbWoman.isChecked = true
+            }
+        })
+    }
+
     fun gotoSplash(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentProfile_to_fragmentSplash)
     }
 
     fun gotoLogin(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentProfile_to_fragmentLogin)
-    }
-
-    fun clearUser(){
-        user.let {
-                user ->
-            user!!.id = 0
-            user!!.name = ""
-            user!!.email = ""
-            user!!.password = ""
-            user!!.jk = ""
-            user!!.profile = ""
-        }
     }
 
     fun setLocale(lang: String?) {

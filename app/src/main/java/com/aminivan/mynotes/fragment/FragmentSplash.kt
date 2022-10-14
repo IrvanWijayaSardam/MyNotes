@@ -68,12 +68,6 @@ class FragmentSplash : Fragment() {
         android.os.Handler(Looper.myLooper()!!).postDelayed({
             var token : String = ""
             viewModeluser.dataUser.observe(viewLifecycleOwner,{
-//                Log.d(TAG, "onResponseLogin: ${it.id}")
-//                Log.d(TAG, "onResponseLogin: ${it.name}")
-//                Log.d(TAG, "onResponseLogin: ${it.email}")
-//                Log.d(TAG, "onResponseLogin: ${it.password}")
-//                Log.d(TAG, "onResponseLogin: ${it.jk}")
-//                Log.d(TAG, "onResponseLogin: ${it.token}")
                     user!!.id = it.id
                     user!!.name = it.name
                     user!!.email = it.email

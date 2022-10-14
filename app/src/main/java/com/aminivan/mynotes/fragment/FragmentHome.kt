@@ -183,7 +183,6 @@ class FragmentHome : Fragment() {
                         }
                         if(defaultUri.equals("Default")) {
                             postNotes(token,0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
-                            noteAddUpdateViewModel.insert(note!!)
                             Thread.sleep(100)
                             setAdapter()
                             judul.text.clear()
@@ -192,7 +191,6 @@ class FragmentHome : Fragment() {
                             dialog.dismiss()
                         } else {
                             postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
-                            noteAddUpdateViewModel.insert(note!!)
                             Thread.sleep(100)
                             setAdapter()
                             judul.text.clear()
@@ -200,7 +198,7 @@ class FragmentHome : Fragment() {
                             defaultUri = "Default"
                             dialog.dismiss()
                         }
-                        setAdapter()
+                        noteAddUpdateViewModel.insert(note!!)
                         Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                     }
@@ -208,9 +206,6 @@ class FragmentHome : Fragment() {
             }
             dialog.show()
         }
-
-
-
     }
 
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
@@ -601,7 +596,6 @@ class FragmentHome : Fragment() {
                     }
                     if(defaultUri.equals("Default")) {
                         postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),"Default")
-                        noteAddUpdateViewModel.insert(note!!)
                         Thread.sleep(100)
                         setAdapter()
                         edtJudul.text.clear()
@@ -610,7 +604,6 @@ class FragmentHome : Fragment() {
                         dialog.dismiss()
                     } else {
                         postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
-                        noteAddUpdateViewModel.insert(note!!)
                         Thread.sleep(100)
                         setAdapter()
                         edtJudul.text.clear()
@@ -618,6 +611,7 @@ class FragmentHome : Fragment() {
                         defaultUri = "Default"
                         dialog.dismiss()
                     }
+                    noteAddUpdateViewModel.insert(note!!)
                     setAdapter()
                     Toast.makeText(context, "Berhasil menambahkan satu data", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
