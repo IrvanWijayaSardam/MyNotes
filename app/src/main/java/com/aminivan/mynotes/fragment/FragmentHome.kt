@@ -600,7 +600,6 @@ class FragmentHome : Fragment() {
     fun onResumeHandler(){
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.custom_dialog);
-        dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
         val edtJudul : EditText = dialog.findViewById(R.id.edtJudul)
         val edtDescription : EditText = dialog.findViewById(R.id.edtCatatan)
@@ -610,6 +609,8 @@ class FragmentHome : Fragment() {
         val ivLock : ImageView = dialog.findViewById(R.id.ivLock)
         val ivUnlock : ImageView = dialog.findViewById(R.id.ivUnlock)
 
+        dialogUpdate.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialogUpdate.show()
 
         tvAttachImage.text = selectedFile
         if (selectedFile.length >30) {
@@ -773,13 +774,14 @@ class FragmentHome : Fragment() {
                     noteUpdate?.image = noteUpdate!!.image
                     noteUpdate?.secret = secret
                 }
-                noteAddUpdateViewModel.update(Note(0,noteUpdate!!.title,noteUpdate!!.description,noteUpdate!!.date,noteUpdate!!.idUser,noteUpdate!!.image,noteUpdate!!.secret))
+                noteAddUpdateViewModel.update(Note(0,noteUpdate!!.title.toString(),noteUpdate!!.description.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,noteUpdate!!.image.toString(),noteUpdate!!.secret))
                 updateNote(token.toString(),note!!.id,
                     edtTitleUpdate.text.toString(),
                     edtDescription.text.toString(), note!!.date.toString(), note!!.image.toString()
                 )
-                Toast.makeText(context, "Masuk Btn Submit OnUpdateResume If Attach File", Toast.LENGTH_SHORT).show()
-                //setAdapter()
+                Log.d(TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if Attach File")
+                Log.d(TAG, "onResumeUpdateHandler: Note ${noteUpdate!!.title.toString()}")
+                setAdapter()
                 dialogUpdate.dismiss()
             } else {
                 noteUpdate.let { noteUpdate ->
@@ -790,13 +792,13 @@ class FragmentHome : Fragment() {
                     noteUpdate?.image = imageUri.toString()
                     noteUpdate?.secret = secret
                 }
-                noteAddUpdateViewModel.update(noteUpdate!!)
+                noteAddUpdateViewModel.update(Note(note!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(),note!!.date.toString(),note!!.idUser,imageUri.toString(),secret))
                 //noteAddUpdateViewModel.update(Note(0,edtTitleUpdate.text.toString(),edtDescription.text.toString(),noteUpdate!!.date,noteUpdate!!.idUser,imageUri.toString(),noteUpdate!!.secret))
-                updateNote(token.toString(),note!!.id,
+                updateNote(token,note!!.id,
                     edtTitleUpdate.text.toString(),
                     edtDescription.text.toString(), note!!.date.toString(), imageUri.toString()
                 )
-                Toast.makeText(context, "Masuk Btn Submit OnUpdateResume if With Image", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if With Image")
                 Log.d(TAG, "onResumeUpdateHandler: ${noteUpdate!!.title} uri ${noteUpdate!!.image}")
                 setAdapter()
                 dialogUpdate.dismiss()
