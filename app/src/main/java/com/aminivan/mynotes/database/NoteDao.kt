@@ -11,8 +11,8 @@ interface NoteDao {
     fun update(note: Note)
     @Delete
     fun delete(note: Note)
-    @Query("SELECT * from note WHERE idUser LIKE:idUser ORDER BY id ASC ")
-    fun getAllNotes(idUser: String): LiveData<List<Note>>
+    @Query("SELECT * from note WHERE idUser LIKE:idUser AND secret LIKE:secret ORDER BY id ASC ")
+    fun getAllNotes(idUser: String, secret : Boolean): LiveData<List<Note>>
 
     @Query("DELETE FROM note")
     fun deleteAllNotes()

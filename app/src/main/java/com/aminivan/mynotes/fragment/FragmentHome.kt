@@ -92,7 +92,7 @@ class FragmentHome : Fragment() {
     override fun onResume() {
         super.onResume()
         //onResumeHandler()
-        onResumeUpdateHandler()
+        //UpdateHandler()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -345,7 +345,7 @@ class FragmentHome : Fragment() {
     }
     fun observer(){
         val mainViewModel = obtainViewModel(requireActivity())
-        mainViewModel.getAllNotes(user!!.id.toString()).observe(requireActivity(), { noteList ->
+        mainViewModel.getAllNotes(user!!.id.toString(),false).observe(requireActivity(), { noteList ->
             if (noteList != null) {
                 adapter.setListNotes(noteList)
                 if(noteList.size == 0) {
@@ -609,8 +609,8 @@ class FragmentHome : Fragment() {
         val ivLock : ImageView = dialog.findViewById(R.id.ivLock)
         val ivUnlock : ImageView = dialog.findViewById(R.id.ivUnlock)
 
-        dialogUpdate.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialogUpdate.show()
+        dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.show()
 
         tvAttachImage.text = selectedFile
         if (selectedFile.length >30) {

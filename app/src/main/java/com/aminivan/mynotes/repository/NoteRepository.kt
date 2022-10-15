@@ -16,7 +16,7 @@ class NoteRepository(application: Application) {
         val db = NoteRoomDatabase.getDatabase(application)
         mNotesDao = db.noteDao()
     }
-    fun getAllNotes(idUser: String): LiveData<List<Note>> = mNotesDao.getAllNotes(idUser)
+    fun getAllNotes(idUser: String,secret : Boolean): LiveData<List<Note>> = mNotesDao.getAllNotes(idUser,secret)
     fun insert(note: Note) {
         executorService.execute { mNotesDao.insert(note) }
     }
