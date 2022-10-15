@@ -67,7 +67,11 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentSecret"
-        android:name="com.aminivan.mynotes.FragmentSecret"
+        android:name="com.aminivan.mynotes.fragment.FragmentSecret"
         android:label="fragment_secret"
-        tools:layout="@layout/fragment_secret" />
+        tools:layout="@layout/fragment_secret" >
+        <action
+            android:id="@+id/action_fragmentSecret_to_fragmentHome"
+            app:destination="@id/fragmentHome" />
+    </fragment>
 </navigation>
