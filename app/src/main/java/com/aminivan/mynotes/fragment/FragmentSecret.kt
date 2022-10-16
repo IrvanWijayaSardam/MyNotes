@@ -3,6 +3,7 @@ package com.aminivan.mynotes.fragment
 import android.app.Activity
 import android.app.Dialog
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -16,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -26,7 +28,6 @@ import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.CustomDialogBinding
-import com.aminivan.mynotes.databinding.FragmentHomeBinding
 import com.aminivan.mynotes.databinding.FragmentSecretBinding
 import com.aminivan.mynotes.helper.DateHelper
 import com.aminivan.mynotes.helper.SwipeToDeleteCallback
@@ -60,19 +61,17 @@ class FragmentSecret : Fragment() {
     private val handler = Handler()
     lateinit var viewModeluser : UserViewModel
 
-
     private val pickImage = 100
     private val updateImage = 69
     lateinit var imageUri : Uri
     lateinit var defaultUri : String
     lateinit var token : String
     var secret : Boolean = false
-
     private var note: Note? = null
     private var noteUpdate : Note? = null
     private var user : User? = null
-
     private lateinit var adapter: NoteSecretAdapter
+    private val viewModel: BlurViewModel by viewModels { BlurViewModelFactory(activity) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -113,8 +112,6 @@ class FragmentSecret : Fragment() {
             Log.d(ContentValues.TAG, "FragmentHome: ${it.token}")
 
 
-//            binding.tvWelcomeHome.setText(it.name)
-
             user.let { user ->
                 user!!.id = it.id
                 user!!.name = it.name
@@ -131,109 +128,6 @@ class FragmentSecret : Fragment() {
             gotoHome()
         }
 
-//        binding.tvWelcomeHome.setOnClickListener {
-//            gotoProfile()
-//        }
-//
-//        binding.ivMan.setOnClickListener{
-//            gotoProfile()
-//        }
-//
-//        binding.ivSecret.setOnClickListener{
-//            gotoSecret()
-//        }
-
-//        binding.fabAdd.setOnClickListener(){
-//            setDialog()
-//            val judul : EditText = dialog.findViewById(R.id.edtJudul)
-//            val catatan : EditText = dialog.findViewById(R.id.edtCatatan)
-//            val submit : Button = dialog.findViewById(R.id.btnSubmit)
-//            val attachImage : LinearLayout = dialog.findViewById(R.id.linearAttachFile)
-//            val icCancel : ImageView = dialog.findViewById(R.id.ivCancel)
-//            val tvAttachImage : TextView = dialog.findViewById(R.id.tvAttachFile)
-//            val ivLock : ImageView = dialog.findViewById(R.id.ivLock)
-//            val ivUnlock : ImageView = dialog.findViewById(R.id.ivUnlock)
-//
-//            ivLock.visibility = View.VISIBLE
-//
-//            ivLock.setOnClickListener {
-//                secret = true
-//                ivLock.visibility = View.INVISIBLE
-//                ivUnlock.visibility = View.VISIBLE
-//                Toast.makeText(context, "This Notes Will Be Added As Secret Notes", Toast.LENGTH_SHORT).show()
-//                Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
-//            }
-//
-//            ivUnlock.setOnClickListener {
-//                secret = false
-//                ivLock.visibility = View.VISIBLE
-//                ivUnlock.visibility = View.INVISIBLE
-//                Toast.makeText(context, "Secret Status : ${secret}", Toast.LENGTH_SHORT).show()
-//            }
-//
-//
-//            icCancel.setOnClickListener {
-//                selectedFile = "Attach File"
-//                tvAttachImage.text = selectedFile
-//                icCancel.visibility = View.INVISIBLE
-//                deleteImage(defaultUri)
-//                defaultUri = "Default"
-//            }
-//
-//            attachImage.setOnClickListener {
-//                Log.d("AttachImage Onclick", "Clicked: ")
-//                pickImageFromGallery(100)
-//                dialog.dismiss()
-//            }
-//
-//
-//            submit.setOnClickListener{
-//                when {
-//                    judul.text.toString().isEmpty() -> {
-//                        Toast.makeText(context, "Judul Masih Kosong", Toast.LENGTH_SHORT).show()
-//                    }
-//                    catatan.text.toString().isEmpty() -> {
-//                        Toast.makeText(context, "Catatan Masih Kosong", Toast.LENGTH_SHORT).show() }
-//                    else -> {
-//                        note.let { note ->
-//                            note?.title = judul.text.toString()
-//                            note?.description = catatan.text.toString()
-//                            note?.date = DateHelper.getCurrentDate()
-//                            note?.idUser = user!!.id
-//                            note?.image = defaultUri
-//                            note?.secret = secret
-//                        }
-//                        if(defaultUri.equals("Default")) {
-//                            postNotes(token,0,note?.title.toString(),note?.description.toString(),
-//                                DateHelper.getCurrentDate(),"Default")
-//                            Thread.sleep(100)
-//                            //setAdapter()
-//                            judul.text.clear()
-//                            catatan.text.clear()
-//                            defaultUri = "Default"
-//                            dialog.dismiss()
-//                        } else {
-//                            postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),
-//                                DateHelper.getCurrentDate(),defaultUri)
-//                            Thread.sleep(100)
-//                            //setAdapter()
-//                            judul.text.clear()
-//                            catatan.text.clear()
-//                            defaultUri = "Default"
-//                            dialog.dismiss()
-//                        }
-//                        Toast.makeText(context, "Secret Status : ${note?.secret}", Toast.LENGTH_SHORT).show()
-//                        noteAddUpdateViewModel.insert(Note(0,note?.title.toString(),note?.description.toString(),note?.date.toString(),note?.idUser!!.toInt(),imageUri.toString(),note?.secret))
-//                        //setAdapter()
-//                        Toast.makeText(context, "Berhasil menambahkan satu data ${note!!.description}${note!!.secret}", Toast.LENGTH_SHORT).show()
-//                        Log.d(ContentValues.TAG, "onViewCreated: Berhasil Menambahkan ${note!!.description}${note!!.secret}")
-//                        dialog.dismiss()
-//                    }
-//                }
-//
-//            }
-//            dialog.show()
-//        }
     }
 
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
@@ -362,6 +256,7 @@ class FragmentSecret : Fragment() {
         binding?.rvNotesSecret?.setHasFixedSize(true)
         binding?.rvNotesSecret?.adapter = adapter
 
+
         val swipeToDeleteCallback = object : SwipeToDeleteCallback(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
@@ -385,12 +280,18 @@ class FragmentSecret : Fragment() {
                 dialog = Dialog(requireContext())
                 dialog.setContentView(R.layout.custom_dialog_attachment);
                 val ivAttachment : ImageView = dialog.findViewById(R.id.imageDialogue)
+                imageUri = Uri.parse(adapter.listNotes[position].image.toString())
 
-                Glide.with(requireContext()).load(adapter.listNotes[position].image.toString()).into(ivAttachment)
+
+                Log.d(TAG, "onSwiped: imageUri ${imageUri}")
+                
+                Glide.with(requireContext()).load(imageUri).into(ivAttachment)
 
                 dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 dialog.show()
                 observer()
+                viewModel.applyBlur(3)
+
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
@@ -806,5 +707,24 @@ class FragmentSecret : Fragment() {
             }
         }
     }
+
+    /**
+     * Shows and hides views for when the Activity is processing an image
+     */
+    private fun showWorkInProgress() {
+        with(binding) {
+            Log.d(TAG, "showWorkInProgress: Work In Progress")
+        }
+    }
+
+    /**
+     * Shows and hides views for when the Activity is done processing an image
+     */
+    private fun showWorkFinished() {
+        with(binding) {
+            Log.d(TAG, "showWorkFinished: Work Finished")
+        }
+    }
+
 
 }
