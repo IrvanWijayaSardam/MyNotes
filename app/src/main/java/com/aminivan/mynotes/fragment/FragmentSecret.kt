@@ -136,7 +136,7 @@ class FragmentSecret : Fragment() {
     }
 
     fun setAdapter(){
-        retriveNotes(token)
+        //retriveNotes(token)
         adapter = NoteSecretAdapter(
             object : NoteSecretAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {

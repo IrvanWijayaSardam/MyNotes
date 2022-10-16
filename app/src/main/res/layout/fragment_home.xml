@@ -27,7 +27,8 @@
                     android:layout_height="30dp"
                     android:src="@drawable/account"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_toLeftOf="@id/ivSecret"
                     />
                 <TextView
                     android:id="@+id/welcome"
@@ -37,7 +38,6 @@
                     android:text="@string/welcome"
                     android:textStyle="bold"
                     android:layout_marginTop="20dp"
-                    android:layout_toRightOf="@+id/ivMan"
                     />
 
                 <TextView

@@ -73,6 +73,7 @@ class FragmentHome : Fragment() {
     lateinit var imageUri : Uri
     lateinit var defaultUri : String
     lateinit var token : String
+    private var idForUpdate : Int = 0
     var secret : Boolean = false
 
     private var note: Note? = null
@@ -89,11 +90,6 @@ class FragmentHome : Fragment() {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        //onResumeHandler()
-        //UpdateHandler()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -224,7 +220,7 @@ class FragmentHome : Fragment() {
                         }
                         Toast.makeText(context, "Secret Status : ${note?.secret}", Toast.LENGTH_SHORT).show()
                         noteAddUpdateViewModel.insert(Note(0,note?.title.toString(),note?.description.toString(),note?.date.toString(),note?.idUser!!.toInt(),imageUri.toString(),note?.secret))
-                        //setAdapter()
+                        setAdapter()
                         Toast.makeText(context, "Berhasil menambahkan satu data ${note!!.description}${note!!.secret}", Toast.LENGTH_SHORT).show()
                         Log.d(TAG, "onViewCreated: Berhasil Menambahkan ${note!!.description}${note!!.secret}")
                         dialog.dismiss()
@@ -242,7 +238,7 @@ class FragmentHome : Fragment() {
     }
 
     fun setAdapter(){
-        retriveNotes(token)
+        //retriveNotes(token)
         adapter = NoteAdapter(
             object : NoteAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {
@@ -253,6 +249,7 @@ class FragmentHome : Fragment() {
                 }
                 override fun onUpdate(note: Note) {
                     noteUpdate.let { noteUpdate ->
+                        noteUpdate!!.id = note.id
                         noteUpdate!!.title = note.title
                         noteUpdate!!.description = note.description
                         noteUpdate!!.date = note.date
@@ -260,8 +257,7 @@ class FragmentHome : Fragment() {
                         noteUpdate!!.image = note.image
                         noteUpdate!!.secret = note.secret
                     }
-
-                    Log.d(TAG, "onUpdate: noteUpdate title ${noteUpdate!!.title}")
+                    Log.d(TAG, "onUpdate: onUpdate ${noteUpdate!!.id}")
                     var dialogUpdate = Dialog(requireContext())
                     dialogUpdate.setContentView(R.layout.custom_dialog_update);
                     var tvTitleUpdate : EditText = dialogUpdate.findViewById(R.id.edtJudulUpdate)
@@ -685,6 +681,7 @@ class FragmentHome : Fragment() {
                         defaultUri = "Default"
                         dialog.dismiss()
                     } else {
+
                         postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),defaultUri)
                         Thread.sleep(100)
                         setAdapter()
@@ -694,7 +691,6 @@ class FragmentHome : Fragment() {
                         dialog.dismiss()
                     }
                     noteAddUpdateViewModel.insert(Note(0,note?.title.toString(),note?.description.toString(),note?.date.toString(),note?.idUser!!.toInt(),imageUri.toString(),note?.secret))
-
                     setAdapter()
                     Toast.makeText(context, "Berhasil menambahkan satu data ${note!!.toString()}", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
@@ -766,40 +762,22 @@ class FragmentHome : Fragment() {
 
         btnSubmit.setOnClickListener {
             if (selectedFile.equals("Attach File")){
-                noteUpdate.let { noteUpdate ->
-                    noteUpdate?.title = edtTitleUpdate.text.toString()
-                    noteUpdate?.description = edtDescription.text.toString()
-                    noteUpdate?.date = noteUpdate!!.date
-                    noteUpdate?.idUser = noteUpdate!!.idUser
-                    noteUpdate?.image = noteUpdate!!.image
-                    noteUpdate?.secret = secret
-                }
-                noteAddUpdateViewModel.update(Note(0,noteUpdate!!.title.toString(),noteUpdate!!.description.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,noteUpdate!!.image.toString(),noteUpdate!!.secret))
-                updateNote(token.toString(),note!!.id,
+                noteAddUpdateViewModel.update(Note(noteUpdate!!.id,noteUpdate!!.title.toString(),noteUpdate!!.description.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,noteUpdate!!.image.toString(),noteUpdate!!.secret))
+                updateNote(token.toString(),noteUpdate!!.id,
                     edtTitleUpdate.text.toString(),
-                    edtDescription.text.toString(), note!!.date.toString(), note!!.image.toString()
+                    edtDescription.text.toString(), noteUpdate!!.date.toString(), noteUpdate!!.image.toString()
                 )
-                Log.d(TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if Attach File")
-                Log.d(TAG, "onResumeUpdateHandler: Note ${noteUpdate!!.title.toString()}")
+                Log.d(TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if Attach File ${noteUpdate!!.id}")
                 setAdapter()
                 dialogUpdate.dismiss()
             } else {
-                noteUpdate.let { noteUpdate ->
-                    noteUpdate?.title = edtTitleUpdate.text.toString()
-                    noteUpdate?.description = edtDescription.text.toString()
-                    noteUpdate?.date = noteUpdate!!.date
-                    noteUpdate?.idUser = noteUpdate!!.idUser
-                    noteUpdate?.image = imageUri.toString()
-                    noteUpdate?.secret = secret
-                }
-                noteAddUpdateViewModel.update(Note(note!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(),note!!.date.toString(),note!!.idUser,imageUri.toString(),secret))
+                Log.d(TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if With Image ${noteUpdate!!.id}")
+                noteAddUpdateViewModel.update(Note(noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,imageUri.toString(),secret))
                 //noteAddUpdateViewModel.update(Note(0,edtTitleUpdate.text.toString(),edtDescription.text.toString(),noteUpdate!!.date,noteUpdate!!.idUser,imageUri.toString(),noteUpdate!!.secret))
-                updateNote(token,note!!.id,
+                updateNote(token,noteUpdate!!.id,
                     edtTitleUpdate.text.toString(),
-                    edtDescription.text.toString(), note!!.date.toString(), imageUri.toString()
+                    edtDescription.text.toString(), noteUpdate!!.date.toString(), imageUri.toString()
                 )
-                Log.d(TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if With Image")
-                Log.d(TAG, "onResumeUpdateHandler: ${noteUpdate!!.title} uri ${noteUpdate!!.image}")
                 setAdapter()
                 dialogUpdate.dismiss()
             }
