@@ -73,7 +73,6 @@ class FragmentHome : Fragment() {
     lateinit var imageUri : Uri
     lateinit var defaultUri : String
     lateinit var token : String
-    private var idForUpdate : Int = 0
     var secret : Boolean = false
 
     private var note: Note? = null

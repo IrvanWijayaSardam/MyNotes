@@ -11,11 +11,10 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 
 private const val TAG = "BlurWorker"
-class BlurWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
+class BlurWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
     override fun doWork(): Result {
         val appContext = applicationContext
-
         val resourceUri = inputData.getString(KEY_IMAGE_URI)
 
         makeStatusNotification("Blurring image", appContext)
@@ -38,6 +37,7 @@ class BlurWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
             // Write bitmap to a temp file
             val outputUri = writeBitmapToFile(appContext, output)
+            Log.d(TAG, "doWork Blur Worker: OutputUri ${outputUri}")
 
             val outputData = workDataOf(KEY_IMAGE_URI to outputUri.toString())
 
@@ -48,4 +48,5 @@ class BlurWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
             Result.failure()
         }
     }
+
 }

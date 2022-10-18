@@ -6,9 +6,9 @@ import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Bundle
-import android.os.Handler
+import android.os.*
 import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -38,14 +38,20 @@ import com.aminivan.mynotes.response.PostNotesResponse
 import com.aminivan.mynotes.response.ResponseFetchAll
 import com.aminivan.mynotes.response.UpdateNotesResponse
 import com.aminivan.mynotes.viewmodel.*
+import com.aminivan.mynotes.workers.BlurWorker
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.*
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.Executors
 
 
 class FragmentSecret : Fragment() {
@@ -65,6 +71,7 @@ class FragmentSecret : Fragment() {
     private val updateImage = 69
     lateinit var imageUri : Uri
     lateinit var defaultUri : String
+    var imageUriDownload : Uri? = null
     lateinit var token : String
     var secret : Boolean = false
     private var note: Note? = null
@@ -72,6 +79,8 @@ class FragmentSecret : Fragment() {
     private var user : User? = null
     private lateinit var adapter: NoteSecretAdapter
     private val viewModel: BlurViewModel by viewModels { BlurViewModelFactory(activity) }
+    val myExecutor = Executors.newSingleThreadExecutor()
+    val myHandler = Handler(Looper.getMainLooper())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,6 +100,7 @@ class FragmentSecret : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setDialog()
         var context = binding.rvNotesSecret.context
+
         selectedFile = "Attach File"
         imageUri = Uri.parse("DefaultUri")
         defaultUri = "Default"
@@ -99,7 +109,6 @@ class FragmentSecret : Fragment() {
         noteUpdate = Note()
         user = User()
         dialogBinding = CustomDialogBinding.inflate(layoutInflater)
-
         Log.d(ContentValues.TAG, "onViewCreated: Sudah Masuk Home")
         token = ""
         viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
@@ -285,12 +294,22 @@ class FragmentSecret : Fragment() {
 
                 Log.d(TAG, "onSwiped: imageUri ${imageUri}")
                 
-                Glide.with(requireContext()).load(imageUri).into(ivAttachment)
+                //Glide.with(requireContext()).load(imageUri).into(ivAttachment)
 
-                dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                dialog.show()
+//                dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//                dialog.show()
                 observer()
-                viewModel.applyBlur(3)
+
+                var mImage: Bitmap?
+                myExecutor.execute {
+                    mImage = mLoad("https://firebasestorage.googleapis.com/v0/b/mynotes-f6709.appspot.com/o/images%2F2022_10_16_17_57_17?alt=media&token=f4e55a26-e04b-4adf-9454-65f9d3eef3eb")
+                    myHandler.post {
+                        //mImageView.setImageBitmap(mImage)
+                        if(mImage!=null){
+                            mSaveMediaToStorage("temporary",mImage)
+                        }
+                    }
+                }
 
             }
         }
@@ -708,23 +727,66 @@ class FragmentSecret : Fragment() {
         }
     }
 
-    /**
-     * Shows and hides views for when the Activity is processing an image
-     */
-    private fun showWorkInProgress() {
-        with(binding) {
-            Log.d(TAG, "showWorkInProgress: Work In Progress")
+    private fun mLoad(string: String): Bitmap? {
+        val url: URL = mStringToURL(string)!!
+        val connection: HttpURLConnection?
+        try {
+            connection = url.openConnection() as HttpURLConnection
+            connection.connect()
+            val inputStream: InputStream = connection.inputStream
+            val bufferedInputStream = BufferedInputStream(inputStream)
+            return BitmapFactory.decodeStream(bufferedInputStream)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.d(TAG, "mLoad: Error")
         }
+        return null
     }
 
-    /**
-     * Shows and hides views for when the Activity is done processing an image
-     */
-    private fun showWorkFinished() {
-        with(binding) {
-            Log.d(TAG, "showWorkFinished: Work Finished")
+    // Function to convert string to URL
+    private fun mStringToURL(string: String): URL? {
+        try {
+            return URL(string)
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
         }
+        return null
     }
 
+    // Function to save image on the device.
+    // Refer: https://www.geeksforgeeks.org/circular-crop-an-image-and-save-it-to-the-file-in-android/
+    private fun mSaveMediaToStorage(filename : String,bitmap: Bitmap?) {
+        val filename = "${filename}.jpg"
+        var fos: OutputStream? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requireContext().contentResolver?.also { resolver ->
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+                }
+                imageUriDownload = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                Log.d(TAG, "mSaveMediaToStorage: imageUriDownload ${imageUriDownload}")
+                viewModel.setImageUri(imageUriDownload)
+                viewModel.applyBlur(3)
+                dialog = Dialog(requireContext())
+                dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.setContentView(R.layout.custom_dialog_attachment);
+                Glide.with(requireContext()).load("file:///data/user/0/com.aminivan.mynotes/files/blur_filter_outputs/blur-filter-output-a00fcc40-290e-4dc5-9d7d-053a07574190.png").into(dialog.findViewById(R.id.imageDialogue))
+                Log.d(TAG, "mSaveMediaToStorage: Blur Worker outputUri ${viewModel.getOutputUri()} ")
+                fos = imageUriDownload?.let { resolver.openOutputStream(it) }
+                dialog.show()
+            }
+        } else {
+            val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            val image = File(imagesDir, filename)
+            Log.d(TAG, "mSaveMediaToStorage: ${imagesDir}")
+            fos = FileOutputStream(image)
+        }
+        fos?.use {
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, it)
+            Toast.makeText(context , "Saved to Gallery" , Toast.LENGTH_SHORT).show()
+        }
+    }
 
 }

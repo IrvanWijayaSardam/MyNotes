@@ -3,11 +3,9 @@ package com.aminivan.mynotes.viewmodel
 import IMAGE_MANIPULATION_WORK_NAME
 import KEY_IMAGE_URI
 import TAG_OUTPUT
-import android.content.ContentResolver
-import android.content.Context
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.*
@@ -20,12 +18,13 @@ class BlurViewModel(application: FragmentActivity?) : ViewModel() {
     private var imageUri: Uri? = null
     internal var outputUri: Uri? = null
     private val workManager = application?.let { WorkManager.getInstance(it) }
-    internal val outputWorkInfos: LiveData<List<WorkInfo>> = workManager!!.getWorkInfosByTagLiveData(TAG_OUTPUT)
 
-    init {
-        // This transformation makes sure that whenever the current work Id changes the WorkInfo
-        // the UI is listening to changes
-        imageUri = getImageUri(application!!.applicationContext)
+    fun setImageUri(uri: Uri?) {
+        imageUri = uri
+    }
+
+    fun getOutputUri() : Uri?{
+        return outputUri
     }
 
     internal fun cancelWork() {
@@ -40,6 +39,7 @@ class BlurViewModel(application: FragmentActivity?) : ViewModel() {
         val builder = Data.Builder()
         imageUri?.let {
             builder.putString(KEY_IMAGE_URI, imageUri.toString())
+            setOutputUri(imageUri.toString())
         }
         return builder.build()
     }
@@ -87,27 +87,8 @@ class BlurViewModel(application: FragmentActivity?) : ViewModel() {
         continuation.enqueue()
     }
 
-    private fun uriOrNull(uriString: String?): Uri? {
-        return if (!uriString.isNullOrEmpty()) {
-            Uri.parse(uriString)
-        } else {
-            null
-        }
-    }
-
-    private fun getImageUri(context: Context): Uri {
-        val resources = context.resources
-
-        return Uri.Builder()
-            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-            .authority(resources.getResourcePackageName(com.aminivan.mynotes.R.drawable.gw))
-            .appendPath(resources.getResourceTypeName(com.aminivan.mynotes.R.drawable.gw))
-            .appendPath(resources.getResourceEntryName(com.aminivan.mynotes.R.drawable.gw))
-            .build()
-    }
-
     internal fun setOutputUri(outputImageUri: String?) {
-        outputUri = uriOrNull(outputImageUri)
+        outputUri = outputImageUri!!.toUri()
     }
 }
 
