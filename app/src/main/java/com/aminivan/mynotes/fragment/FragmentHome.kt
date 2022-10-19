@@ -357,7 +357,6 @@ class FragmentHome : Fragment() {
                 noteAddUpdateViewModel.delete(dataDelete)
                 val mainViewModel = obtainViewModel(requireActivity())
                 mainViewModel.deleteNote(token,dataDelete.id)
-                //deleteNote(token.toString(),dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
                         val mainViewModel = obtainViewModel(requireActivity())

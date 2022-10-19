@@ -146,12 +146,12 @@ class FragmentSecret : Fragment() {
     }
 
     fun setAdapter(){
-        //retriveNotes(token)
         adapter = NoteSecretAdapter(
             object : NoteSecretAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {
                     noteAddUpdateViewModel.delete(note)
-                    deleteNote(token,note.id)
+                    val mainViewModel = obtainViewModel(requireActivity())
+                    mainViewModel.deleteNote(token,note.id)
                     Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
                 }
@@ -210,10 +210,8 @@ class FragmentSecret : Fragment() {
                         }
                         if (selectedFile.equals("Attach File")){
                             noteAddUpdateViewModel.update(note!!)
-                            updateNote(token.toString(),note!!.id,
-                                tvTitleUpdate.text.toString(),
-                                tvDeskripsi.text.toString(), note!!.date.toString(), note!!.image.toString()
-                            )
+                            val mainViewModel = obtainViewModel(requireActivity())
+                            mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id ,note!!.image.toString())
                             try {
                                 Thread.sleep(3000)
                             } catch (e : InterruptedException){
@@ -223,10 +221,8 @@ class FragmentSecret : Fragment() {
                             dialogUpdate.dismiss()
                         } else {
                             noteAddUpdateViewModel.update(note!!)
-                            updateNote(token.toString(),note!!.id,
-                                tvTitleUpdate.text.toString(),
-                                tvDeskripsi.text.toString(), note!!.date.toString(), imageUri.toString()
-                            )
+                            val mainViewModel = obtainViewModel(requireActivity())
+                            mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, imageUri.toString())
                             try {
                                 Thread.sleep(3000)
                             } catch (e : InterruptedException){
@@ -273,10 +269,12 @@ class FragmentSecret : Fragment() {
                 val dataDelete = adapter.listNotes[position]
 
                 noteAddUpdateViewModel.delete(dataDelete)
-                deleteNote(token.toString(),dataDelete.id)
+                val mainViewModel = obtainViewModel(requireActivity())
+                mainViewModel.deleteNote(token,dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
-                        postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),dataDelete.image.toString())
+                        val mainViewModel = obtainViewModel(requireActivity())
+                        mainViewModel.postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),user!!.id,dataDelete.image.toString())
                         noteAddUpdateViewModel.insert(dataDelete)
                     }
                     show()
@@ -329,95 +327,6 @@ class FragmentSecret : Fragment() {
         dialogUpdate.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
 
-    }
-
-    fun deleteImage(downloadLink : String){
-        val mFirebaseStorage = FirebaseStorage.getInstance().getReference().getStorage();
-        val photoRef = mFirebaseStorage.getReferenceFromUrl(downloadLink)
-        photoRef.delete().addOnSuccessListener {
-            Log.d(ContentValues.TAG, "deleteImage: Image Deleted")
-        }.addOnFailureListener {
-            Log.d(ContentValues.TAG, "deleteImage: Failed deleting image "+it.message)
-        }
-
-    }
-
-    private fun postNotes(token : String,id: Int,title:String,description:String,date: String, image : String) {
-        val client = ApiConfig.getApiService().createNotes(token,
-            NoteResponseItem(id,title,description,date, user!!.id,image)
-        )
-        client.enqueue(object : Callback<PostNotesResponse> {
-            override fun onResponse(
-                call: Call<PostNotesResponse>,
-                response: Response<PostNotesResponse>
-            ) {
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    Toast.makeText(context, "Notes updated", Toast.LENGTH_SHORT).show()
-                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                    dialog.dismiss()
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                    Log.d(ContentValues.TAG, "onResponse: ${token}")
-                    Log.d(ContentValues.TAG, "onResponse: ${id}")
-                    Log.d(ContentValues.TAG, "onResponse: ${title}")
-                    Log.d(ContentValues.TAG, "onResponse: ${description}")
-                    Log.d(ContentValues.TAG, "onResponse: ${date}")
-                    Log.d(ContentValues.TAG, "onResponse: ${image}")
-                }
-            }
-
-            override fun onFailure(call: Call<PostNotesResponse>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-
-        })
-    }
-
-    private fun updateNote(token: String,id: Int,title: String,description: String,date: String,image: String){
-        val client = ApiConfig.getApiService().updateNotes(token,id.toString(),
-            NoteResponseItem(id, title, description, date, user!!.id, image)
-        )
-        client.enqueue(object : Callback<UpdateNotesResponse> {
-            override fun onResponse(
-                call: Call<UpdateNotesResponse>,
-                response: Response<UpdateNotesResponse>
-            ) {
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<UpdateNotesResponse>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-
-        })
-    }
-
-    private fun deleteNote(token: String,id: Int) {
-        val client = ApiConfig.getApiService().deleteNotes(token,id.toString())
-        client.enqueue(object : Callback<ResponseFetchAll> {
-            override fun onResponse(
-                call: Call<ResponseFetchAll>,
-                response: Response<ResponseFetchAll>
-            ) {
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-
-        })
     }
 
     private fun pickImageFromGallery(code : Int) {
@@ -478,43 +387,6 @@ class FragmentSecret : Fragment() {
 
     fun gotoHome(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentSecret_to_fragmentHome)
-    }
-
-    private fun retriveNotes(token : String) {
-        val client = ApiConfig.getApiService().getNotes(token)
-        client.enqueue(object : Callback<ResponseFetchAll> {
-            override fun onResponse(
-                call: Call<ResponseFetchAll>,
-                response: Response<ResponseFetchAll>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()!!.data!!.notes
-                    if (responseBody != null) {
-                        Log.d(ContentValues.TAG, "onResponse: ${responseBody}")
-                        for (i in 0 until responseBody.size) {
-                            note.let { note ->
-                                note?.id = responseBody[i]!!.id!!.toInt()
-                                note?.title = responseBody[i]!!.title
-                                note?.description = responseBody[i]!!.description
-                                note?.date = responseBody[i]!!.date
-                                note?.idUser = responseBody[i]!!.user!!.id!!.toInt()
-                                note?.image = responseBody[i]!!.image
-                                note?.secret = false
-                                noteAddUpdateViewModel.insert(Note(responseBody[i]!!.id!!.toInt(),responseBody[i]!!.title,responseBody[i]!!.description,
-                                    responseBody[i]!!.date,responseBody[i]!!.user!!.id!!.toInt(),responseBody[i]!!.image,note?.secret))
-                            }
-//                            Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
-//                            Log.d(TAG, "onResponse: ${responseBody[i]!!.description}")
-                        }
-                    }
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                }
-            }
-            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-        })
     }
 
     fun onResumeHandler(){
@@ -597,8 +469,8 @@ class FragmentSecret : Fragment() {
                         note?.secret = secret
                     }
                     if(defaultUri.equals("Default")) {
-                        postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),
-                            DateHelper.getCurrentDate(),"Default")
+                        val mainViewModel = obtainViewModel(requireActivity())
+                        mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,"Default")
                         Thread.sleep(100)
                         setAdapter()
                         edtJudul.text.clear()
@@ -606,8 +478,8 @@ class FragmentSecret : Fragment() {
                         defaultUri = "Default"
                         dialog.dismiss()
                     } else {
-                        postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),
-                            DateHelper.getCurrentDate(),defaultUri)
+                        val mainViewModel = obtainViewModel(requireActivity())
+                        mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,defaultUri)
                         Thread.sleep(100)
                         setAdapter()
                         edtJudul.text.clear()
@@ -697,10 +569,8 @@ class FragmentSecret : Fragment() {
                     noteUpdate?.secret = secret
                 }
                 noteAddUpdateViewModel.update(Note(0,noteUpdate!!.title.toString(),noteUpdate!!.description.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,noteUpdate!!.image.toString(),noteUpdate!!.secret))
-                updateNote(token.toString(),note!!.id,
-                    edtTitleUpdate.text.toString(),
-                    edtDescription.text.toString(), note!!.date.toString(), note!!.image.toString()
-                )
+                val mainViewModel = obtainViewModel(requireActivity())
+                mainViewModel.updateNote(token.toString(),noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, noteUpdate!!.image.toString())
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if Attach File")
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Note ${noteUpdate!!.title.toString()}")
                 setAdapter()
@@ -715,11 +585,8 @@ class FragmentSecret : Fragment() {
                     noteUpdate?.secret = secret
                 }
                 noteAddUpdateViewModel.update(Note(note!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(),note!!.date.toString(),note!!.idUser,imageUri.toString(),secret))
-                //noteAddUpdateViewModel.update(Note(0,edtTitleUpdate.text.toString(),edtDescription.text.toString(),noteUpdate!!.date,noteUpdate!!.idUser,imageUri.toString(),noteUpdate!!.secret))
-                updateNote(token,note!!.id,
-                    edtTitleUpdate.text.toString(),
-                    edtDescription.text.toString(), note!!.date.toString(), imageUri.toString()
-                )
+                val mainViewModel = obtainViewModel(requireActivity())
+                mainViewModel.updateNote(token,noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, imageUri.toString())
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if With Image")
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: ${noteUpdate!!.title} uri ${noteUpdate!!.image}")
                 setAdapter()
