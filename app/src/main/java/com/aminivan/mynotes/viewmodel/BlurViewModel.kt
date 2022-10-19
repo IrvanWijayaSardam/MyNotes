@@ -6,6 +6,7 @@ import TAG_OUTPUT
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.*
@@ -14,11 +15,15 @@ import com.aminivan.mynotes.workers.CleanupWorker
 import com.aminivan.mynotes.workers.SaveImageToFileWorker
 
 class BlurViewModel(application: FragmentActivity?) : ViewModel() {
-
+    val workInfo : LiveData<List<WorkInfo>>
     private var imageUri: Uri? = null
     internal var outputUri: Uri? = null
     private val workManager = application?.let { WorkManager.getInstance(it) }
 
+
+    init {
+        workInfo = workManager!!.getWorkInfosByTagLiveData(TAG_OUTPUT)
+    }
 
     fun setImageUri(uri: Uri?) {
         imageUri = uri
@@ -86,6 +91,11 @@ class BlurViewModel(application: FragmentActivity?) : ViewModel() {
 
         // Actually start the work
         continuation.enqueue()
+
+        workManager.enqueueUniqueWork(
+            "savework",ExistingWorkPolicy.KEEP,save
+        )
+
     }
 
     internal fun setOutputUri(outputImageUri: String?) {

@@ -1,5 +1,6 @@
 package com.aminivan.mynotes.fragment
 
+import KEY_IMAGE_URI
 import android.app.Activity
 import android.app.Dialog
 import android.content.ContentValues
@@ -23,6 +24,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
@@ -301,11 +303,11 @@ class FragmentSecret : Fragment() {
 
                 var mImage: Bitmap?
                 myExecutor.execute {
-                    mImage = mLoad("https://firebasestorage.googleapis.com/v0/b/mynotes-f6709.appspot.com/o/images%2F2022_10_16_17_57_17?alt=media&token=f4e55a26-e04b-4adf-9454-65f9d3eef3eb")
+                    mImage = mLoad(imageUri.toString())
                     myHandler.post {
                         //mImageView.setImageBitmap(mImage)
                         if(mImage!=null){
-                            mSaveMediaToStorage("temporary",mImage)
+                            mSaveMediaToStorage(imageUri.toString(),mImage)
                         }
                     }
                 }
@@ -640,10 +642,16 @@ class FragmentSecret : Fragment() {
                 dialog = Dialog(requireContext())
                 dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 dialog.setContentView(R.layout.custom_dialog_attachment);
-                Handler().postDelayed(Runnable {
-                    Glide.with(requireContext()).load(viewModel.getOutputUri()).into(dialog.findViewById(R.id.imageDialogue))
-                    Log.d(TAG, "mSaveMediaToStorage: Blur Worker outputUri ")
-                }, 10000)
+                viewModel.workInfo.observe(viewLifecycleOwner, {
+                    val workInfo = it[0]
+                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                        val data = workInfo.outputData
+                        val uri = data.getString(KEY_IMAGE_URI)
+                        Log.d(TAG, "mSaveMediaToStorage: uriGetted ${uri}")
+                        Glide.with(requireContext()).load(uri).into(dialog.findViewById(R.id.imageDialogue))
+                        //Log.d(TAG, "mSaveMediaToStorage: Blur Worker outputUri ")
+                    }
+                })
                 fos = imageUriDownload?.let { resolver.openOutputStream(it) }
                 dialog.show()
             }
