@@ -19,6 +19,7 @@ class BlurViewModel(application: FragmentActivity?) : ViewModel() {
     internal var outputUri: Uri? = null
     private val workManager = application?.let { WorkManager.getInstance(it) }
 
+
     fun setImageUri(uri: Uri?) {
         imageUri = uri
     }
@@ -31,6 +32,7 @@ class BlurViewModel(application: FragmentActivity?) : ViewModel() {
         workManager!!.cancelUniqueWork(IMAGE_MANIPULATION_WORK_NAME)
     }
 
+
     /**
      * Creates the input data bundle which includes the Uri to operate on
      * @return Data which contains the Image Uri as a String
@@ -39,7 +41,6 @@ class BlurViewModel(application: FragmentActivity?) : ViewModel() {
         val builder = Data.Builder()
         imageUri?.let {
             builder.putString(KEY_IMAGE_URI, imageUri.toString())
-            setOutputUri(imageUri.toString())
         }
         return builder.build()
     }

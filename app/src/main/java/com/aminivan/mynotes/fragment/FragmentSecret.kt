@@ -23,6 +23,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.WorkManager
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.database.Note
@@ -772,8 +773,10 @@ class FragmentSecret : Fragment() {
                 dialog = Dialog(requireContext())
                 dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 dialog.setContentView(R.layout.custom_dialog_attachment);
-                Glide.with(requireContext()).load("file:///data/user/0/com.aminivan.mynotes/files/blur_filter_outputs/blur-filter-output-a00fcc40-290e-4dc5-9d7d-053a07574190.png").into(dialog.findViewById(R.id.imageDialogue))
-                Log.d(TAG, "mSaveMediaToStorage: Blur Worker outputUri ${viewModel.getOutputUri()} ")
+                Handler().postDelayed(Runnable {
+                    Glide.with(requireContext()).load(viewModel.getOutputUri()).into(dialog.findViewById(R.id.imageDialogue))
+                    Log.d(TAG, "mSaveMediaToStorage: Blur Worker outputUri ")
+                }, 10000)
                 fos = imageUriDownload?.let { resolver.openOutputStream(it) }
                 dialog.show()
             }

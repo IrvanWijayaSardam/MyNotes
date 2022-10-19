@@ -11,7 +11,6 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 
 private const val TAG = "BlurWorker"
-
 class BlurWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
     override fun doWork(): Result {
         val appContext = applicationContext
