@@ -1,4 +1,4 @@
-package com.aminivan.mynotes.`interface`
+package com.aminivan.mynotes.service
 
 import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.response.*

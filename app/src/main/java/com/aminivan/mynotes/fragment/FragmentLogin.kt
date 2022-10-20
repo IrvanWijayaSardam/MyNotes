@@ -24,15 +24,18 @@ import com.aminivan.mynotes.databinding.FragmentSplashBinding
 import com.aminivan.mynotes.helper.Encryptor
 import com.aminivan.mynotes.response.*
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
+import com.aminivan.mynotes.viewmodel.NotesViewModel
 import com.aminivan.mynotes.viewmodel.UserViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
+import com.aminivan.mynotes.workers.sleep
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import kotlin.math.log
 
-
+@AndroidEntryPoint
 class FragmentLogin : Fragment() {
 
     private var _binding : FragmentLoginBinding? = null
@@ -72,7 +75,26 @@ class FragmentLogin : Fragment() {
             } else if (binding.edtPasswordLogin.text.toString().isEmpty()){
                 binding.edtPasswordLogin.error = "Silahkan isi password"
             } else {
-                authApi(binding.edtEmailLogin.text.toString(),binding.edtPasswordLogin.text.toString())
+                val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                viewModel.authApi(binding.edtEmailLogin.text.toString(), binding.edtPasswordLogin.text.toString())
+                viewModel.getLiveDataUsers().observe(viewLifecycleOwner,{
+                    Log.d(TAG, "onViewCreated: ${it}")
+                    if(it == null) {
+                        Log.d(TAG, "onViewCreated: Data Kosong ${it}")
+                    } else {
+                        idUser = it.data?.id!!.toInt()
+                        user!!.id = it.data?.id!!.toInt()
+                        user!!.email = it.data?.email
+                        user!!.name = it.data?.name
+                        user!!.profile = it.data?.profile
+                        user!!.jk = it.data?.jk
+                        Log.d(TAG, "onViewCreated: token after login ${it.data.token}")
+                        viewModeluser.editData(user!!.id, user!!.name.toString(),user!!.email.toString(),binding.edtPasswordLogin.text.toString(),user!!.profile.toString(),it.data?.jk.toString(),it.data.token.toString())
+                        retrieveNotes(it.data.token.toString())
+                        gotoHome()
+                        //Log.d(TAG, "onViewCreated: Login Berhasil ${it}")
+                    }
+                })
             }
         }
 
@@ -95,75 +117,64 @@ class FragmentLogin : Fragment() {
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
     }
 
-    fun authApi(email : String,password: String){
-        val client = ApiConfig.getApiService().auth(email, password)
-        client.enqueue(object : Callback<LoginResponse> {
-            override fun onResponse(
-                call: Call<LoginResponse>,
-                response: Response<LoginResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        Log.d(TAG, "UserToken: ${responseBody}")
-                        idUser = responseBody.data!!.id!!.toInt()
-                        user!!.id = responseBody.data!!.id!!.toInt()
-                        user!!.email = responseBody.data.email
-                        user!!.name = responseBody.data.name
-                        user!!.profile = responseBody.data.profile
-                        user!!.jk = responseBody.data.jk
-                        noteAddUpdateViewModel.deleteAllNotes()
-                        viewModeluser.editData(user!!.id,
-                            user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),responseBody.data.jk.toString(),responseBody.data.token.toString())
-                        retriveNotes(responseBody.data.token.toString())
-                        Log.d(TAG, "UserToken: ${responseBody.data}")
-                        gotoHome()
-                    }
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                    if (response.message().equals("Unauthorized")){
-                        Toast.makeText(context, "Email / Password salah", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-        })
-    }
 
-    private fun retriveNotes(token : String) {
-        val client = ApiConfig.getApiService().getNotes(token)
-        client.enqueue(object : Callback<ResponseFetchAll> {
-            override fun onResponse(
-                call: Call<ResponseFetchAll>,
-                response: Response<ResponseFetchAll>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()!!.data!!.notes
-                    if (responseBody != null) {
-                        Log.d(TAG, "onResponse: ${responseBody}")
-                        for (i in 0 until responseBody.size) {
-                            note.let { note ->
-                                note?.id = responseBody[i]!!.id!!.toInt()
-                                note?.title = responseBody[i]!!.title
-                                note?.description = responseBody[i]!!.description
-                                note?.date = responseBody[i]!!.date
-                                note?.idUser = responseBody[i]!!.user!!.id!!.toInt()
-                                note?.image = responseBody[i]!!.image
-                                noteAddUpdateViewModel.insert(Note(responseBody[i]!!.id!!.toInt(),responseBody[i]!!.title,responseBody[i]!!.description,
-                                    responseBody[i]!!.date,responseBody[i]!!.user!!.id!!.toInt(),responseBody[i]!!.image,false))
-                            }
-//                            Log.d(TAG, "onResponse: ${responseBody.size.toString()}")
-//                            Log.d(TAG, "onResponse: ${responseBody[i]!!.description}")
-                        }
-                    }
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+
+
+//    fun authApi(email : String,password: String){
+//        val viewModel = ViewModelProvider(this).get(NotesViewModel::class.java)
+//        val client = ApiConfig.getApiService().auth(email, password)
+//        client.enqueue(object : Callback<LoginResponse> {
+//            override fun onResponse(
+//                call: Call<LoginResponse>,
+//                response: Response<LoginResponse>
+//            ) {
+//                if (response.isSuccessful) {
+//                    val responseBody = response.body()
+//                    if (responseBody != null) {
+//                        Log.d(TAG, "UserToken: ${responseBody}")
+//                        idUser = responseBody.data!!.id!!.toInt()
+//                        user!!.id = responseBody.data!!.id!!.toInt()
+//                        user!!.email = responseBody.data.email
+//                        user!!.name = responseBody.data.name
+//                        user!!.profile = responseBody.data.profile
+//                        user!!.jk = responseBody.data.jk
+//                        noteAddUpdateViewModel.deleteAllNotes()
+//                        viewModeluser.editData(user!!.id,
+//                            user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),responseBody.data.jk.toString(),responseBody.data.token.toString())
+//                        retriveNotes(responseBody.data.token.toString())
+//                        Log.d(TAG, "UserToken: ${responseBody.data}")
+//                        gotoHome()
+//                    }
+//                } else {
+//                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+//                    if (response.message().equals("Unauthorized")){
+//                        Toast.makeText(context, "Email / Password salah", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+//                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+//            }
+//        })
+//    }
+
+    fun retrieveNotes(token : String) {
+        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+        viewModel.retriveNotes(token)
+        viewModel.liveDataNotes.observe(viewLifecycleOwner, {
+            for(i in 1 until it.data!!.notes!!.size){
+                note.let { note ->
+                    note?.id = it.data.notes!![i]!!.id!!.toInt()
+                    note?.title = it.data.notes!![i]!!.title
+                    note?.description = it.data.notes!![i]!!.description
+                    note?.date = it.data.notes!![i]!!.date
+                    note?.idUser = it.data.notes!![i]!!.user!!.id!!.toInt()
+                    note?.image = it.data.notes!![i]!!.image
+                    noteAddUpdateViewModel.insert(
+                        Note(it.data.notes!![i]!!.id!!.toInt(),it.data.notes!![i]!!.title,it.data.notes!![i]!!.description,
+                            it.data.notes!![i]!!.date,it.data.notes!![i]!!.user!!.id!!.toInt(),it.data.notes!![i]!!.image,false)
+                    )
                 }
-            }
-            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
             }
         })
     }

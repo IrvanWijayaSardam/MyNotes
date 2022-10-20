@@ -153,7 +153,7 @@ class FragmentSecret : Fragment() {
                 override fun onDelete(note: Note) {
                     noteAddUpdateViewModel.delete(note)
                     val mainViewModel = obtainViewModel(requireActivity())
-                    mainViewModel.deleteNote(token,note.id)
+                    //mainViewModel.deleteNote(token,note.id)
                     Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
                 }
@@ -213,7 +213,7 @@ class FragmentSecret : Fragment() {
                         if (selectedFile.equals("Attach File")){
                             noteAddUpdateViewModel.update(note!!)
                             val mainViewModel = obtainViewModel(requireActivity())
-                            mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id ,note!!.image.toString())
+                            //mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id ,note!!.image.toString())
                             try {
                                 Thread.sleep(3000)
                             } catch (e : InterruptedException){
@@ -224,7 +224,7 @@ class FragmentSecret : Fragment() {
                         } else {
                             noteAddUpdateViewModel.update(note!!)
                             val mainViewModel = obtainViewModel(requireActivity())
-                            mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, imageUri.toString())
+                            //mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, imageUri.toString())
                             try {
                                 Thread.sleep(3000)
                             } catch (e : InterruptedException){
@@ -272,11 +272,11 @@ class FragmentSecret : Fragment() {
 
                 noteAddUpdateViewModel.delete(dataDelete)
                 val mainViewModel = obtainViewModel(requireActivity())
-                mainViewModel.deleteNote(token,dataDelete.id)
+                //mainViewModel.deleteNote(token,dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
                         val mainViewModel = obtainViewModel(requireActivity())
-                        mainViewModel.postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),user!!.id,dataDelete.image.toString())
+                        //mainViewModel.postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),user!!.id,dataDelete.image.toString())
                         noteAddUpdateViewModel.insert(dataDelete)
                     }
                     show()
@@ -472,7 +472,7 @@ class FragmentSecret : Fragment() {
                     }
                     if(defaultUri.equals("Default")) {
                         val mainViewModel = obtainViewModel(requireActivity())
-                        mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,"Default")
+                        //mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,"Default")
                         Thread.sleep(100)
                         setAdapter()
                         edtJudul.text.clear()
@@ -481,7 +481,7 @@ class FragmentSecret : Fragment() {
                         dialog.dismiss()
                     } else {
                         val mainViewModel = obtainViewModel(requireActivity())
-                        mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,defaultUri)
+                        //mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,defaultUri)
                         Thread.sleep(100)
                         setAdapter()
                         edtJudul.text.clear()
@@ -572,7 +572,7 @@ class FragmentSecret : Fragment() {
                 }
                 noteAddUpdateViewModel.update(Note(0,noteUpdate!!.title.toString(),noteUpdate!!.description.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,noteUpdate!!.image.toString(),noteUpdate!!.secret))
                 val mainViewModel = obtainViewModel(requireActivity())
-                mainViewModel.updateNote(token.toString(),noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, noteUpdate!!.image.toString())
+                //mainViewModel.updateNote(token.toString(),noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, noteUpdate!!.image.toString())
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if Attach File")
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Note ${noteUpdate!!.title.toString()}")
                 setAdapter()
@@ -588,7 +588,7 @@ class FragmentSecret : Fragment() {
                 }
                 noteAddUpdateViewModel.update(Note(note!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(),note!!.date.toString(),note!!.idUser,imageUri.toString(),secret))
                 val mainViewModel = obtainViewModel(requireActivity())
-                mainViewModel.updateNote(token,noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, imageUri.toString())
+                //mainViewModel.updateNote(token,noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, imageUri.toString())
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if With Image")
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: ${noteUpdate!!.title} uri ${noteUpdate!!.image}")
                 setAdapter()

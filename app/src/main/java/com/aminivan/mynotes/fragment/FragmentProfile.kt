@@ -91,29 +91,29 @@ class FragmentProfile : Fragment() {
         }
 
         binding.btnSave.setOnClickListener {
-            updateUser(token,"",user!!.email.toString(),user!!.name.toString(),imageUri.toString(),user!!.jk.toString())
+            //updateUser(token,"",user!!.email.toString(),user!!.name.toString(),imageUri.toString(),user!!.jk.toString())
             viewModeluser.editData(user!!.id,
                 user!!.name.toString(),user!!.email.toString(),user!!.password.toString(),imageUri.toString(),user!!.jk.toString(),token)
         }
         binding.btnUpdateUser.setOnClickListener {
             if(binding.edtPassword.text!!.isEmpty()){
                 if(binding.rbMan.isChecked) {
-                    updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
+                    //updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
                     viewModeluser.editData(user!!.id,
                         binding.edtName.text.toString(),binding.edtEmail.text.toString(),user!!.password.toString(),user!!.profile.toString(),"M",token)
                 } else {
-                    updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
+                    //updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
                     viewModeluser.editData(user!!.id,
                         binding.edtName.text.toString(),binding.edtEmail.text.toString(),user!!.password.toString(),user!!.profile.toString(),"W",token)
                 }
 
             } else {
                 if(binding.rbMan.isChecked) {
-                    updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
+                    //updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
                     viewModeluser.clearData()
                     gotoSplash()
                 } else {
-                    updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
+                    //updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
                     viewModeluser.clearData()
                     gotoSplash()
                 }
@@ -167,31 +167,31 @@ class FragmentProfile : Fragment() {
         }
     }
 
-    private fun updateUser(token: String,password : String,email:String,name:String,profile: String, Jk: String) {
-        val client = ApiConfig.getApiService().updateUser(token, UserResponseItem(password,0,email,name,profile,Jk))
-        client.enqueue(object : Callback<UserResponseItem> {
-            override fun onResponse(
-                call: Call<UserResponseItem>,
-                response: Response<UserResponseItem>
-            ) {
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                    viewModeluser.editData(user!!.id,
-                        user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),user!!.jk.toString(),token)
-                    Toast.makeText(context, "Upload Profile Success", Toast.LENGTH_SHORT).show()
-                    binding.btnSave.visibility = View.GONE
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<UserResponseItem>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-
-        })
-    }
+//    private fun updateUser(token: String,password : String,email:String,name:String,profile: String, Jk: String) {
+//        val client = ApiConfig.getApiService().updateUser(token, UserResponseItem(password,0,email,name,profile,Jk))
+//        client.enqueue(object : Callback<UserResponseItem> {
+//            override fun onResponse(
+//                call: Call<UserResponseItem>,
+//                response: Response<UserResponseItem>
+//            ) {
+//                val responseBody = response.body()
+//                if (response.isSuccessful && responseBody != null) {
+//                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+//                    viewModeluser.editData(user!!.id,
+//                        user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),user!!.jk.toString(),token)
+//                    Toast.makeText(context, "Upload Profile Success", Toast.LENGTH_SHORT).show()
+//                    binding.btnSave.visibility = View.GONE
+//                } else {
+//                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<UserResponseItem>, t: Throwable) {
+//                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+//            }
+//
+//        })
+//    }
 
     fun fetchDataUser() {
         viewModeluser.dataUser.observe(requireActivity(),{

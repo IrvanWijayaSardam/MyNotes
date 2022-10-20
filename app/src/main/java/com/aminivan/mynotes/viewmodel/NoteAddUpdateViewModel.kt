@@ -40,89 +40,81 @@ class NoteAddUpdateViewModel(application: Application) : ViewModel() {
     fun insertUser(user: User){
         mNoteRepository.insertUser(user)
     }
-    fun updateUser(user: User){
-        mNoteRepository.updateUser(user)
-    }
-    fun deleteUser(user: User){
-        mNoteRepository.deleteUser(user)
-    }
-    fun authUser(email : String): LiveData<User> = mNoteRepository.authUser(email)
 
+//    fun postNotes(token : String,id: Int,title:String,description:String,date: String,userid : Int, image : String) {
+//        val client = ApiConfig.getApiService().createNotes(token,
+//            NoteResponseItem(id,title,description,date, userid,image)
+//        )
+//        client.enqueue(object : Callback<PostNotesResponse> {
+//            override fun onResponse(
+//                call: Call<PostNotesResponse>,
+//                response: Response<PostNotesResponse>
+//            ) {
+//                val responseBody = response.body()
+//                if (response.isSuccessful && responseBody != null) {
+//                    Log.d(TAG, "onResponse: Note Inserted")
+//                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+//                    //dialog.dismiss()
+//                } else {
+//                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+//                    Log.d(ContentValues.TAG, "onResponse: ${token}")
+//                    Log.d(ContentValues.TAG, "onResponse: ${id}")
+//                    Log.d(ContentValues.TAG, "onResponse: ${title}")
+//                    Log.d(ContentValues.TAG, "onResponse: ${description}")
+//                    Log.d(ContentValues.TAG, "onResponse: ${date}")
+//                    Log.d(ContentValues.TAG, "onResponse: ${image}")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<PostNotesResponse>, t: Throwable) {
+//                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+//            }
+//
+//        })
+//    }
 
-    fun postNotes(token : String,id: Int,title:String,description:String,date: String,userid : Int, image : String) {
-        val client = ApiConfig.getApiService().createNotes(token,
-            NoteResponseItem(id,title,description,date, userid,image)
-        )
-        client.enqueue(object : Callback<PostNotesResponse> {
-            override fun onResponse(
-                call: Call<PostNotesResponse>,
-                response: Response<PostNotesResponse>
-            ) {
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    Log.d(TAG, "onResponse: Note Inserted")
-                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                    //dialog.dismiss()
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                    Log.d(ContentValues.TAG, "onResponse: ${token}")
-                    Log.d(ContentValues.TAG, "onResponse: ${id}")
-                    Log.d(ContentValues.TAG, "onResponse: ${title}")
-                    Log.d(ContentValues.TAG, "onResponse: ${description}")
-                    Log.d(ContentValues.TAG, "onResponse: ${date}")
-                    Log.d(ContentValues.TAG, "onResponse: ${image}")
-                }
-            }
+//    fun updateNote(token: String,id: Int,title: String,description: String,date: String,userid: Int,image: String){
+//        val client = ApiConfig.getApiService().updateNotes(token,id.toString(),
+//            NoteResponseItem(id, title, description, date, userid, image))
+//        client.enqueue(object : Callback<UpdateNotesResponse> {
+//            override fun onResponse(
+//                call: Call<UpdateNotesResponse>,
+//                response: Response<UpdateNotesResponse>
+//            ) {
+//                val responseBody = response.body()
+//                if (response.isSuccessful && responseBody != null) {
+//                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+//                } else {
+//                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+//                }
+//            }
+//            override fun onFailure(call: Call<UpdateNotesResponse>, t: Throwable) {
+//                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+//            }
+//
+//        })
+//    }
 
-            override fun onFailure(call: Call<PostNotesResponse>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-
-        })
-    }
-
-    fun updateNote(token: String,id: Int,title: String,description: String,date: String,userid: Int,image: String){
-        val client = ApiConfig.getApiService().updateNotes(token,id.toString(),
-            NoteResponseItem(id, title, description, date, userid, image))
-        client.enqueue(object : Callback<UpdateNotesResponse> {
-            override fun onResponse(
-                call: Call<UpdateNotesResponse>,
-                response: Response<UpdateNotesResponse>
-            ) {
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                }
-            }
-            override fun onFailure(call: Call<UpdateNotesResponse>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-
-        })
-    }
-
-    fun deleteNote(token: String,id: Int) {
-        val client = ApiConfig.getApiService().deleteNotes(token,id.toString())
-        client.enqueue(object : Callback<ResponseFetchAll> {
-            override fun onResponse(
-                call: Call<ResponseFetchAll>,
-                response: Response<ResponseFetchAll>
-            ) {
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-
-        })
-    }
+//    fun deleteNote(token: String,id: Int) {
+//        val client = ApiConfig.getApiService().deleteNotes(token,id.toString())
+//        client.enqueue(object : Callback<ResponseFetchAll> {
+//            override fun onResponse(
+//                call: Call<ResponseFetchAll>,
+//                response: Response<ResponseFetchAll>
+//            ) {
+//                val responseBody = response.body()
+//                if (response.isSuccessful && responseBody != null) {
+//                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+//                } else {
+//                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<ResponseFetchAll>, t: Throwable) {
+//                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+//            }
+//
+//        })
+//    }
 
 }

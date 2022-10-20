@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.database.User
@@ -23,12 +24,13 @@ import com.aminivan.mynotes.response.LoginResponse
 import com.aminivan.mynotes.response.PostUserResponse
 import com.aminivan.mynotes.response.UserResponseItem
 import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
+import com.aminivan.mynotes.viewmodel.NotesViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
 
 class FragmentRegister : Fragment() {
     lateinit var binding : FragmentRegisterBinding
@@ -84,7 +86,7 @@ class FragmentRegister : Fragment() {
                         note?.password = encryptor.encryptAndSavePassword(requireContext(),binding.edtPassword.text.toString()).toString()
                     }
                     noteAddUpdateViewModel.insertUser(user as User)
-                    postUser(binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtUsername.text.toString(),"",Jk)
+                    registUser(User(0,binding.edtUsername.text.toString(),binding.edtEmail.text.toString(),binding.edtPassword.text.toString(),"default",Jk))
                     Toast.makeText(context, "Registrasi Berhasil Silahkan Login", Toast.LENGTH_SHORT).show()
                     noteAddUpdateViewModel.deleteAllNotes()
                     gotoLogin()
@@ -126,26 +128,9 @@ class FragmentRegister : Fragment() {
 
     }
 
-    private fun postUser(password: String,email:String,name:String,profile: String, Jk: String) {
-        val client = ApiConfig.getApiService().createUser(User(0,name,email,password,"default",Jk))
-        client.enqueue(object : Callback<User> {
-            override fun onResponse(
-                call: Call<User>,
-                response: Response<User>
-            ) {
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-                } else {
-                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-            }
-
-        })
+    private fun registUser(user: User) {
+        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+        viewModel.registUser(user)
     }
 
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
