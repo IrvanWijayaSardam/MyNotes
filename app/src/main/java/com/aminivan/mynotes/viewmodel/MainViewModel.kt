@@ -18,7 +18,4 @@ import retrofit2.Response
 class MainViewModel (application: Application) : ViewModel() {
     private val mNoteRepository: NoteRepository = NoteRepository(application)
 
-
-
-
 }
