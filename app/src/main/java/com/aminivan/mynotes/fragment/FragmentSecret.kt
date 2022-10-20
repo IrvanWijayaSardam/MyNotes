@@ -103,7 +103,7 @@ class FragmentSecret : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setDialog()
         var context = binding.rvNotesSecret.context
-
+        secret = true
         selectedFile = "Attach File"
         imageUri = Uri.parse("DefaultUri")
         defaultUri = "Default"
@@ -152,13 +152,16 @@ class FragmentSecret : Fragment() {
             object : NoteSecretAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {
                     noteAddUpdateViewModel.delete(note)
-                    val mainViewModel = obtainViewModel(requireActivity())
+                    val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                    viewModel.deleteNote(token,note.id)
+                    //val mainViewModel = obtainViewModel(requireActivity())
                     //mainViewModel.deleteNote(token,note.id)
                     Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
                 }
                 override fun onUpdate(note: Note) {
                     noteUpdate.let { noteUpdate ->
+                        noteUpdate!!.id = note.id
                         noteUpdate!!.title = note.title
                         noteUpdate!!.description = note.description
                         noteUpdate!!.date = note.date
@@ -167,7 +170,7 @@ class FragmentSecret : Fragment() {
                         noteUpdate!!.secret = note.secret
                     }
 
-                    Log.d(ContentValues.TAG, "onUpdate: noteUpdate title ${noteUpdate!!.title}")
+                    Log.d(ContentValues.TAG, "onUpdate: noteUpdate title ${noteUpdate!!.id}")
                     var dialogUpdate = Dialog(requireContext())
                     dialogUpdate.setContentView(R.layout.custom_dialog_update);
                     var tvTitleUpdate : EditText = dialogUpdate.findViewById(R.id.edtJudulUpdate)
@@ -178,7 +181,7 @@ class FragmentSecret : Fragment() {
                     val ivUnlockUpdate : ImageView = dialogUpdate.findViewById(R.id.ivUnlockUpdate)
 
 
-                    ivLockUpdate.visibility = View.VISIBLE
+                    ivUnlockUpdate.visibility = View.VISIBLE
                     ivLockUpdate.setOnClickListener {
                         secret = true
                         ivLockUpdate.visibility = View.INVISIBLE
@@ -212,7 +215,9 @@ class FragmentSecret : Fragment() {
                         }
                         if (selectedFile.equals("Attach File")){
                             noteAddUpdateViewModel.update(note!!)
-                            val mainViewModel = obtainViewModel(requireActivity())
+                            val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                            viewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id ,note!!.image.toString())
+                            //val mainViewModel = obtainViewModel(requireActivity())
                             //mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id ,note!!.image.toString())
                             try {
                                 Thread.sleep(3000)
@@ -223,7 +228,9 @@ class FragmentSecret : Fragment() {
                             dialogUpdate.dismiss()
                         } else {
                             noteAddUpdateViewModel.update(note!!)
-                            val mainViewModel = obtainViewModel(requireActivity())
+                            val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                            viewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, imageUri.toString())
+                            //val mainViewModel = obtainViewModel(requireActivity())
                             //mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, imageUri.toString())
                             try {
                                 Thread.sleep(3000)
@@ -269,13 +276,16 @@ class FragmentSecret : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val dataDelete = adapter.listNotes[position]
-
                 noteAddUpdateViewModel.delete(dataDelete)
-                val mainViewModel = obtainViewModel(requireActivity())
+                val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                viewModel.deleteNote(token,dataDelete.id)
+                //val mainViewModel = obtainViewModel(requireActivity())
                 //mainViewModel.deleteNote(token,dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
-                        val mainViewModel = obtainViewModel(requireActivity())
+                        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                        viewModel.postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),user!!.id,dataDelete.image.toString())
+                        //val mainViewModel = obtainViewModel(requireActivity())
                         //mainViewModel.postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),user!!.id,dataDelete.image.toString())
                         noteAddUpdateViewModel.insert(dataDelete)
                     }
@@ -511,7 +521,7 @@ class FragmentSecret : Fragment() {
         val ivUnlockUpdate : ImageView = dialogUpdate.findViewById(R.id.ivUnlockUpdate)
 
 
-        ivLockUpdate.visibility = View.VISIBLE
+        ivUnlockUpdate.visibility = View.VISIBLE
         ivLockUpdate.setOnClickListener {
             secret = true
             ivLockUpdate.visibility = View.INVISIBLE
@@ -571,23 +581,19 @@ class FragmentSecret : Fragment() {
                     noteUpdate?.secret = secret
                 }
                 noteAddUpdateViewModel.update(Note(0,noteUpdate!!.title.toString(),noteUpdate!!.description.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,noteUpdate!!.image.toString(),noteUpdate!!.secret))
-                val mainViewModel = obtainViewModel(requireActivity())
+                val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                viewModel.updateNote(token.toString(),noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, noteUpdate!!.image.toString())
+                //val mainViewModel = obtainViewModel(requireActivity())
                 //mainViewModel.updateNote(token.toString(),noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, noteUpdate!!.image.toString())
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if Attach File")
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Note ${noteUpdate!!.title.toString()}")
                 setAdapter()
                 dialogUpdate.dismiss()
             } else {
-                noteUpdate.let { noteUpdate ->
-                    noteUpdate?.title = edtTitleUpdate.text.toString()
-                    noteUpdate?.description = edtDescription.text.toString()
-                    noteUpdate?.date = noteUpdate!!.date
-                    noteUpdate?.idUser = noteUpdate!!.idUser
-                    noteUpdate?.image = imageUri.toString()
-                    noteUpdate?.secret = secret
-                }
                 noteAddUpdateViewModel.update(Note(note!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(),note!!.date.toString(),note!!.idUser,imageUri.toString(),secret))
-                val mainViewModel = obtainViewModel(requireActivity())
+                val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                viewModel.updateNote(token,noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, imageUri.toString())
+                //val mainViewModel = obtainViewModel(requireActivity())
                 //mainViewModel.updateNote(token,noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, imageUri.toString())
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if With Image")
                 Log.d(ContentValues.TAG, "onResumeUpdateHandler: ${noteUpdate!!.title} uri ${noteUpdate!!.image}")

@@ -238,7 +238,9 @@ class FragmentHome : Fragment() {
             object : NoteAdapter.OnAdapterListener {
                 override fun onDelete(note: Note) {
                     noteAddUpdateViewModel.delete(note)
-                    val mainViewModel = obtainViewModel(requireActivity())
+                    val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                    viewModel.deleteNote(token,note.id)
+                    //val mainViewModel = obtainViewModel(requireActivity())
                     //mainViewModel.deleteNote(token,note.id)
                     Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
@@ -358,9 +360,10 @@ class FragmentHome : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val dataDelete = adapter.listNotes[position]
-
                 noteAddUpdateViewModel.delete(dataDelete)
-                val mainViewModel = obtainViewModel(requireActivity())
+                val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                viewModel.deleteNote(token,dataDelete.id)
+                //val mainViewModel = obtainViewModel(requireActivity())
                 //mainViewModel.deleteNote(token,dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
