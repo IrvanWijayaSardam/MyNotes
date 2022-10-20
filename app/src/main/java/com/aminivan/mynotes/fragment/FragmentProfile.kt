@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.aminivan.mynotes.R
@@ -26,7 +27,10 @@ import com.aminivan.mynotes.helper.URIPathHelper
 import com.aminivan.mynotes.response.DataUpdate
 import com.aminivan.mynotes.response.User
 import com.aminivan.mynotes.response.UserResponseItem
+import com.aminivan.mynotes.viewmodel.NoteAddUpdateViewModel
+import com.aminivan.mynotes.viewmodel.NotesViewModel
 import com.aminivan.mynotes.viewmodel.UserViewModel
+import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
@@ -35,13 +39,9 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-
 class FragmentProfile : Fragment() {
 
-
     lateinit var binding : FragmentProfileBinding
-    //lateinit var dataUserShared : SharedPreferences
     private val pickImage = 100
     lateinit var imageUri : Uri
     lateinit var profile : Bitmap
@@ -50,6 +50,7 @@ class FragmentProfile : Fragment() {
     lateinit var viewModeluser : UserViewModel
     private var user : com.aminivan.mynotes.database.User? = null
     lateinit var token : String
+    private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,6 +69,7 @@ class FragmentProfile : Fragment() {
         user = com.aminivan.mynotes.database.User()
         token = ""
         viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
+        noteAddUpdateViewModel = obtainViewModel(requireActivity())
 
         fetchDataUser()
         binding.btnUploadProfile.setOnClickListener {
@@ -80,9 +82,10 @@ class FragmentProfile : Fragment() {
         }
 
         binding.tvLogout.setOnClickListener(){
-            gotoLogin()
-            viewModeluser.clearData()
             Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
+            gotoLogin()
+            noteAddUpdateViewModel.deleteAllNotes()
+            viewModeluser.clearData()
         }
 
         binding.tvID.setOnClickListener {
@@ -91,29 +94,32 @@ class FragmentProfile : Fragment() {
         }
 
         binding.btnSave.setOnClickListener {
-            //updateUser(token,"",user!!.email.toString(),user!!.name.toString(),imageUri.toString(),user!!.jk.toString())
-            viewModeluser.editData(user!!.id,
-                user!!.name.toString(),user!!.email.toString(),user!!.password.toString(),imageUri.toString(),user!!.jk.toString(),token)
+            val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+            viewModel.updateUser(token,"",user!!.email.toString(),user!!.name.toString(),imageUri.toString(),user!!.jk.toString())
+            viewModeluser.editData(user!!.id, user!!.name.toString(),user!!.email.toString(),user!!.password.toString(),imageUri.toString(),user!!.jk.toString(),token)
+            binding.btnSave.visibility = View.GONE
         }
         binding.btnUpdateUser.setOnClickListener {
             if(binding.edtPassword.text!!.isEmpty()){
                 if(binding.rbMan.isChecked) {
-                    //updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
-                    viewModeluser.editData(user!!.id,
-                        binding.edtName.text.toString(),binding.edtEmail.text.toString(),user!!.password.toString(),user!!.profile.toString(),"M",token)
+                    val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                    viewModel.updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
+                    viewModeluser.editData(user!!.id, binding.edtName.text.toString(),binding.edtEmail.text.toString(),user!!.password.toString(),user!!.profile.toString(),"M",token)
                 } else {
-                    //updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
-                    viewModeluser.editData(user!!.id,
-                        binding.edtName.text.toString(),binding.edtEmail.text.toString(),user!!.password.toString(),user!!.profile.toString(),"W",token)
+                    val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                    viewModel.updateUser(token,"",binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
+                    viewModeluser.editData(user!!.id, binding.edtName.text.toString(),binding.edtEmail.text.toString(),user!!.password.toString(),user!!.profile.toString(),"W",token)
                 }
 
             } else {
                 if(binding.rbMan.isChecked) {
-                    //updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
+                    val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                    viewModel.updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"M")
                     viewModeluser.clearData()
                     gotoSplash()
                 } else {
-                    //updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
+                    val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+                    viewModel.updateUser(token,binding.edtPassword.text.toString(),binding.edtEmail.text.toString(),binding.edtName.text.toString(),user!!.profile.toString(),"W")
                     viewModeluser.clearData()
                     gotoSplash()
                 }
@@ -121,14 +127,15 @@ class FragmentProfile : Fragment() {
         }
     }
 
-    fun showData(){
-
-    }
-
     private fun pickImageFromGallery() {
         val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         startActivityForResult(gallery, pickImage)
 
+    }
+
+    private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
+        val factory = ViewModelFactory.getInstance(activity.application)
+        return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -148,9 +155,7 @@ class FragmentProfile : Fragment() {
 
     fun uploadToFirebase(){
         val fileName = user!!.id
-
         val storageReference = FirebaseStorage.getInstance().getReference("profile/$fileName")
-
         storageReference.putFile(imageUri).addOnSuccessListener {
             Log.d(TAG, "uploadToFirebase: SUCCESS")
             it.storage.downloadUrl.addOnCompleteListener {
@@ -166,32 +171,6 @@ class FragmentProfile : Fragment() {
             Log.d(TAG, "uploadToFirebase: YOU'RE SUCH A FAILURE")
         }
     }
-
-//    private fun updateUser(token: String,password : String,email:String,name:String,profile: String, Jk: String) {
-//        val client = ApiConfig.getApiService().updateUser(token, UserResponseItem(password,0,email,name,profile,Jk))
-//        client.enqueue(object : Callback<UserResponseItem> {
-//            override fun onResponse(
-//                call: Call<UserResponseItem>,
-//                response: Response<UserResponseItem>
-//            ) {
-//                val responseBody = response.body()
-//                if (response.isSuccessful && responseBody != null) {
-//                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
-//                    viewModeluser.editData(user!!.id,
-//                        user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),user!!.jk.toString(),token)
-//                    Toast.makeText(context, "Upload Profile Success", Toast.LENGTH_SHORT).show()
-//                    binding.btnSave.visibility = View.GONE
-//                } else {
-//                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<UserResponseItem>, t: Throwable) {
-//                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-//            }
-//
-//        })
-//    }
 
     fun fetchDataUser() {
         viewModeluser.dataUser.observe(requireActivity(),{

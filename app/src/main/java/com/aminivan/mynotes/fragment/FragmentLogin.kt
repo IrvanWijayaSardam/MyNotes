@@ -45,6 +45,7 @@ class FragmentLogin : Fragment() {
     lateinit var viewModeluser : UserViewModel
     private var note: Note? = null
     private var user: User? = null
+    var status : Boolean = false
     var idUser : Int = 0
 
     override fun onCreateView(
@@ -91,8 +92,6 @@ class FragmentLogin : Fragment() {
                         Log.d(TAG, "onViewCreated: token after login ${it.data.token}")
                         viewModeluser.editData(user!!.id, user!!.name.toString(),user!!.email.toString(),binding.edtPasswordLogin.text.toString(),user!!.profile.toString(),it.data?.jk.toString(),it.data.token.toString())
                         retrieveNotes(it.data.token.toString())
-                        gotoHome()
-                        //Log.d(TAG, "onViewCreated: Login Berhasil ${it}")
                     }
                 })
             }
@@ -118,46 +117,6 @@ class FragmentLogin : Fragment() {
     }
 
 
-
-
-//    fun authApi(email : String,password: String){
-//        val viewModel = ViewModelProvider(this).get(NotesViewModel::class.java)
-//        val client = ApiConfig.getApiService().auth(email, password)
-//        client.enqueue(object : Callback<LoginResponse> {
-//            override fun onResponse(
-//                call: Call<LoginResponse>,
-//                response: Response<LoginResponse>
-//            ) {
-//                if (response.isSuccessful) {
-//                    val responseBody = response.body()
-//                    if (responseBody != null) {
-//                        Log.d(TAG, "UserToken: ${responseBody}")
-//                        idUser = responseBody.data!!.id!!.toInt()
-//                        user!!.id = responseBody.data!!.id!!.toInt()
-//                        user!!.email = responseBody.data.email
-//                        user!!.name = responseBody.data.name
-//                        user!!.profile = responseBody.data.profile
-//                        user!!.jk = responseBody.data.jk
-//                        noteAddUpdateViewModel.deleteAllNotes()
-//                        viewModeluser.editData(user!!.id,
-//                            user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),responseBody.data.jk.toString(),responseBody.data.token.toString())
-//                        retriveNotes(responseBody.data.token.toString())
-//                        Log.d(TAG, "UserToken: ${responseBody.data}")
-//                        gotoHome()
-//                    }
-//                } else {
-//                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
-//                    if (response.message().equals("Unauthorized")){
-//                        Toast.makeText(context, "Email / Password salah", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-//                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
-//            }
-//        })
-//    }
-
     fun retrieveNotes(token : String) {
         val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
         viewModel.retriveNotes(token)
@@ -177,8 +136,8 @@ class FragmentLogin : Fragment() {
                 }
             }
         })
+        gotoHome()
     }
-
 
     fun gotoHome(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentHome)

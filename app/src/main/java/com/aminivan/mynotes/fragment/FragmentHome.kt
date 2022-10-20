@@ -119,6 +119,11 @@ class FragmentHome : Fragment() {
                 user!!.profile = it.profile
             }
             token = it.token
+            Glide.with(this)
+                .load(it.profile)
+                .error(R.drawable.account)
+                .circleCrop()
+                .into(binding.ivMan)
             setAdapter()
         })
 
@@ -197,9 +202,6 @@ class FragmentHome : Fragment() {
                         if(defaultUri.equals("Default")) {
                             val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                             viewModel.postNotes(token,0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,"Default")
-                            //val mainViewModel = obtainViewModel(requireActivity())
-                            //mainViewModel.postNotes(token,0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,"Default")
-                            Thread.sleep(100)
                             judul.text.clear()
                             catatan.text.clear()
                             defaultUri = "Default"
@@ -207,9 +209,6 @@ class FragmentHome : Fragment() {
                         } else {
                             val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                             viewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,defaultUri)
-                            //val mainViewModel = obtainViewModel(requireActivity())
-                            //mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,defaultUri)
-                            Thread.sleep(100)
                             judul.text.clear()
                             catatan.text.clear()
                             defaultUri = "Default"
@@ -240,8 +239,6 @@ class FragmentHome : Fragment() {
                     noteAddUpdateViewModel.delete(note)
                     val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                     viewModel.deleteNote(token,note.id)
-                    //val mainViewModel = obtainViewModel(requireActivity())
-                    //mainViewModel.deleteNote(token,note.id)
                     Toast.makeText(context, "${note.title} DELETED", Toast.LENGTH_SHORT).show()
                     observer()
                 }
@@ -302,26 +299,12 @@ class FragmentHome : Fragment() {
                             noteAddUpdateViewModel.update(note!!)
                             val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                             viewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, note!!.image.toString())
-                            //val mainViewModel = obtainViewModel(requireActivity())
-                            //mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, note!!.image.toString())
-                            try {
-                                Thread.sleep(3000)
-                            } catch (e : InterruptedException){
-                                e.printStackTrace()
-                            }
                             setAdapter()
                             dialogUpdate.dismiss()
                         } else {
                             noteAddUpdateViewModel.update(note!!)
                             val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                             viewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, imageUri.toString())
-                            //val mainViewModel = obtainViewModel(requireActivity())
-                            //mainViewModel.updateNote(token.toString(),note!!.id,tvTitleUpdate.text.toString(),tvDeskripsi.text.toString(), note!!.date.toString(),user!!.id, imageUri.toString())
-                            try {
-                                Thread.sleep(3000)
-                            } catch (e : InterruptedException){
-                                e.printStackTrace()
-                            }
                             setAdapter()
                             dialogUpdate.dismiss()
                         }
@@ -363,14 +346,10 @@ class FragmentHome : Fragment() {
                 noteAddUpdateViewModel.delete(dataDelete)
                 val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                 viewModel.deleteNote(token,dataDelete.id)
-                //val mainViewModel = obtainViewModel(requireActivity())
-                //mainViewModel.deleteNote(token,dataDelete.id)
                 Snackbar.make(view!!,"Notes Deleted",Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO"){
                         val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                         viewModel.postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),user!!.id,dataDelete.image.toString())
-                        //val mainViewModel = obtainViewModel(requireActivity())
-                        //mainViewModel.postNotes(token.toString(),dataDelete.id,dataDelete.title.toString(),dataDelete.description.toString(),dataDelete.date.toString(),user!!.id,dataDelete.image.toString())
                         noteAddUpdateViewModel.insert(dataDelete)
                     }
                     show()
@@ -566,9 +545,6 @@ class FragmentHome : Fragment() {
                     if(defaultUri.equals("Default")) {
                         val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                         viewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,"Default")
-                        //val mainViewModel = obtainViewModel(requireActivity())
-                        //mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,"Default")
-                        Thread.sleep(100)
                         setAdapter()
                         edtJudul.text.clear()
                         edtDescription.text.clear()
@@ -577,19 +553,16 @@ class FragmentHome : Fragment() {
                     } else {
                         val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                         viewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,defaultUri)
-                        //val mainViewModel = obtainViewModel(requireActivity())
-                        //mainViewModel.postNotes(token.toString(),0,note?.title.toString(),note?.description.toString(),DateHelper.getCurrentDate(),user!!.id,defaultUri)
-                        Thread.sleep(100)
                         setAdapter()
                         edtJudul.text.clear()
                         edtDescription.text.clear()
                         defaultUri = "Default"
                         dialog.dismiss()
                     }
+                    dialog.dismiss()
                     noteAddUpdateViewModel.insert(Note(0,note?.title.toString(),note?.description.toString(),note?.date.toString(),note?.idUser!!.toInt(),imageUri.toString(),note?.secret))
                     setAdapter()
                     Toast.makeText(context, "Berhasil menambahkan satu data ${note!!.toString()}", Toast.LENGTH_SHORT).show()
-                    dialog.dismiss()
                 }
             }
         }
@@ -661,20 +634,18 @@ class FragmentHome : Fragment() {
                 noteAddUpdateViewModel.update(Note(noteUpdate!!.id,noteUpdate!!.title.toString(),noteUpdate!!.description.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,noteUpdate!!.image.toString(),noteUpdate!!.secret))
                 val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                 viewModel.updateNote(token.toString(),noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, noteUpdate!!.image.toString())
-                //val mainViewModel = obtainViewModel(requireActivity())
-                //mainViewModel.updateNote(token.toString(),noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, noteUpdate!!.image.toString())
                 Log.d(TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if Attach File ${noteUpdate!!.id}")
                 setAdapter()
                 dialogUpdate.dismiss()
+
             } else {
                 noteAddUpdateViewModel.update(Note(noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(),noteUpdate!!.date.toString(),noteUpdate!!.idUser,imageUri.toString(),secret))
                 Log.d(TAG, "onResumeUpdateHandler: Masuk Btn Submit OnUpdateResume if With Image ${noteUpdate!!.id}")
                 val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                 viewModel.updateNote(token,noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, imageUri.toString())
-                //val mainViewModel = obtainViewModel(requireActivity())
-                //mainViewModel.updateNote(token,noteUpdate!!.id,edtTitleUpdate.text.toString(),edtDescription.text.toString(), noteUpdate!!.date.toString(),user!!.id, imageUri.toString())
                 setAdapter()
                 dialogUpdate.dismiss()
+
             }
         }
     }

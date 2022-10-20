@@ -3,6 +3,7 @@ package com.aminivan.mynotes.viewmodel
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -186,7 +187,27 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
         })
     }
 
+    fun updateUser(token: String,password : String,email:String,name:String,profile: String, Jk: String) {
+        val client = api.updateUser(token, UserResponseItem(password,0,email,name,profile,Jk))
+        client.enqueue(object : Callback<UserResponseItem> {
+            override fun onResponse(
+                call: Call<UserResponseItem>,
+                response: Response<UserResponseItem>
+            ) {
+                val responseBody = response.body()
+                if (response.isSuccessful && responseBody != null) {
+                    Log.e(ContentValues.TAG, "onSuccess: ${responseBody}")
+                } else {
+                    Log.e(ContentValues.TAG, "onFailure: ${response.message()}")
+                }
+            }
 
+            override fun onFailure(call: Call<UserResponseItem>, t: Throwable) {
+                Log.e(ContentValues.TAG, "onFailure: ${t.message}")
+            }
+
+        })
+    }
 
 
 }
