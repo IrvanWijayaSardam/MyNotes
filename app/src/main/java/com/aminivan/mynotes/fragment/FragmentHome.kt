@@ -73,6 +73,7 @@ class FragmentHome : Fragment() {
     private var note: Note? = null
     private var noteUpdate : Note? = null
     private var user : User? = null
+    var idUser : Int = 0
 
     private lateinit var adapter: NoteAdapter
 
@@ -96,6 +97,25 @@ class FragmentHome : Fragment() {
         noteUpdate = Note()
         user = User()
         dialogBinding = CustomDialogBinding.inflate(layoutInflater)
+
+        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+        viewModel.getLiveDataUsers().observe(viewLifecycleOwner,{
+            Log.d(TAG, "onViewCreated: Observe${it}")
+            if(it == null) {
+                Log.d(TAG, "onViewCreated: Data Kosong ${it}")
+                Toast.makeText(context, "Username / Password salah", Toast.LENGTH_SHORT).show()
+            } else {
+                idUser = it.data?.id!!.toInt()
+                user!!.id = it.data?.id!!.toInt()
+                user!!.email = it.data?.email
+                user!!.name = it.data?.name
+                user!!.profile = it.data?.profile
+                user!!.jk = it.data?.jk
+                Log.d(TAG, "onViewCreated: token after login ${it.data.token}")
+                retrieveNotes(it.data.token.toString())
+                viewModeluser.editData(user!!.id, user!!.name.toString(),user!!.email.toString(),"",user!!.profile.toString(),it.data?.jk.toString(),it.data.token.toString())
+            }
+        })
 
         Log.d(TAG, "onViewCreated: Sudah Masuk Home")
         token = ""
@@ -229,6 +249,26 @@ class FragmentHome : Fragment() {
     private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
         val factory = ViewModelFactory.getInstance(activity.application)
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
+    }
+
+    fun retrieveNotes(token : String) {
+        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+        viewModel.retriveNotes(token)
+        viewModel.getLiveDataNote().observe(viewLifecycleOwner, {
+            for(i in 0 until it?.data!!.notes!!.size){
+                note.let { note ->
+                    note?.id = it.data.notes!![i]!!.id!!.toInt()
+                    note?.title = it.data.notes!![i]!!.title
+                    note?.description = it.data.notes!![i]!!.description
+                    note?.date = it.data.notes!![i]!!.date
+                    note?.idUser = it.data.notes!![i]!!.user!!.id!!.toInt()
+                    note?.image = it.data.notes!![i]!!.image
+                    noteAddUpdateViewModel.insert(Note(it.data.notes!![i]!!.id!!.toInt(),it.data.notes!![i]!!.title,it.data.notes!![i]!!.description,
+                        it.data.notes!![i]!!.date,it.data.notes!![i]!!.user!!.id!!.toInt(),it.data.notes!![i]!!.image,false))
+                }
+                Log.d(TAG, "retrieveNotes: retrieveNotesExecuted")
+            }
+        })
     }
 
     fun setAdapter(){

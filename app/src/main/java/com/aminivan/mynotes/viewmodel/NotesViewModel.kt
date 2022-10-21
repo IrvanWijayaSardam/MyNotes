@@ -19,6 +19,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
+import kotlin.math.log
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
@@ -48,6 +49,7 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
     }
 
     fun authApi(email : String,password: String){
+        Log.d(TAG, "authApi: Executed")
         val client = api.auth(email, password)
         client.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(
@@ -55,19 +57,21 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
                 response: Response<LoginResponse>
             ) {
                 val responseBody = response.body()
-                if (response.code().equals(200)) {
+                if (response.isSuccessful) {
                     if (responseBody != null) {
                         Log.d(ContentValues.TAG, "UserToken: ${responseBody}")
                         liveDataUser.postValue(response.body())
+                    } else {
+                        liveDataUser.postValue(null)
                     }
                 } else {
-                    Log.d(TAG, "onResponse: else ${responseBody} ")
-                    liveDataUser.postValue(response.body())
+                    liveDataUser.postValue(null)
                 }
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
+                liveDataUser.postValue(null)
             }
         })
     }
