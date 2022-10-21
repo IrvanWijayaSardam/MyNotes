@@ -23,20 +23,28 @@ import javax.inject.Inject
 @HiltViewModel
 class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
 
-    lateinit var liveDataUser : MutableLiveData<LoginResponse>
-    lateinit var liveDataNotes : MutableLiveData<ResponseFetchAll>
+    lateinit var liveDataUser : MutableLiveData<LoginResponse?>
+    lateinit var liveDataNotes : MutableLiveData<ResponseFetchAll?>
 
     init {
         liveDataUser = MutableLiveData()
         liveDataNotes = MutableLiveData()
     }
 
-    fun getLiveDataUsers() : MutableLiveData<LoginResponse> {
+    fun getLiveDataUsers() : MutableLiveData<LoginResponse?> {
         return liveDataUser
     }
 
-    fun getLiveDataNote() : MutableLiveData<ResponseFetchAll> {
+    fun getLiveDataNote() : MutableLiveData<ResponseFetchAll?> {
         return liveDataNotes
+    }
+
+    fun setNullNotes(){
+        liveDataNotes.value = null
+    }
+
+    fun setNullUser(){
+        liveDataUser.value = null
     }
 
     fun authApi(email : String,password: String){
@@ -75,9 +83,7 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
                     val responseBody = response.body()!!.data!!.notes
                     if (responseBody != null) {
                         Log.d(TAG, "onResponse: ${responseBody}")
-                        for (i in 0 until responseBody.size) {
-                            liveDataNotes.postValue(response.body())
-                        }
+                        liveDataNotes.postValue(response.body())
                     }
                 } else {
                     Log.e(ContentValues.TAG, "onFailure: ${response.message()}")

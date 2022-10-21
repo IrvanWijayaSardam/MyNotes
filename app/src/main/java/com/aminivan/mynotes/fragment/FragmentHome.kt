@@ -221,7 +221,6 @@ class FragmentHome : Fragment() {
                         dialog.dismiss()
                     }
                 }
-
             }
             dialog.show()
         }

@@ -82,6 +82,7 @@ class FragmentLogin : Fragment() {
                     Log.d(TAG, "onViewCreated: ${it}")
                     if(it == null) {
                         Log.d(TAG, "onViewCreated: Data Kosong ${it}")
+                        Toast.makeText(context, "Username / Password salah", Toast.LENGTH_SHORT).show()
                     } else {
                         idUser = it.data?.id!!.toInt()
                         user!!.id = it.data?.id!!.toInt()
@@ -90,8 +91,8 @@ class FragmentLogin : Fragment() {
                         user!!.profile = it.data?.profile
                         user!!.jk = it.data?.jk
                         Log.d(TAG, "onViewCreated: token after login ${it.data.token}")
-                        viewModeluser.editData(user!!.id, user!!.name.toString(),user!!.email.toString(),binding.edtPasswordLogin.text.toString(),user!!.profile.toString(),it.data?.jk.toString(),it.data.token.toString())
                         retrieveNotes(it.data.token.toString())
+                        viewModeluser.editData(user!!.id, user!!.name.toString(),user!!.email.toString(),binding.edtPasswordLogin.text.toString(),user!!.profile.toString(),it.data?.jk.toString(),it.data.token.toString())
                     }
                 })
             }
@@ -120,8 +121,8 @@ class FragmentLogin : Fragment() {
     fun retrieveNotes(token : String) {
         val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
         viewModel.retriveNotes(token)
-        viewModel.liveDataNotes.observe(viewLifecycleOwner, {
-            for(i in 1 until it.data!!.notes!!.size){
+        viewModel.getLiveDataNote().observe(viewLifecycleOwner, {
+            for(i in 0 until it?.data!!.notes!!.size){
                 note.let { note ->
                     note?.id = it.data.notes!![i]!!.id!!.toInt()
                     note?.title = it.data.notes!![i]!!.title
@@ -129,14 +130,13 @@ class FragmentLogin : Fragment() {
                     note?.date = it.data.notes!![i]!!.date
                     note?.idUser = it.data.notes!![i]!!.user!!.id!!.toInt()
                     note?.image = it.data.notes!![i]!!.image
-                    noteAddUpdateViewModel.insert(
-                        Note(it.data.notes!![i]!!.id!!.toInt(),it.data.notes!![i]!!.title,it.data.notes!![i]!!.description,
-                            it.data.notes!![i]!!.date,it.data.notes!![i]!!.user!!.id!!.toInt(),it.data.notes!![i]!!.image,false)
-                    )
+                    noteAddUpdateViewModel.insert(Note(it.data.notes!![i]!!.id!!.toInt(),it.data.notes!![i]!!.title,it.data.notes!![i]!!.description,
+                        it.data.notes!![i]!!.date,it.data.notes!![i]!!.user!!.id!!.toInt(),it.data.notes!![i]!!.image,false))
                 }
+                Log.d(TAG, "retrieveNotes: retrieveNotesExecuted")
             }
+            gotoHome()
         })
-        gotoHome()
     }
 
     fun gotoHome(){
