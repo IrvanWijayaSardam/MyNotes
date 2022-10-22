@@ -82,13 +82,16 @@ class FragmentLogin : Fragment() {
                     Log.d(TAG, "onViewCreated: Observe${it}")
                     if(it != null){
                         status = true
+                        //gotoHome()
+                        findNavController().navigate(R.id.action_fragmentLogin_to_fragmentHome)
+                        Log.d(TAG, "onViewCreated: Found Executed")
                         Toast.makeText(requireContext(), "Login berhasil", Toast.LENGTH_SHORT).show()
                     } else {
                         status = false
                         Toast.makeText(requireContext(), "Username / Password salah", Toast.LENGTH_SHORT).show()
                     }
                 })
-                check(status)
+                //check(status)
                 Log.d(TAG, "onViewCreated: clicked status ${status}")
             }
         }
@@ -123,7 +126,9 @@ class FragmentLogin : Fragment() {
     }
 
     fun gotoHome(){
-        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentHome)
+        requireActivity().runOnUiThread {
+            Navigation.findNavController(binding.root).navigate(R.id.action_fragmentLogin_to_fragmentHome)
+        }
     }
     fun gotoRegister(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentRegister)

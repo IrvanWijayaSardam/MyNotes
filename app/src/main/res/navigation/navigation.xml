@@ -21,7 +21,10 @@
         tools:layout="@layout/fragment_login" >
         <action
             android:id="@+id/action_fragmentLogin_to_fragmentHome"
-            app:destination="@id/fragmentHome" />
+            app:destination="@id/fragmentHome"
+            app:popUpToInclusive="true"
+
+            />
         <action
             android:id="@+id/action_fragmentLogin_to_fragmentRegister"
             app:destination="@id/fragmentRegister" />
