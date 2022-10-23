@@ -60,12 +60,16 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
                 if (response.isSuccessful) {
                     if (responseBody != null) {
                         Log.d(ContentValues.TAG, "UserToken: ${responseBody}")
-                        liveDataUser.postValue(response.body())
+                        if (responseBody.status == true) {
+                            liveDataUser.value = responseBody
+                        } else {
+                            Log.d(TAG, "onResponse: Masuk Else If Status")
+                        }
                     } else {
-                        liveDataUser.postValue(null)
+                        Log.d(TAG, "onResponse: Masuk Else Atas")
                     }
                 } else {
-                    liveDataUser.postValue(null)
+                    Log.d(TAG, "onResponse: Masuk Else Bawah")
                 }
             }
 

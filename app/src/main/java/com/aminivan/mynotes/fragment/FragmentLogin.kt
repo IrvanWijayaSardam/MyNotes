@@ -80,18 +80,26 @@ class FragmentLogin : Fragment() {
                 viewModel.authApi(binding.edtEmailLogin.text.toString(), binding.edtPasswordLogin.text.toString())
                 viewModel.getLiveDataUsers().observe(viewLifecycleOwner,{
                     Log.d(TAG, "onViewCreated: Observe${it}")
-                    if(it != null){
-                        status = true
-                        //gotoHome()
-                        findNavController().navigate(R.id.action_fragmentLogin_to_fragmentHome)
-                        Log.d(TAG, "onViewCreated: Found Executed")
-                        Toast.makeText(requireContext(), "Login berhasil", Toast.LENGTH_SHORT).show()
-                    } else {
-                        status = false
-                        Toast.makeText(requireContext(), "Username / Password salah", Toast.LENGTH_SHORT).show()
+                    if(status == false) {
+                        if(it == null) {
+                            Log.d(TAG, "onViewCreated It Null: Didalam Null ")
+                            Toast.makeText(requireContext(), "Username / Password Salah If Null", Toast.LENGTH_SHORT).show()
+                        } else {
+                            if(it!!.status == false){
+                                Toast.makeText(requireContext(), "Username / Password salah If Status False", Toast.LENGTH_SHORT).show()
+                            } else {
+                                if(it!!.data!!.email.equals(binding.edtEmailLogin.text.toString())){
+                                    status = true
+                                    gotoHome()
+                                    Log.d(TAG, "onViewCreated: Found Executed")
+                                    Toast.makeText(requireContext(), "Login berhasil", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(requireContext(), "Username / Password salah If Status False", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
                     }
                 })
-                //check(status)
                 Log.d(TAG, "onViewCreated: clicked status ${status}")
             }
         }
@@ -115,20 +123,8 @@ class FragmentLogin : Fragment() {
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
     }
 
-    fun check(status : Boolean){
-        Log.d(TAG, "check: status ${status}")
-        if(status == true){
-            Log.d(TAG, "check: status if ${status}")
-            gotoHome()
-        } else {
-            Log.d(TAG, "check: status else ${status}")
-        }
-    }
-
     fun gotoHome(){
-        requireActivity().runOnUiThread {
-            Navigation.findNavController(binding.root).navigate(R.id.action_fragmentLogin_to_fragmentHome)
-        }
+        findNavController().navigate(R.id.action_fragmentLogin_to_fragmentHome)
     }
     fun gotoRegister(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentRegister)
