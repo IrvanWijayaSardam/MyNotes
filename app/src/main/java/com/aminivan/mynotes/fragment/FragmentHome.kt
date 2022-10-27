@@ -63,7 +63,6 @@ class FragmentHome : Fragment() {
     private val handler = Handler()
     lateinit var viewModeluser : UserViewModel
 
-
     private val updateImage = 69
     lateinit var imageUri : Uri
     lateinit var defaultUri : String
@@ -74,8 +73,9 @@ class FragmentHome : Fragment() {
     private var noteUpdate : Note? = null
     private var user : User? = null
     var idUser : Int = 0
-
+    private var password = ""
     private lateinit var adapter: NoteAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -98,6 +98,9 @@ class FragmentHome : Fragment() {
         user = User()
         dialogBinding = CustomDialogBinding.inflate(layoutInflater)
 
+        password = arguments?.getString("password","").toString()
+        Log.d(TAG, "onViewCreated: password :${password}")
+
         val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
         viewModel.getLiveDataUsers().observe(viewLifecycleOwner,{
             Log.d(TAG, "onViewCreated: Observe${it}")
@@ -113,7 +116,7 @@ class FragmentHome : Fragment() {
                 user!!.jk = it.data?.jk
                 Log.d(TAG, "onViewCreated: token after login ${it.data.token}")
                 retrieveNotes(it.data.token.toString())
-                viewModeluser.editData(user!!.id, user!!.name.toString(),user!!.email.toString(),"",user!!.profile.toString(),it.data?.jk.toString(),it.data.token.toString())
+                viewModeluser.editData(user!!.id, user!!.name.toString(),user!!.email.toString(),password,user!!.profile.toString(),it.data?.jk.toString(),it.data.token.toString())
             }
         })
 
@@ -156,7 +159,35 @@ class FragmentHome : Fragment() {
         }
 
         binding.ivSecret.setOnClickListener{
-            gotoSecret()
+            dialog = Dialog(requireContext())
+            dialog.setContentView(R.layout.custom_dialog_password);
+            dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            val edtPasswordSecret : EditText = dialog.findViewById(R.id.edtPasswordDialogSecret)
+            val btnUnlockSecret : Button = dialog.findViewById(R.id.btnLoginYes)
+            val btnCancelSecret : Button = dialog.findViewById(R.id.btnLoginCancel)
+            viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
+            viewModeluser.dataUser.observe(requireActivity(),{
+                Log.d(ContentValues.TAG, "FragmentHome: ${it.password}")
+                password = it.password
+            })
+
+            btnUnlockSecret.setOnClickListener {
+                Log.d(TAG, "onViewCreated: masuk unlock listener")
+                if(edtPasswordSecret.text.toString().equals(password)){
+                    gotoSecret()
+                    dialog.dismiss()
+                } else {
+                    Log.d(TAG, "onViewCreated: masuk else onclick listener password : ${password} edt pw ${edtPasswordSecret.text.toString()} ")
+                    Toast.makeText(requireContext(), "Incorrect Password", Toast.LENGTH_SHORT).show()
+                }
+            }
+        
+            btnCancelSecret.setOnClickListener { 
+                dialog.dismiss()
+            }
+
+            dialog.show()
+            
         }
 
         binding.fabAdd.setOnClickListener(){

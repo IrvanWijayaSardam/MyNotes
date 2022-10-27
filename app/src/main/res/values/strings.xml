@@ -42,4 +42,6 @@
     <string name="input_notes">Input Notes</string>
     <string name="welcome">Welcome,</string>
     <string name="secret_notes">Secret Notes</string>
+    <string name="input_password">Input Password</string>
+    <string name="unlock">Unlock</string>
 </resources>

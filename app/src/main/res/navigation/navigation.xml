@@ -43,6 +43,9 @@
         <action
             android:id="@+id/action_fragmentHome_to_fragmentSecret"
             app:destination="@id/fragmentSecret" />
+        <argument
+            android:name="password"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSplash"

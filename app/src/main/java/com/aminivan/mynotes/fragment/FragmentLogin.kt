@@ -124,7 +124,9 @@ class FragmentLogin : Fragment() {
     }
 
     fun gotoHome(){
-        findNavController().navigate(R.id.action_fragmentLogin_to_fragmentHome)
+        val bundle = Bundle()
+        bundle.putString("password",binding.edtPasswordLogin.text.toString())
+        findNavController().navigate(R.id.action_fragmentLogin_to_fragmentHome,bundle)
     }
     fun gotoRegister(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentRegister)
