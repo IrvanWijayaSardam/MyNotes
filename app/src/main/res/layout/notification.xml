@@ -20,8 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title"
-            android:textSize="20sp"
-            android:textStyle="bold"
+            android:textSize="15sp"
             android:layout_toRightOf="@id/iv_logo"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"/>
@@ -30,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Message"
-            android:textSize="20sp"
+            android:textSize="12sp"
             android:layout_below="@id/tvTitle"
             android:layout_toRightOf="@id/iv_logo"
             android:layout_marginLeft="10dp"
