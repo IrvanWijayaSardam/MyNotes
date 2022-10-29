@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+            <variable
+                name="dataUser"
+                type="com.aminivan.mynotes.response.User" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragment.FragmentProfile">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="25dp"
+            app:cardElevation="30dp"
+            app:cardCornerRadius="15dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#D3D2D2">
+
+                <ImageView
+                    android:id="@+id/tvLogout"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/logout"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp" />
+
+                <ImageView
+                    android:id="@+id/ivProfile"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/man" />
+
+                <LinearLayout
+                    android:id="@+id/linearBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ivProfile"
+                    android:layout_centerHorizontal="true"
+                    >
+                    <Button
+                        android:id="@+id/btnUploadProfile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UPLOAD"
+                        android:layout_centerHorizontal="true"
+                        app:icon="@drawable/ic_add_profile"
+                        style="@style/Widget.MaterialComponents.Button.TextButton.Icon" />
+
+                    <Button
+                        android:id="@+id/btnSave"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ivProfile"
+                        android:text="SAVE"
+                        android:layout_centerHorizontal="true"
+                        app:icon="@drawable/ic_upload"
+                        android:visibility="gone"
+                        style="@style/Widget.MaterialComponents.Button.TextButton.Icon" />
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textFieldName"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="300dp"
+                    android:layout_height="70dp"
+                    android:hint="Name"
+                    android:layout_below="@+id/linearBtn"
+                    android:layout_centerHorizontal="true"
+                    app:startIconDrawable="@drawable/ic_name"
+                    app:startIconContentDescription="username">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtName"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@{dataUser.name}"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textFieldEmail"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="300dp"
+                    android:layout_height="70dp"
+                    android:hint="Email"
+                    android:layout_below="@+id/textFieldName"
+                    android:layout_centerHorizontal="true"
+                    app:startIconDrawable="@drawable/ic_email"
+                    app:startIconContentDescription="username">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@{dataUser.email}"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textFieldPassword"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="300dp"
+                    android:layout_height="70dp"
+                    android:hint="Password"
+                    android:layout_below="@+id/textFieldEmail"
+                    android:layout_centerHorizontal="true"
+                    app:startIconDrawable="@drawable/ic_password"
+                    app:startIconContentDescription="username">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/GreenText"
+                        android:id="@+id/edtPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:id="@+id/linarRB"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_below="@+id/textFieldPassword"
+                        android:layout_marginLeft="30dp"
+                        >
+                        <RadioGroup
+                            android:id="@+id/radioGroup"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            >
+                        <RadioButton
+                            android:id="@+id/rbMan"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="@string/man" />
+
+                        <RadioButton
+                            android:id="@+id/rbWoman"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="@string/woman" />
+                        </RadioGroup>
+
+                    </LinearLayout>
+
+                <Button
+                    android:layout_below="@+id/linarRB"
+                    android:id="@+id/btnUpdateUser"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/update_data"
+                    android:backgroundTint="#AFA4A4"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/tvEN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="EN"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="20dp"
+                    />
+                <TextView
+                    android:id="@+id/tvID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID"
+                    android:layout_toRightOf="@+id/tvEN"
+                    android:layout_alignParentBottom="true"
+                    android:layout_margin="20dp"
+                    />
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+</layout>

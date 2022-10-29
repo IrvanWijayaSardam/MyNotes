@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragment.FragmentHome"
+        android:background="#D3D2D2">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#AFA4A4"
+                >
+                <ImageView
+                    android:id="@+id/ivAdmin"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/admin"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="20dp"
+                    android:layout_toLeftOf="@id/ivMan"
+                    />
+                <ImageView
+                    android:id="@+id/ivMan"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/account"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="20dp"
+                    android:layout_toLeftOf="@id/ivSecret"
+                    />
+                <TextView
+                    android:id="@+id/welcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/welcome"
+                    android:textStyle="bold"
+                    android:layout_marginTop="20dp"
+                    />
+
+                <TextView
+                    android:id="@+id/tvWelcomeHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_toRightOf="@+id/welcome"
+                    android:text="Username!"
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+                <ImageView
+                    android:id="@+id/ivSecret"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/folder"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    />
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/tvHome"
+                android:layout_centerHorizontal="true"
+                android:layout_marginRight="10dp"
+                android:text="@string/home"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="70dp"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvNoteEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Notes Data Empty"
+                android:visibility="invisible"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_notes"
+                android:layout_width="match_parent"
+                android:layout_height="595dp"
+                android:layout_below="@id/tvHome"
+                tools:listitem="@layout/item_note" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@color/white"
+                android:foregroundGravity="bottom"
+                app:fabSize="normal"
+                app:layout_anchorGravity="bottom|end"
+                app:srcCompat="@drawable/ic_add" />
+        </RelativeLayout>
+
+    </FrameLayout>
+</layout>
