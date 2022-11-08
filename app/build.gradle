@@ -28,6 +28,10 @@ android {
             applicationIdSuffix ".admin"
             dimension "mynotes"
         }
+        userfree{
+            applicationIdSuffix ".userfree"
+            dimension "mynotes"
+        }
     }
 
     buildTypes {
@@ -46,6 +50,10 @@ android {
 
     buildFeatures {
         dataBinding true
+    }
+
+    lintOptions {
+        disable 'Typos'
     }
 }
 

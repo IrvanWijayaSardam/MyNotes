@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="12dp"
+            android:backgroundTint="#ECE7E7"
+            >
+
+            <ImageView
+                android:id="@+id/ivLockUpdate"
+                android:layout_margin="20dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_unlock"
+                android:layout_gravity="right"
+                android:visibility="invisible"
+                />
+            <ImageView
+                android:id="@+id/ivUnlockUpdate"
+                android:layout_margin="20dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_lock"
+                android:layout_gravity="right"
+                android:visibility="invisible"
+                />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:layout_gravity="center"
+                />
+
+            <TextView
+                android:id="@+id/tvInputCustomDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/update_data"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center_horizontal" />
+
+            <EditText
+                android:id="@+id/edtJudulUpdate"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/title"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="50dp" />
+
+            <EditText
+                android:id="@+id/edtCatatanUpdate"
+                android:layout_width="300dp"
+                android:layout_height="200dp"
+                android:hint="@string/input_notes"
+                android:gravity="left"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="100dp" />
+
+            <LinearLayout
+                android:id="@+id/linearAttachFileUpdate"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="310dp"
+                android:layout_marginLeft="30dp"
+                android:gravity="center_vertical"
+                >
+                <ImageView
+                    android:id="@+id/ivAttachImage"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/attach_file"
+                    />
+
+                <TextView
+                    android:id="@+id/tvAttachFileUpdate"
+                    android:layout_width="252dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/attach_file" />
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/ivCancelUpdate"
+                android:layout_marginLeft="300dp"
+                android:layout_marginTop="315dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/ic_cancel"
+                android:visibility="visible"
+                />
+            <Button
+                android:id="@+id/btnSubmitUpdate"
+                android:layout_width="300dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="170dp"
+                android:layout_gravity="center"
+                android:text="@string/update_data"
+                android:backgroundTint="#AFA4A4"
+
+                />
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+</layout>
