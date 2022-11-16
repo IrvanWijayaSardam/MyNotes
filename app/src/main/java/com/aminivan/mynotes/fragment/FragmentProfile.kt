@@ -84,11 +84,10 @@ class FragmentProfile : Fragment() {
         binding.tvLogout.setOnClickListener(){
             noteAddUpdateViewModel.deleteAllNotes()
             viewModeluser.clearData()
-            val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
             //viewModel.setNullNotes()
             //viewModel.setNullUser()
             Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
-            gotoLogin()
+            gotoSplash()
         }
 
         binding.tvID.setOnClickListener {

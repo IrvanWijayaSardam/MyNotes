@@ -5,6 +5,7 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Looper
 import android.text.InputType
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -46,7 +47,7 @@ class FragmentLogin : Fragment() {
     private var user: User?                                             = null
     var status : Boolean                                                = false
     var idUser : Int                                                    = 0
-    private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
+    private lateinit var noteAddUpdateViewModel : NoteAddUpdateViewModel
     lateinit var encryptor: Encryptor
     lateinit var viewModeluser : UserViewModel
 
@@ -65,12 +66,27 @@ class FragmentLogin : Fragment() {
         encryptor                           = Encryptor()
         note                                = Note()
         user                                = User()
+        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
 
         Glide.with(this)
             .load(R.drawable.login)
             .into(binding.ivLogin);
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
 
+        viewModel.getDataUser().observe(viewLifecycleOwner, {
+            Log.d(TAG, "onViewCreated ObserverDataUser: $it")
+            if (it != null){
+                if(it!!.status == false){
+                    showSnack("Username / Password Salah")
+                } else {
+                    if(it!!.data != null){
+                        gotoHome()
+                    }
+                }
+            } else {
+                showSnack("Username / Password Salah")
+            }
+        })
 
         binding.btnLogin.setOnClickListener(){
             if(binding.edtEmailLogin.text.toString().isEmpty()) {
@@ -78,17 +94,7 @@ class FragmentLogin : Fragment() {
             } else if (binding.edtPasswordLogin.text.toString().isEmpty()){
                 binding.edtPasswordLogin.error = "Silahkan isi password"
             } else {
-                val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                 viewModel.authApi(binding.edtEmailLogin.text.toString(), binding.edtPasswordLogin.text.toString())
-                viewModel.getDataUser().observe(viewLifecycleOwner, {
-                    if(it == null){
-                        showSnack("Email / Password Salah !")
-                    } else {
-                        gotoHome()
-                    }
-                })
-
-                Log.d(TAG, "onViewCreated: clicked status ${status}")
             }
         }
 

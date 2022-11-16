@@ -59,29 +59,36 @@ class FragmentSplash : Fragment() {
         note = Note()
         user = User()
         viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
+        var token: String = ""
+
+        viewModeluser.dataUser.observe(viewLifecycleOwner,{
+            Log.d(TAG, "onViewCreatedSplash: ${it.toString()}")
+            user!!.id = it.id
+            user!!.name = it.name
+            user!!.email = it.email
+            user!!.password = it.password
+            user!!.profile = it.profile
+            user!!.jk = it.jk
+            Log.d(TAG, "onViewCreated: userData ${user?.email}")
+            if(user?.email?.length == 0){
+                android.os.Handler(Looper.myLooper()!!).postDelayed({
+                    gotoLogin()
+                },5000)
+                Log.d(TAG, "onViewCreated: GotoLogin EXECUTED")
+            } else {
+                android.os.Handler(Looper.myLooper()!!).postDelayed({
+                    gotoHome()
+                },5000)
+                Log.d(TAG, "onViewCreated: GotoHome EXECUTED")
+            }
+        })
 
         Glide.with(this)
             .load(R.drawable.notebook)
             .into(binding.ivSplash);
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
 
-        android.os.Handler(Looper.myLooper()!!).postDelayed({
-            var token : String = ""
-            viewModeluser.dataUser.observe(viewLifecycleOwner,{
-                    user!!.id = it.id
-                    user!!.name = it.name
-                    user!!.email = it.email
-                    user!!.password = it.password
-                    user!!.profile = it.profile
-                    user!!.jk = it.jk
-                    Log.d(TAG, "onViewCreated: userData ${user?.email}")
-                    if(user?.email?.length == 0){
-                        gotoLogin()
-                    } else {
-                        gotoHome()
-                    }
-            })
-        },5000)
+
     }
 
     fun gotoLogin(){

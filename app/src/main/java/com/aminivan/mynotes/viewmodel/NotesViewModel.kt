@@ -64,14 +64,13 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
             ) {
                 val responseBody = response.body()
                 if (response.isSuccessful && responseBody != null){
-                    liveDataUser.value = responseBody
+                    liveDataUser.postValue(responseBody)
                 } else {
-                    liveDataUser.value = null
+                    liveDataUser.postValue(null)
                 }
             }
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
-                liveDataUser.value = null
             }
         })
     }
