@@ -42,4 +42,7 @@
     <string name="attach_file">Sisipkan File</string>
     <string name="input_notes">Masukkan Notes</string>
     <string name="welcome">Selamat Datang,</string>
+    <string name="secret_notes">Catatan Rahasia</string>
+    <string name="input_password">Masukkan Password</string>
+    <string name="unlock">Buka Kunci</string>
 </resources>

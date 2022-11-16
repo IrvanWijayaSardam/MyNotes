@@ -30,6 +30,7 @@ import com.aminivan.mynotes.viewmodel.UserViewModel
 import com.aminivan.mynotes.viewmodel.ViewModelFactory
 import com.aminivan.mynotes.workers.sleep
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
@@ -39,15 +40,15 @@ import kotlin.math.log
 @AndroidEntryPoint
 class FragmentLogin : Fragment() {
 
-    private var _binding : FragmentLoginBinding? = null
-    private val binding get() = _binding!!
+    private var _binding : FragmentLoginBinding?                        = null
+    private val binding get()                                           = _binding!!
+    private var note: Note?                                             = null
+    private var user: User?                                             = null
+    var status : Boolean                                                = false
+    var idUser : Int                                                    = 0
     private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     lateinit var encryptor: Encryptor
     lateinit var viewModeluser : UserViewModel
-    private var note: Note? = null
-    private var user: User? = null
-    var status : Boolean = false
-    var idUser : Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,16 +60,17 @@ class FragmentLogin : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.edtPasswordLogin.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
-        encryptor = Encryptor()
+        binding.edtPasswordLogin.inputType  = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        viewModeluser                       = ViewModelProvider(this).get(UserViewModel::class.java)
+        encryptor                           = Encryptor()
+        note                                = Note()
+        user                                = User()
 
         Glide.with(this)
             .load(R.drawable.login)
             .into(binding.ivLogin);
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
-        note = Note()
-        user = User()
+
 
         binding.btnLogin.setOnClickListener(){
             if(binding.edtEmailLogin.text.toString().isEmpty()) {
@@ -78,28 +80,14 @@ class FragmentLogin : Fragment() {
             } else {
                 val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
                 viewModel.authApi(binding.edtEmailLogin.text.toString(), binding.edtPasswordLogin.text.toString())
-                viewModel.getLiveDataUsers().observe(viewLifecycleOwner,{
-                    Log.d(TAG, "onViewCreated: Observe${it}")
-                    if(status == false) {
-                        if(it == null) {
-                            Log.d(TAG, "onViewCreated It Null: Didalam Null ")
-                            Toast.makeText(requireContext(), "Username / Password Salah If Null", Toast.LENGTH_SHORT).show()
-                        } else {
-                            if(it!!.status == false){
-                                Toast.makeText(requireContext(), "Username / Password salah If Status False", Toast.LENGTH_SHORT).show()
-                            } else {
-                                if(it!!.data!!.email.equals(binding.edtEmailLogin.text.toString())){
-                                    status = true
-                                    gotoHome()
-                                    Log.d(TAG, "onViewCreated: Found Executed")
-                                    Toast.makeText(requireContext(), "Login berhasil", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Toast.makeText(requireContext(), "Username / Password salah If Status False", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
+                viewModel.getDataUser().observe(viewLifecycleOwner, {
+                    if(it == null){
+                        showSnack("Email / Password Salah !")
+                    } else {
+                        gotoHome()
                     }
                 })
+
                 Log.d(TAG, "onViewCreated: clicked status ${status}")
             }
         }
@@ -131,4 +119,9 @@ class FragmentLogin : Fragment() {
     fun gotoRegister(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentLogin_to_fragmentRegister)
     }
+
+    fun showSnack(message: String){
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+    }
+
 }

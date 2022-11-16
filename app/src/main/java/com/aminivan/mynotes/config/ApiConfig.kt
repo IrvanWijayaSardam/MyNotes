@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ApiConfig {
 
-    const val BASE_URL= "http://159.89.48.60:8080/"
+    const val BASE_URL= "https://mynotesapp-production-95d8.up.railway.app/"
 
     private  val logging : HttpLoggingInterceptor
         get(){

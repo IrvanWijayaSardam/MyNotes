@@ -5,6 +5,7 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -24,16 +25,21 @@ import kotlin.math.log
 @HiltViewModel
 class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
 
-    lateinit var liveDataUser : MutableLiveData<LoginResponse?>
+    var liveDataUser = MutableLiveData<LoginResponse?>()
+    var dataUserResponse : LiveData<LoginResponse?> = liveDataUser
+
     lateinit var liveDataNotes : MutableLiveData<ResponseFetchAll?>
 
     init {
-        liveDataUser = MutableLiveData()
         liveDataNotes = MutableLiveData()
     }
 
-    fun getLiveDataUsers() : MutableLiveData<LoginResponse?> {
-        return liveDataUser
+    fun getLiveDataUsers() : LiveData<LoginResponse?> {
+        return dataUserResponse
+    }
+
+    fun getDataUser() : LiveData<LoginResponse?>{
+        return dataUserResponse
     }
 
     fun getLiveDataNote() : MutableLiveData<ResponseFetchAll?> {
@@ -57,25 +63,15 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
                 response: Response<LoginResponse>
             ) {
                 val responseBody = response.body()
-                if (response.isSuccessful) {
-                    if (responseBody != null) {
-                        Log.d(ContentValues.TAG, "UserToken: ${responseBody}")
-                        if (responseBody.status == true) {
-                            liveDataUser.value = responseBody
-                        } else {
-                            Log.d(TAG, "onResponse: Masuk Else If Status")
-                        }
-                    } else {
-                        Log.d(TAG, "onResponse: Masuk Else Atas")
-                    }
+                if (response.isSuccessful && responseBody != null){
+                    liveDataUser.value = responseBody
                 } else {
-                    Log.d(TAG, "onResponse: Masuk Else Bawah")
+                    liveDataUser.value = null
                 }
             }
-
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
-                liveDataUser.postValue(null)
+                liveDataUser.value = null
             }
         })
     }
