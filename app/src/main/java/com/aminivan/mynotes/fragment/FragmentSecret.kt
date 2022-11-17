@@ -8,6 +8,7 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.Image
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
@@ -17,6 +18,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -280,6 +282,8 @@ class FragmentSecret : Fragment() {
                 dialog = Dialog(requireContext())
                 dialog.setContentView(R.layout.custom_dialog_attachment);
                 val ivAttachment : ImageView = dialog.findViewById(R.id.imageDialogue)
+
+
                 imageUri = Uri.parse(adapter.listNotes[position].image.toString())
 
                 Log.d(TAG, "onSwiped: imageUri ${imageUri}")
@@ -492,6 +496,11 @@ class FragmentSecret : Fragment() {
     // Function to save image on the device.
     // Refer: https://www.geeksforgeeks.org/circular-crop-an-image-and-save-it-to-the-file-in-android/
     private fun mSaveMediaToStorage(filename : String,bitmap: Bitmap?) {
+        dialog = Dialog(requireContext())
+        dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setContentView(R.layout.custom_dialog_attachment);
+        val ivUnlockImage : ImageView = dialog.findViewById(R.id.ivtoUnlock)
+        ivUnlockImage.isVisible = false
         val filename = "${filename}.jpg"
         var fos: OutputStream? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -505,9 +514,6 @@ class FragmentSecret : Fragment() {
                 Log.d(TAG, "mSaveMediaToStorage: imageUriDownload ${imageUriDownload}")
                 viewModel.setImageUri(imageUriDownload)
                 viewModel.applyBlur(3)
-                dialog = Dialog(requireContext())
-                dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                dialog.setContentView(R.layout.custom_dialog_attachment);
                 viewModel.workInfo.observe(viewLifecycleOwner, {
                     val workInfo = it[0]
                     if (workInfo.state == WorkInfo.State.SUCCEEDED) {
@@ -515,10 +521,16 @@ class FragmentSecret : Fragment() {
                         val uri = data.getString(KEY_IMAGE_URI)
                         Log.d(TAG, "mSaveMediaToStorage: uriGetted ${uri}")
                         Glide.with(requireContext()).load(uri).into(dialog.findViewById(R.id.imageDialogue))
+                        ivUnlockImage.isVisible = true
                         //Log.d(TAG, "mSaveMediaToStorage: Blur Worker outputUri ")
                     }
                 })
                 fos = imageUriDownload?.let { resolver.openOutputStream(it) }
+
+                ivUnlockImage.setOnClickListener {
+                    Glide.with(requireContext()).load(imageUriDownload).into(dialog.findViewById(R.id.imageDialogue))
+                }
+
                 dialog.show()
             }
         } else {

@@ -433,7 +433,9 @@ class FragmentHome : Fragment() {
                 dialog = Dialog(requireContext())
                 dialog.setContentView(R.layout.custom_dialog_attachment);
                 val ivAttachment : ImageView = dialog.findViewById(R.id.imageDialogue)
+                val ivToUnlock : ImageView = dialog.findViewById(R.id.ivtoUnlock)
 
+                ivToUnlock.isVisible = false
                 Glide.with(requireContext()).load(adapter.listNotes[position].image.toString()).into(ivAttachment)
 
                 dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
