@@ -34,10 +34,6 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
         liveDataNotes = MutableLiveData()
     }
 
-    fun getLiveDataUsers() : LiveData<LoginResponse?> {
-        return dataUserResponse
-    }
-
     fun getDataUser() : LiveData<LoginResponse?>{
         return dataUserResponse
     }
@@ -64,9 +60,9 @@ class NotesViewModel @Inject constructor(var api : ApiService) : ViewModel() {
             ) {
                 val responseBody = response.body()
                 if (response.isSuccessful && responseBody != null){
-                    liveDataUser.postValue(responseBody)
+                    liveDataUser.value = responseBody
                 } else {
-                    liveDataUser.postValue(null)
+                    liveDataUser.value = null
                 }
             }
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {

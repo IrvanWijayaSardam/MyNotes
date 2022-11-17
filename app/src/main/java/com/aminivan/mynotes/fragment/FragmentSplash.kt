@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
@@ -40,7 +41,6 @@ class FragmentSplash : Fragment() {
 
     private var _binding : FragmentSplashBinding? = null
     private val binding get() = _binding!!
-    private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
     private var note: Note? = null
     private var user : User? = null
     lateinit var viewModeluser : UserViewModel
@@ -56,13 +56,12 @@ class FragmentSplash : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        note = Note()
-        user = User()
-        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
-        var token: String = ""
+        note                                            = Note()
+        user                                            = User()
+        viewModeluser                                   = ViewModelProvider(this)[UserViewModel::class.java]
 
         viewModeluser.dataUser.observe(viewLifecycleOwner,{
-            Log.d(TAG, "onViewCreatedSplash: ${it.toString()}")
+            Log.d(TAG, "onViewCreatedSplash: ${it.email.toString()}")
             user!!.id = it.id
             user!!.name = it.name
             user!!.email = it.email
@@ -70,24 +69,22 @@ class FragmentSplash : Fragment() {
             user!!.profile = it.profile
             user!!.jk = it.jk
             Log.d(TAG, "onViewCreated: userData ${user?.email}")
-            if(user?.email?.length == 0){
+            if(it.email.isBlank()){
                 android.os.Handler(Looper.myLooper()!!).postDelayed({
                     gotoLogin()
                 },5000)
-                Log.d(TAG, "onViewCreated: GotoLogin EXECUTED")
+                Log.d(TAG, "onViewCreated: GotoLogin EXECUTED + ${it.email}")
             } else {
                 android.os.Handler(Looper.myLooper()!!).postDelayed({
                     gotoHome()
                 },5000)
-                Log.d(TAG, "onViewCreated: GotoHome EXECUTED")
+                Log.d(TAG, "onViewCreated: GotoHome EXECUTED + ${it.email}")
             }
         })
 
         Glide.with(this)
             .load(R.drawable.notebook)
             .into(binding.ivSplash);
-        noteAddUpdateViewModel = obtainViewModel(requireActivity())
-
 
     }
 
@@ -97,9 +94,5 @@ class FragmentSplash : Fragment() {
     fun gotoHome(){
         Navigation.findNavController(requireView()).navigate(R.id.action_fragmentSplash_to_fragmentHome)
     }
-    private fun obtainViewModel(activity: FragmentActivity): NoteAddUpdateViewModel {
-        val factory = ViewModelFactory.getInstance(activity.application)
-        return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
-    }
-    
+
 }

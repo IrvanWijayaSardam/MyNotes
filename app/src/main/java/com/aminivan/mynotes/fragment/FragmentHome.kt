@@ -88,21 +88,22 @@ class FragmentHome : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setDialog()
-        var context = binding.rvNotes.context
-        selectedFile = "Attach File"
-        imageUri = Uri.parse("DefaultUri")
-        defaultUri = "Default"
-        noteAddUpdateViewModel = obtainViewModel(requireActivity())
-        note = Note()
-        noteUpdate = Note()
-        user = User()
-        dialogBinding = CustomDialogBinding.inflate(layoutInflater)
-
+        var context                                                             = binding.rvNotes.context
+        selectedFile                                                            = "Attach File"
+        imageUri                                                                = Uri.parse("DefaultUri")
+        defaultUri                                                              = "Default"
+        noteAddUpdateViewModel                                                  = obtainViewModel(requireActivity())
+        note                                                                    = Note()
+        noteUpdate                                                              = Note()
+        user                                                                    = User()
+        dialogBinding                                                           = CustomDialogBinding.inflate(layoutInflater)
         password = arguments?.getString("password","").toString()
+        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
         Log.d(TAG, "onViewCreated: password :${password}")
 
-        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
-        viewModel.getLiveDataUsers().observe(viewLifecycleOwner,{
+        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
+
+        viewModel.getDataUser().observe(viewLifecycleOwner,{
             Log.d(TAG, "onViewCreated: Observe${it}")
             if(it == null) {
                 Log.d(TAG, "onViewCreated: Data Kosong ${it}")
@@ -122,8 +123,7 @@ class FragmentHome : Fragment() {
 
         Log.d(TAG, "onViewCreated: Sudah Masuk Home")
         token = ""
-        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
-        viewModeluser.dataUser.observe(requireActivity(),{
+        viewModeluser.dataUser.observe(viewLifecycleOwner,{
             Log.d(TAG, "FragmentHome: ${it.id}")
             Log.d(TAG, "FragmentHome: ${it.name}")
             Log.d(TAG, "FragmentHome: ${it.email}")

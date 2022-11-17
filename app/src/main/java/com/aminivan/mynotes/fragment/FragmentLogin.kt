@@ -66,27 +66,12 @@ class FragmentLogin : Fragment() {
         encryptor                           = Encryptor()
         note                                = Note()
         user                                = User()
-        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
+        val viewModel                       = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
 
         Glide.with(this)
             .load(R.drawable.login)
             .into(binding.ivLogin);
         noteAddUpdateViewModel = obtainViewModel(requireActivity())
-
-        viewModel.getDataUser().observe(viewLifecycleOwner, {
-            Log.d(TAG, "onViewCreated ObserverDataUser: $it")
-            if (it != null){
-                if(it!!.status == false){
-                    showSnack("Username / Password Salah")
-                } else {
-                    if(it!!.data != null){
-                        gotoHome()
-                    }
-                }
-            } else {
-                showSnack("Username / Password Salah")
-            }
-        })
 
         binding.btnLogin.setOnClickListener(){
             if(binding.edtEmailLogin.text.toString().isEmpty()) {
@@ -97,11 +82,9 @@ class FragmentLogin : Fragment() {
                 viewModel.authApi(binding.edtEmailLogin.text.toString(), binding.edtPasswordLogin.text.toString())
             }
         }
-
         binding.tvGotoRegister.setOnClickListener(){
             gotoRegister()
         }
-
         binding.ivEyeLogin.setOnClickListener {
             if(binding.edtPasswordLogin.inputType == InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD) {
                 binding.edtPasswordLogin.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
@@ -109,6 +92,27 @@ class FragmentLogin : Fragment() {
                 binding.edtPasswordLogin.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
         }
+
+        viewModeluser.dataUser.observe(viewLifecycleOwner,{
+            Log.d(TAG, "onViewCreatedSplash: ${it.email.toString()}")
+            Log.d(TAG, "onViewCreated: userData ${user?.email}")
+            user!!.email = it.email
+        })
+
+        viewModel.getDataUser().observe(viewLifecycleOwner, {
+            Log.d(TAG, "onViewCreated ObserverDataUser: $it")
+            if (it != null){
+                if(it!!.status == false ){
+                    showSnack("Username / Password Salah")
+                } else {
+                    if(it!!.data != null){
+                        gotoHome()
+                    }
+                }
+            } else {
+                showSnack("Username / Password Salah")
+            }
+        })
 
     }
 

@@ -9,6 +9,7 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -19,6 +20,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.aminivan.mynotes.R
 import com.aminivan.mynotes.config.ApiConfig
 import com.aminivan.mynotes.databinding.FragmentHomeBinding
@@ -63,13 +65,14 @@ class FragmentProfile : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        imageUri = Uri.parse("DefaultUri")
-        selectedFile = "Attach File"
-        defaultUri = "Default"
-        user = com.aminivan.mynotes.database.User()
-        token = ""
-        viewModeluser = ViewModelProvider(this).get(UserViewModel::class.java)
-        noteAddUpdateViewModel = obtainViewModel(requireActivity())
+        imageUri                                            = Uri.parse("DefaultUri")
+        selectedFile                                        = "Attach File"
+        defaultUri                                          = "Default"
+        user                                                = com.aminivan.mynotes.database.User()
+        token                                               = ""
+        viewModeluser                                       = ViewModelProvider(this).get(UserViewModel::class.java)
+        noteAddUpdateViewModel                              = obtainViewModel(requireActivity())
+        val viewModel                                       = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
 
         fetchDataUser()
         binding.btnUploadProfile.setOnClickListener {
@@ -84,10 +87,9 @@ class FragmentProfile : Fragment() {
         binding.tvLogout.setOnClickListener(){
             noteAddUpdateViewModel.deleteAllNotes()
             viewModeluser.clearData()
-            //viewModel.setNullNotes()
-            //viewModel.setNullUser()
+            viewModel.setNullUser()
+            gotoLogin()
             Toast.makeText(context, "Logout Berhasil", Toast.LENGTH_SHORT).show()
-            gotoSplash()
         }
 
         binding.tvID.setOnClickListener {
@@ -204,7 +206,8 @@ class FragmentProfile : Fragment() {
     }
 
     fun gotoSplash(){
-        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentProfile_to_fragmentSplash)
+        //Navigation.findNavController(requireView()).navigate(R.id.action_fragmentProfile_to_fragmentSplash)
+        findNavController().navigate(R.id.action_fragmentProfile_to_fragmentSplash)
     }
 
     fun gotoLogin(){
