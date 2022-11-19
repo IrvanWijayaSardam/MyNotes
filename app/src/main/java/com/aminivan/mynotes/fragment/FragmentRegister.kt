@@ -10,6 +10,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
@@ -31,12 +34,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.aminivan.mynotes.helper.AuthenticationError
+
 
 class FragmentRegister : Fragment() {
-    lateinit var binding : FragmentRegisterBinding
-    private lateinit var noteAddUpdateViewModel: NoteAddUpdateViewModel
-    lateinit var Jk: String
-    private var user: User? = null
+    lateinit var binding                        : FragmentRegisterBinding
+    private lateinit var noteAddUpdateViewModel : NoteAddUpdateViewModel
+    lateinit var Jk                             : String
+    private var user                            : User? = null
 
 
     override fun onCreateView(
@@ -54,6 +59,8 @@ class FragmentRegister : Fragment() {
         binding.edtRepeatPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         val encryptor = Encryptor()
         Jk = "N"
+
+
 
         Glide.with(this)
             .load(R.drawable.document)
@@ -128,6 +135,8 @@ class FragmentRegister : Fragment() {
 
     }
 
+
+    
     private fun registUser(user: User) {
         val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
         viewModel.registUser(user)

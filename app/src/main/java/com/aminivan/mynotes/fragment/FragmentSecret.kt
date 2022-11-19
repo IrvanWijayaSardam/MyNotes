@@ -18,6 +18,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
@@ -34,10 +37,7 @@ import com.aminivan.mynotes.database.Note
 import com.aminivan.mynotes.database.User
 import com.aminivan.mynotes.databinding.CustomDialogBinding
 import com.aminivan.mynotes.databinding.FragmentSecretBinding
-import com.aminivan.mynotes.helper.DateHelper
-import com.aminivan.mynotes.helper.SwipeToDeleteCallback
-import com.aminivan.mynotes.helper.SwipeToSeeCallBack
-import com.aminivan.mynotes.helper.URIPathHelper
+import com.aminivan.mynotes.helper.*
 import com.aminivan.mynotes.response.NoteResponseItem
 import com.aminivan.mynotes.response.PostNotesResponse
 import com.aminivan.mynotes.response.ResponseFetchAll
@@ -71,6 +71,8 @@ class FragmentSecret : Fragment() {
     lateinit var profile : Bitmap
     private val handler = Handler()
     lateinit var viewModeluser : UserViewModel
+    private lateinit var biometricPrompt        : BiometricPrompt
+    private lateinit var biometricManager       : BiometricManager
 
     private val pickImage = 100
     private val updateImage = 69
@@ -95,16 +97,13 @@ class FragmentSecret : Fragment() {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        //onResumeHandler()
-        //UpdateHandler()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setDialog()
         var context = binding.rvNotesSecret.context
+        setupBiometricAuthentication()
+        checkBiometricFeatureState()
         secret = true
         selectedFile = "Attach File"
         imageUri = Uri.parse("DefaultUri")
@@ -306,6 +305,55 @@ class FragmentSecret : Fragment() {
         itemTouchHelper.attachToRecyclerView(binding.rvNotesSecret)
         itemTouchHelperSee.attachToRecyclerView(binding.rvNotesSecret)
     }
+
+    private fun setupBiometricAuthentication() {
+        biometricManager = BiometricManager.from(requireContext())
+        val executor = ContextCompat.getMainExecutor(requireContext())
+        biometricPrompt = BiometricPrompt(this, executor, biometricCallback)
+    }
+    private fun checkBiometricFeatureState() {
+        when (biometricManager.canAuthenticate()) {
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> setErrorNotice("Sorry. It seems your device has no biometric hardware")
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> setErrorNotice("Biometric features are currently unavailable.")
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> setErrorNotice("You have not registered any biometric credentials")
+            BiometricManager.BIOMETRIC_SUCCESS -> {}
+        }
+    }
+    private fun buildBiometricPrompt(): BiometricPrompt.PromptInfo {
+        return BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Verify your identity")
+            .setDescription("Confirm your identity so we can verify it's you")
+            .setNegativeButtonText("Cancel")
+            .setConfirmationRequired(false) //Allows user to authenticate without performing an action, such as pressing a button, after their biometric credential is accepted.
+            .build()
+    }
+
+    private fun isBiometricFeatureAvailable(): Boolean {
+        return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
+    }
+
+    private val biometricCallback = object : BiometricPrompt.AuthenticationCallback(){
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            super.onAuthenticationSucceeded(result)
+            //navigateTo<HomeActivity>()
+            //Glide.with(requireContext()).load(uri).into(dialog.findViewById(R.id.imageDialogue))
+            Glide.with(requireContext()).load(imageUriDownload).into(dialog.findViewById(R.id.imageDialogue))
+            Toast.makeText(context, "Authorized !", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+            super.onAuthenticationError(errorCode, errString)
+
+            if (errorCode != AuthenticationError.AUTHENTICATION_DIALOG_DISMISSED.errorCode && errorCode != AuthenticationError.CANCELLED.errorCode) {
+                setErrorNotice(errString.toString())
+            }
+        }
+    }
+
+    private fun setErrorNotice(errorMessage: String) {
+        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+    }
+
 
     fun setDialog(){
         dialog = Dialog(requireContext())
@@ -528,7 +576,9 @@ class FragmentSecret : Fragment() {
                 fos = imageUriDownload?.let { resolver.openOutputStream(it) }
 
                 ivUnlockImage.setOnClickListener {
-                    Glide.with(requireContext()).load(imageUriDownload).into(dialog.findViewById(R.id.imageDialogue))
+                    if(isBiometricFeatureAvailable()){
+                        biometricPrompt.authenticate(buildBiometricPrompt())
+                    }
                 }
 
                 dialog.show()
